@@ -1,0 +1,41 @@
+Setting it up
+
+Ok, now that we got that out of our way let's get our hands dirty!
+
+Download the latest release of libtcod 1.6 and extract it somewhere. Be warned that both Python and libtcod must either be both 32 bit, or both 64 bit. If you get dll loading errors, getting this wrong is the most likely cause.
+Now to create your project's folder. Create an empty file with a name of your choice, like firstrl.py. The easiest way to use libtcod is to copy the following files to your project's folder:
+The libtcodpy directory from the python sub-directory.
+libtcod.dll on Windows, probably libtcod.so on Linux
+SDL2.dll on Windows, something else on Linux
+A font from the fonts folder. We chose arial10x10.png.
+
+I'm using https://github.com/HexDecimal/libtcod-cffi to run the libtcod-32 bits in the windows 64 bits enviroment without having to recompile everything.
+
+Only difference is that I need to say very clearly to python that some variables are integers
+
+libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+
+
+This is probably the most important call, initializing the window. We're specifying its size, the title (change it now if you want to), and the last parameter tells it if it should be fullscreen or not.
+
+libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial', False)
+
+For a real-time roguelike, you wanna limit the speed of the game (frames-per-second or FPS). If you want it to be turn-based, ignore this line. (This line will simply have no effect if your game is turn-based.)
+
+libtcod.sys_set_fps(LIMIT_FPS) #FPS limits also the speed of the game
+
+while not libtcod.console_is_window_closed(): # this is the main game loop
+
+
+For each iteration we'll want to print something useful to the window. If your game is turn-based each iteration is a turn; if it's real-time, each one is a frame. Here we're setting the text color to be white. There's a good list of colors you can use here, along with some info about mixing them and all that. The zero is the console we're printing to, in this case the screen; more on that later.
+	http://roguecentral.org/doryen/data/libtcod/doc/1.5.1/html2/color.html?c=false&cpp=false&cs=false&py=true&lua=false
+
+    libtcod.console_set_default_foreground(0, libtcod.white)
+
+Now print a character to the coordinates (1,1). Once more the first zero specifies the console, which is the screen in this case. Can you guess what that character is? No, it doesn't move yet!
+
+    libtcod.console_put_char(0, 1, 1, '@', libtcod.BKGND_NONE)
+
+At the end of the main loop you'll always need to present the changes to the screen. This is called flushing the console and is done with the following line.
+
+    libtcod.console_flush()
