@@ -106,6 +106,10 @@ SERVER_CONNECTION = config.getboolean('SERVER', 'CONNECT')
 
 # Game messages
 game_msgs = []
+l_menu_text = ["NAME", "CHARACTER SHEET", "PEOPLE AND PLACES", "E\/E MAIL",
+    "FITTING", "MARKET", "SCIENCE & INDUSTRY", "CONTRACTS", "MAP",
+    "CORPORATION", "ASSETS", "WALLET", "CHANELS", "JOURNAL",
+    "CONFIGURATIONS", "HELP" ]
 
 color_dark_wall = libtcod.Color(0,0,100)
 color_dark_ground = libtcod.Color(50,50,150)
@@ -231,6 +235,34 @@ class Line:
             self.y2 = y + l
 
         self.start_end_char = start_end_char
+
+class Button(object):
+    """docstring for Button."""
+    # def __init__(self, *arg, **kwarg):
+    def __init__(self, x, y, name, color, func=None, icon=None, alt=None):
+        '''
+        @param x        = x and y position
+        @param y        = x and y position
+        @param name     = name of the button
+        @param color    = libtcod.color
+        @param func     = function to be called
+        @param icon     = icon to be shown (3x3?)
+        @param alt      = alternative text
+        '''
+        super(Button, self).__init__()
+        self.x = x
+        self.y = y
+        self.name = name
+        self.color = color
+        self.icon = icon
+        self.alt = alt
+        self.func = func
+        if self.func:
+            self.func.owner = self
+
+
+
+
 
 # Monster/item classes
 class Asteroid(object):
@@ -461,11 +493,16 @@ def handle_keys():
     else:
         return "didnt-take-turn"
 
-
+# redo the list menus, stuff
 def get_names_under_mouse():
     global mouse
 
     (x, y) = (mouse.cx, mouse.cy)
+    # objects in this case are to be enemies, but there must be a special
+    # definition for the menus, so there must be objects in the menus.
+    # at least Left menu and right menu, so that the player may select targets
+    # or a menu option. Also necessary to rework the down menu for chat screen
+
     names = [obj.name for obj in objects if obj.x == x and obj.y == y and
                                 libtcod.map_is_in_fov(fov_map, obj.x, obj.y)]
     names = ', '.join(names)  #join the names, separated by commas
@@ -619,22 +656,18 @@ def create_line(panel, x1, y1, x2, y2, start_end_char: str=""):
             libtcod.console_print_ex(panel, x1, y, libtcod.BKGND_NONE,
                 libtcod.LEFT, "|")
 
-def create_window(window):
-    global map
+def create_window(panel, x, y, height, width):
     # go through the tiles in the rectangle and make them passable
+    for x1 in [x, x+width-1]:
+        for y1 in range(y,height-1):
+            libtcod.console_print_ex(panel, x1, y1+1, libtcod.BKGND_NONE,
+                libtcod.LEFT, "|")
+    border = ""
+    for y1 in [y, y+height-1]:
+        border = "+"+"-"*(max(x, x+width)-min(x, x+width)-2)+"+"
 
-    for x in range(window.x1, window.x2):
-        for y in [window.y1, window.y2]:
-            map[x][y].border = "-"
-
-    for y in range(window.y1, window.y2):
-        for x in [window.x1, window.x2]:
-            map[x][y].border = "|"
-
-    map[window.x1][window.y1].border = "+"
-    map[window.x1][window.y2].border = "+"
-    map[window.x2][window.y1].border = "+"
-    map[window.x2][window.y2].border = "+"
+        libtcod.console_print_ex(panel, x, y1, libtcod.BKGND_NONE, libtcod.LEFT,
+            border)
 
 def create_list(panel, x, y, height, width, entries: list, step=2):
     if len(entries) > len(range(0, height, step)):
@@ -654,11 +687,10 @@ def create_list(panel, x, y, height, width, entries: list, step=2):
             "+")
         libtcod.console_print_ex(panel, width-1, ys, libtcod.BKGND_NONE, libtcod.LEFT,
             "+")
-
 # To be reworked completely
 def render_all():
     global fov_recompute
-    global panels
+    global l_menu_text
     # draw all objects in the list
 
     if fov_recompute:
@@ -710,56 +742,36 @@ def render_all():
     player.draw()
 
     libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, MAP_X, MAP_Y)
-    # libtcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)   # first visible change, writing the chars directly
-                                                                            # in this screen made the error that was present
-                                                                            # before disappear, where the '@' would not show before
-                                                                            # the first key stroke for movement
-    # deprecated
-    # show the player's stats
-    # libtcod.console_set_default_foreground(con, libtcod.white)
-    # libtcod.console_print_ex(con, 1, SCREEN_HEIGHT - 2, libtcod.BKGND_NONE, libtcod.LEFT,
-    #     'HP: ' + str(player.fighter.hp) + '/' + str(player.fighter.max_hp))
-    #print the game messages, one line at a time
 
     # prepare to render the GUI panel
     # Clear panels
     libtcod.console_set_default_background(l_panel, libtcod.black) # black
     libtcod.console_clear(l_panel)
-    libtcod.console_set_default_background(r_panel, libtcod.blue) # black
+    libtcod.console_set_default_background(r_panel, libtcod.black) # black
     libtcod.console_clear(r_panel)
-    libtcod.console_set_default_background(u_panel, libtcod.green) # black
+    libtcod.console_set_default_background(u_panel, libtcod.darkest_grey) # black
     libtcod.console_clear(u_panel)
-    libtcod.console_set_default_background(d_panel, libtcod.yellow) # black
+    libtcod.console_set_default_background(d_panel, libtcod.black) # black
     libtcod.console_clear(d_panel)
 
-    entry_list = ["NAME", "CHARACTER SHEET", "PEOPLE AND PLACES", "E\/E MAIL",
-        "FITTING", "MARKET", "SCIENCE & INDUSTRY", "CONTRACTS", "MAP",
-        "CORPORATION", "ASSETS", "WALLET", "CHANELS", "JOURNAL",
-        "CONFIGURATIONS", "HELP" ]
-
     create_list(panel=l_panel, x=L_PANEL_X, y=L_PANEL_Y, width=L_PANEL_WIDTH,
-        height=L_PANEL_HEIGHT, step=2, entries=entry_list)
+        height=L_PANEL_HEIGHT, step=2, entries=l_menu_text)
+    create_line(panel=l_panel, x1=0, y1=L_PANEL_HEIGHT-3, x2=L_PANEL_WIDTH,
+        y2=L_PANEL_HEIGHT-3, start_end_char ="+")
+    libtcod.console_print_ex(l_panel, 1, L_PANEL_HEIGHT-2, libtcod.BKGND_NONE,
+        libtcod.LEFT, time.strftime("%d/%m/%y %H:%M", time.localtime()))
+    create_line(panel=l_panel, x1=0, y1=L_PANEL_HEIGHT-1, x2=L_PANEL_WIDTH,
+        y2=L_PANEL_HEIGHT-1, start_end_char ="+")
 
-    create_line(panel=l_panel, x1=0, y1=L_PANEL_HEIGHT-3, x2=L_PANEL_WIDTH, y2=L_PANEL_HEIGHT-3, start_end_char ="+")
-    tempo = time.strftime("%d/%m/%y %H:%M", time.localtime())
-    libtcod.console_print_ex(l_panel, 1, L_PANEL_HEIGHT-2, libtcod.BKGND_NONE, libtcod.LEFT, tempo)
-    create_line(panel=l_panel, x1=0, y1=L_PANEL_HEIGHT-1, x2=L_PANEL_WIDTH, y2=L_PANEL_HEIGHT-1, start_end_char ="+")
 
-
-    #for y in range(0,L_PANEL_HEIGHT,2):
-    #    create_line(panel=l_panel, x1=1, y1=y, x2=L_PANEL_WIDTH-1, y2=y)
-
-    #create_line(panel=l_panel, x1=0, y1=0, x2=0, y2=L_PANEL_HEIGHT)
-    #create_line(panel=l_panel, x1=L_PANEL_WIDTH-1, y1=0, x2=L_PANEL_WIDTH-1, y2=L_PANEL_HEIGHT)
+    create_window(panel=u_panel, x=0, y=0, height=U_PANEL_HEIGHT, width=U_PANEL_WIDTH)
+    create_window(panel=r_panel, x=0, y=0, height=R_PANEL_HEIGHT, width=R_PANEL_WIDTH)
+    create_window(panel=d_panel, x=0, y=0, height=D_PANEL_HEIGHT, width=D_PANEL_WIDTH)
 
     libtcod.console_blit(l_panel, 0, 0, L_PANEL_WIDTH, L_PANEL_HEIGHT, 0, L_PANEL_X, L_PANEL_Y)
     libtcod.console_blit(r_panel, 0, 0, R_PANEL_WIDTH, R_PANEL_HEIGHT, 0, R_PANEL_X, R_PANEL_Y)
     libtcod.console_blit(u_panel, 0, 0, U_PANEL_WIDTH, U_PANEL_HEIGHT, 0, U_PANEL_X, U_PANEL_Y)
     libtcod.console_blit(d_panel, 0, 0, D_PANEL_WIDTH, D_PANEL_HEIGHT, 0, D_PANEL_X, D_PANEL_Y)
-    #libtcod.console_set_default_background(panel, libtcod.gray) # black
-    #libtcod.console_clear(panel)
-
-
 
     #y = 1
     #for (line, color) in game_msgs:
@@ -819,9 +831,6 @@ make_map()
 fov_map = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
 [libtcod.map_set_properties(fov_map, x, y, not map[x][y].block_sight,
     not map[x][y].blocked) for y in range(MAP_HEIGHT) for x in range(MAP_WIDTH)]
-#for y in range(MAP_HEIGHT):
-#    for x in range(MAP_WIDTH):
-#        libtcod.map_set_properties(fov_map, x, y, not map[x][y].block_sight, not map[x][y].blocked)
 
 # ========================
 
