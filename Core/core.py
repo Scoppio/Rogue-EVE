@@ -71,12 +71,12 @@ class ConsoleBuffer(object):
         self.width = width
 
     def render_all(self):
+        if self.map:
+            self.map.draw(self.console)
+
         if self.object_pool:
             for obj in self.object_pool.get_objects_as_list():
                 obj.draw(self.console)
-
-        if self.map:
-            self.map.draw(self.console)
 
         self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.heigth, self.target.X, self.target.Y)
 
@@ -105,6 +105,7 @@ def main():
     object_pool.append(npc)
 
     my_map = MapConstructor(SCREEN_WIDTH, SCREEN_HEIGHT).build_map()
+    my_map.draw_with_chars()
     print(my_map)
 
     collision_handler.set_map(my_map)

@@ -295,9 +295,15 @@ class TileMap(DrawableObject):
         self.tile_map = map
         self.height = len(map)
         self.width = len(map[0])
-
         self.dark_color = (0, 0, 100)
         self.not_so_dark_color = (50, 50, 150)
+        self.legacy_mode = False
+
+    def draw_with_color(self):
+        self.legacy_mode = False
+
+    def draw_with_chars(self):
+        self.legacy_mode = True
 
     def get_width(self):
         return self.width
@@ -312,18 +318,31 @@ class TileMap(DrawableObject):
         return repr(self)
 
     def __repr__(self):
-        return "<TileMap height={height} width={width}>" \
-            .format(height=self.height, width=self.width)
+        return "<TileMap height={height} width={width} legacy_mode={alt_print}>" \
+            .format(height=self.height, width=self.width, alt_print=self.legacy_mode)
 
     def draw(self, console):
         for x in range(len(self.tile_map)):
             for y in range(len(self.tile_map[0])):
                 wall = self.tile_map[x][y].block_sight
+                bg_color = None
+                fg_color = None
+                char = None
                 if wall:
-                    console.draw_char(x, y, None, fg=None, bg=self.not_so_dark_color)
-                else:
-                    console.draw_char(x, y, None, fg=None, bg=self.dark_color)
+                    if not self.legacy_mode:
+                        bg_color = self.not_so_dark_color
+                    else:
+                        fg_color = self.not_so_dark_color
+                        char = '#'
 
+                else:
+                    if not self.legacy_mode:
+                        bg_color = self.dark_color
+                    else:
+                        fg_color = self.dark_color
+                        char = '.'
+
+                console.draw_char(x, y, char, fg=fg_color, bg=bg_color)
 
 class MapConstructor(object):
     def __init__(self, width, height):
