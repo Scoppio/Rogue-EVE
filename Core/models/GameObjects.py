@@ -344,6 +344,7 @@ class TileMap(DrawableObject):
 
                 console.draw_char(x, y, char, fg=fg_color, bg=bg_color)
 
+
 class MapConstructor(object):
     def __init__(self, width, height):
         self.width = width
