@@ -17,7 +17,8 @@ PLACES = ['Adara', 'Adena', 'Adrianne', 'Alarice', 'Alvita', 'Amara', 'Ambika', 
 # This script is hereby entered into the public domain
 ###############################################################################
 
-class Mdict:
+
+class Mdict(object):
     def __init__(self):
         self.d = {}
 
@@ -37,35 +38,38 @@ class Mdict:
         l = self[prefix]
         return random.choice(l)  
 
-class MName:
+
+class MarkovNameGenerator(object):
     """
     A name from a Markov chain
     """
-    def __init__(self, chainlen = 4):
+    def __init__(self, size = 4):
         """
         Building the dictionary
         """
-        if chainlen > 10 or chainlen < 1:
-            print "Chain length must be between 1 and 10, inclusive"
-            sys.exit(0)
+        if size > 10 or size < 1:
+            raise AttributeError("Chain length must be between 1 and 10, inclusive")
     
         self.mcd = Mdict()
-        oldnames = []
-        self.chainlen = chainlen
+        old_names = []
+        self.size = size
     
         for l in PLACES:
             l = l.strip()
-            oldnames.append(l)
-            s = " " * chainlen + l
+            old_names.append(l)
+            s = " " * size + l
             for n in range(0,len(l)):
-                self.mcd.add_key(s[n:n+chainlen], s[n+chainlen])
-            self.mcd.add_key(s[len(l):len(l)+chainlen], "\n")
-    
-    def New(self):
+                self.mcd.add_key(s[n:n+size], s[n+size])
+            self.mcd.add_key(s[len(l):len(l)+size], "\n")
+
+    def __len__(self):
+        return self.size
+
+    def request_name(self):
         """
         New name from the Markov chain
         """
-        prefix = " " * self.chainlen
+        prefix = " " * self.size
         name = ""
         suffix = ""
         while True:
@@ -75,4 +79,4 @@ class MName:
             else:
                 name = name + suffix
                 prefix = prefix[1:] + suffix
-        return name.capitalize()  
+        return name.capitalize()
