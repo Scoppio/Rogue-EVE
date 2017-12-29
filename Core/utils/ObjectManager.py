@@ -1,3 +1,6 @@
+import tdl
+from models.GameObjects import Vector2
+
 class ObjectPool(object):
     class __ObjectPool(object):
         def __init__(self):
@@ -77,3 +80,38 @@ class CollisionHandler(object):
                 return True
 
         return False
+
+class ConsoleBuffer(object):
+    def __init__(self, root, object_pool = None, map = None, width: int = 0, height: int =0,
+                 origin: Vector2=None, target: Vector2=None):
+
+        self.object_pool = object_pool
+        self.map = map
+        self.root = root
+        self.console = tdl.Console(width, height)
+        self.origin = origin
+        self.target = target
+        self.heigth = height
+        self.width = width
+
+    def config_buffer(self, origin: Vector2, width: int, height: int, target: Vector2):
+        self.console = tdl.Console(width, height)
+        self.origin = origin
+        self.target = target
+        self.heigth = height
+        self.width = width
+
+    def render_all(self):
+        if self.map:
+            self.map.draw(self.console)
+
+        if self.object_pool:
+            for obj in self.object_pool.get_objects_as_list():
+                obj.draw(self.console)
+
+        self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.heigth, self.target.X, self.target.Y)
+
+    def clar_all_objects(self):
+        if self.object_pool:
+            for obj in self.object_pool.get_objects_as_list():
+                obj.clear(self.console)
