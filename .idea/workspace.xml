@@ -2,33 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6cdcd319-8bbb-4b24-a3a4-70a8118f51fe" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/Core/core.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/Core/utils/__init__.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/requirements.txt" />
-      <change beforePath="$PROJECT_DIR$/SDL.dll" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/__init__.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/arial10x10.png" afterPath="$PROJECT_DIR$/Core/assets/arial10x10.png" />
-      <change beforePath="$PROJECT_DIR$/assets/references/example_gui.jpg" afterPath="$PROJECT_DIR$/Core/assets/references/example_gui.jpg" />
-      <change beforePath="$PROJECT_DIR$/assets/references/menu_background.png" afterPath="$PROJECT_DIR$/Core/assets/references/menu_background.png" />
-      <change beforePath="$PROJECT_DIR$/eve-gui.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/libtcod-mingw.dll" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/libtcodpy.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/misc-scripts/consolerpg.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/py3_rogue.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/server/tcpServer.py" afterPath="$PROJECT_DIR$/snippets/tcpServer.py" />
-      <change beforePath="$PROJECT_DIR$/server/tcpSocketClient.py" afterPath="$PROJECT_DIR$/snippets/tcpSocketClient.py" />
-      <change beforePath="$PROJECT_DIR$/server/tcpSocketClientB.py" afterPath="$PROJECT_DIR$/snippets/tcpSocketClientB.py" />
-      <change beforePath="$PROJECT_DIR$/server/tcpSocketServer.py" afterPath="$PROJECT_DIR$/snippets/tcpSocketServer.py" />
-      <change beforePath="$PROJECT_DIR$/server/udpServer.py" afterPath="$PROJECT_DIR$/snippets/udpServer.py" />
-      <change beforePath="$PROJECT_DIR$/settings.cfg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/setup" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/utils/NameGenerator.py" afterPath="$PROJECT_DIR$/Core/utils/NameGenerator.py" />
-      <change beforePath="$PROJECT_DIR$/utils/__init__.py" afterPath="$PROJECT_DIR$/Core/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/utils/city.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/utils/config.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/utils/level.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/utils/objects.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/utils/utils.py" afterPath="" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/Core/utils/IdGenerator.py" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/Core/core.py" afterPath="$PROJECT_DIR$/Core/core.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -54,11 +30,36 @@
       <file leaf-file-name="core.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Core/core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="91">
-              <caret line="59" column="17" lean-forward="false" selection-start-line="59" selection-start-column="17" selection-end-line="59" selection-end-column="17" />
+            <state relative-caret-position="-132">
+              <caret line="42" column="0" lean-forward="true" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
+                <element signature="e#217#500#0" expanded="false" />
+                <element signature="e#537#768#0" expanded="false" />
+                <element signature="e#821#909#0" expanded="false" />
+                <element signature="e#963#1040#0" expanded="false" />
+                <element signature="e#1080#1860#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="uuid.py" pinned="false" current-in-tab="false">
+        <entry file="file://D:/Python36/Lib/uuid.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-72">
+              <caret line="105" column="8" lean-forward="false" selection-start-line="105" selection-start-column="8" selection-end-line="105" selection-end-column="8" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IdGenerator.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/utils/IdGenerator.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -103,6 +104,7 @@
         <option value="$PROJECT_DIR$/eve-gui.py" />
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/Core/utils/NameGenerator.py" />
+        <option value="$PROJECT_DIR$/Core/utils/IdGenerator.py" />
         <option value="$PROJECT_DIR$/Core/core.py" />
       </list>
     </option>
@@ -140,6 +142,12 @@
               <item name="Rogue-EVE" type="b2602c69:ProjectViewProjectNode" />
               <item name="Rogue-EVE" type="462c0819:PsiDirectoryNode" />
               <item name="Core" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Rogue-EVE" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Rogue-EVE" type="462c0819:PsiDirectoryNode" />
+              <item name="Core" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Rogue-EVE" type="b2602c69:ProjectViewProjectNode" />
@@ -215,7 +223,7 @@
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24963397" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24963397" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32913387" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -233,6 +241,25 @@
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
+    <layout-to-restore>
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32913387" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24963397" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+    </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -394,6 +421,14 @@
         <state />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/tdl/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-327">
+          <caret line="1003" column="4" lean-forward="false" selection-start-line="1003" selection-start-column="4" selection-end-line="1003" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Core/assets/references/menu_background.png">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -409,20 +444,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/tdl/__init__.py">
+    <entry file="file://$PROJECT_DIR$/Core/utils/IdGenerator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-327">
-          <caret line="1003" column="4" lean-forward="false" selection-start-line="1003" selection-start-column="4" selection-end-line="1003" selection-end-column="4" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Python36/Lib/uuid.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-72">
+          <caret line="105" column="8" lean-forward="false" selection-start-line="105" selection-start-column="8" selection-end-line="105" selection-end-column="8" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Core/core.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="91">
-          <caret line="59" column="17" lean-forward="false" selection-start-line="59" selection-start-column="17" selection-end-line="59" selection-end-column="17" />
+        <state relative-caret-position="-132">
+          <caret line="42" column="0" lean-forward="true" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#217#500#0" expanded="false" />
+            <element signature="e#537#768#0" expanded="false" />
+            <element signature="e#821#909#0" expanded="false" />
+            <element signature="e#963#1040#0" expanded="false" />
+            <element signature="e#1080#1860#0" expanded="false" />
           </folding>
         </state>
       </provider>
