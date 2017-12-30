@@ -351,6 +351,7 @@ class MapConstructor(object):
         self.height = height
         self.dark_color = (0, 0, 100)
         self.not_so_dark_color = (50, 50, 150)
+        self.rooms= []
 
     def set_width(self, width):
         self.width = width
@@ -374,15 +375,37 @@ class MapConstructor(object):
         self.not_so_dark_color = color
         return self
 
+    def add_room(self, room):
+        self.rooms.append(room)
+        return self
+
+
     def build_map(self):
         # fill map with "unblocked" tiles
-        my_map = [[Tile(False)
+        my_map = [[Tile(True)
                    for y in range(self.height)]
                   for x in range(self.width)]
 
-        my_map[30][22].blocked = True
-        my_map[30][22].block_sight = True
-        my_map[40][22].blocked = True
-        my_map[40][22].block_sight = True
+        for room in self.rooms:
+            for x in range(room.x1 + 1, room.x2):
+                for y in range(room.y1 + 1, room.y2):
+                    my_map[x][y].blocked = False
+                    my_map[x][y].block_sight = False
 
         return TileMap(my_map, self.dark_color, self.not_so_dark_color)
+
+
+class Rect(object):
+    # a rectangle on the map. used to characterize a room.
+    def __init__(self, x, y, w, h):
+        self.x1 = x
+        self.y1 = y
+        self.x2 = x + w
+        self.y2 = y + h
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return "<Rect x1={x1} y1={y1} x2={x2} y2={y2}>"\
+            .format(x1=self.x1, x2=self.x2, y1=self.y1, y2=self.y2)

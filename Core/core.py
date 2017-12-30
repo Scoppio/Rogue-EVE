@@ -1,10 +1,12 @@
 import tdl
 import os
 from utils.ObjectManager import ObjectPool, CollisionHandler, ConsoleBuffer
-from models.GameObjects import Character, Vector2, MapConstructor
+from models.GameObjects import Character, Vector2, MapConstructor, Rect
+import logging
 
-# Following the tutorial
-# http://www.roguebasin.com/index.php?title=Roguelike_Tutorial,_using_python3%2Btdl,_part_2
+# Based on the tutorial from RogueBasin for python3 with tdl
+# Adapted to use more objects and be more loosely tied, without global variables
+# http://www.roguebasin.com/index.php?title=Roguelike_Tutorial,_using_python3%2Btdl,_part_3
 
 #########################################
 # Constants
@@ -13,6 +15,15 @@ from models.GameObjects import Character, Vector2, MapConstructor
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
 LIMIT_FPS = 20
+
+# instantiating logger
+logging.basicConfig(filename='debug.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.DEBUG
+                    )
+
+logger = logging.getLogger('Rogue-EVE')
+ch = logging.StreamHandler()
+logger.addHandler(ch)
 
 
 def handle_keys(movable_object):
@@ -29,6 +40,10 @@ def handle_keys(movable_object):
     """
     # turn-based
     user_input = tdl.event.key_wait()
+
+    logger.debug("<User_Input key={} alt={} ctrl={} shift={}>".format(
+                  user_input.key, user_input.alt, user_input.control, user_input.shift)
+    )
 
     if user_input.key == 'ENTER' and user_input.alt:
         # Alt+Enter: toggle fullscreen
@@ -64,16 +79,17 @@ def main():
 
     collision_handler = CollisionHandler()
 
-    player = Character(Vector2(SCREEN_WIDTH//2 , SCREEN_HEIGHT//2), collision_handler=collision_handler)
+    player = Character(Vector2(22, 22), collision_handler=collision_handler)
 
-    npc = Character(Vector2(SCREEN_WIDTH // 2 - 5, SCREEN_HEIGHT // 2), 0, 0, '@', (255, 255, 0))
+    npc = Character(Vector2(25, 22), 0, 0, '@', (255, 255, 0))
 
     object_pool.append(player)
     object_pool.append(npc)
 
-    my_map = MapConstructor(SCREEN_WIDTH, SCREEN_HEIGHT).build_map()
+    map_constructor = MapConstructor(SCREEN_WIDTH, SCREEN_HEIGHT)
+    map_constructor.add_room(Rect(20, 15, 10, 15)).add_room(Rect(50, 15, 10, 15))
+    my_map = map_constructor.build_map()
     my_map.draw_with_chars()
-    print(my_map)
 
     collision_handler.set_map(my_map)
     collision_handler.set_object_pool(object_pool)
