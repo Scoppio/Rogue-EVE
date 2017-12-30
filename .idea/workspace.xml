@@ -4,7 +4,6 @@
     <list default="true" id="6cdcd319-8bbb-4b24-a3a4-70a8118f51fe" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/Core/core.py" afterPath="$PROJECT_DIR$/Core/core.py" />
       <change beforePath="$PROJECT_DIR$/Core/models/GameObjects.py" afterPath="$PROJECT_DIR$/Core/models/GameObjects.py" />
-      <change beforePath="$PROJECT_DIR$/Core/utils/ObjectManager.py" afterPath="$PROJECT_DIR$/Core/utils/ObjectManager.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,11 +17,10 @@
       <file leaf-file-name="core.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Core/core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="127" column="22" lean-forward="false" selection-start-line="127" selection-start-column="22" selection-end-line="127" selection-end-column="22" />
+            <state relative-caret-position="159">
+              <caret line="94" column="13" lean-forward="false" selection-start-line="94" selection-start-column="13" selection-end-line="94" selection-end-column="13" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <element signature="e#1926#3068#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -31,10 +29,11 @@
       <file leaf-file-name="GameObjects.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1757">
-              <caret line="597" column="17" lean-forward="false" selection-start-line="597" selection-start-column="17" selection-end-line="597" selection-end-column="17" />
+            <state relative-caret-position="50">
+              <caret line="574" column="29" lean-forward="false" selection-start-line="574" selection-start-column="29" selection-end-line="574" selection-end-column="29" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#202#6698#0" expanded="false" />
                 <element signature="e#244#273#0" expanded="false" />
                 <element signature="e#313#559#0" expanded="false" />
                 <element signature="e#600#626#0" expanded="false" />
@@ -49,12 +48,13 @@
                 <element signature="e#2723#2884#0" expanded="false" />
                 <element signature="e#2935#3098#0" expanded="false" />
                 <element signature="e#6735#6816#0" expanded="false" />
+                <element signature="e#6857#7719#0" expanded="false" />
                 <element signature="e#7020#7167#0" expanded="false" />
                 <element signature="e#7200#7217#0" expanded="false" />
                 <element signature="e#7251#7486#0" expanded="false" />
                 <element signature="e#7525#7605#0" expanded="false" />
                 <element signature="e#7645#7719#0" expanded="false" />
-                <element signature="e#8739#9061#0" expanded="false" />
+                <element signature="e#7755#8712#0" expanded="false" />
                 <element signature="e#9099#12584#0" expanded="false" />
                 <element signature="e#12621#16900#0" expanded="false" />
                 <element signature="e#16927#17828#0" expanded="false" />
@@ -67,7 +67,7 @@
         <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="397">
-              <caret line="159" column="58" lean-forward="true" selection-start-line="159" selection-start-column="58" selection-end-line="159" selection-end-column="58" />
+              <caret line="159" column="58" lean-forward="false" selection-start-line="159" selection-start-column="58" selection-end-line="159" selection-end-column="58" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
                 <element signature="e#138#2425#0" expanded="false" />
@@ -115,9 +115,9 @@
         <option value="$PROJECT_DIR$/snippets/loggingBoilerplate.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/Core/utils/Colors.py" />
-        <option value="$PROJECT_DIR$/Core/core.py" />
-        <option value="$PROJECT_DIR$/Core/models/GameObjects.py" />
         <option value="$PROJECT_DIR$/Core/utils/ObjectManager.py" />
+        <option value="$PROJECT_DIR$/Core/models/GameObjects.py" />
+        <option value="$PROJECT_DIR$/Core/core.py" />
       </list>
     </option>
   </component>
@@ -276,7 +276,6 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <element signature="e#1926#3068#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -311,6 +310,7 @@
           <caret line="319" column="8" lean-forward="false" selection-start-line="319" selection-start-column="8" selection-end-line="319" selection-end-column="8" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#202#6698#0" expanded="false" />
             <element signature="e#244#273#0" expanded="false" />
             <element signature="e#313#559#0" expanded="false" />
             <element signature="e#600#626#0" expanded="false" />
@@ -325,12 +325,13 @@
             <element signature="e#2723#2884#0" expanded="false" />
             <element signature="e#2935#3098#0" expanded="false" />
             <element signature="e#6735#6816#0" expanded="false" />
+            <element signature="e#6857#7719#0" expanded="false" />
             <element signature="e#7020#7167#0" expanded="false" />
             <element signature="e#7200#7217#0" expanded="false" />
             <element signature="e#7251#7486#0" expanded="false" />
             <element signature="e#7525#7605#0" expanded="false" />
             <element signature="e#7645#7719#0" expanded="false" />
-            <element signature="e#8739#9061#0" expanded="false" />
+            <element signature="e#7755#8712#0" expanded="false" />
             <element signature="e#9099#12584#0" expanded="false" />
             <element signature="e#12621#16900#0" expanded="false" />
             <element signature="e#16927#17828#0" expanded="false" />
@@ -387,7 +388,6 @@
           <caret line="102" column="90" lean-forward="false" selection-start-line="102" selection-start-column="90" selection-end-line="102" selection-end-column="90" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <element signature="e#1926#3068#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -436,6 +436,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-327">
           <caret line="1003" column="4" lean-forward="false" selection-start-line="1003" selection-start-column="4" selection-end-line="1003" selection-end-column="4" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -532,7 +533,7 @@
     <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="397">
-          <caret line="159" column="58" lean-forward="true" selection-start-line="159" selection-start-column="58" selection-end-line="159" selection-end-column="58" />
+          <caret line="159" column="58" lean-forward="false" selection-start-line="159" selection-start-column="58" selection-end-line="159" selection-end-column="58" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
             <element signature="e#138#2425#0" expanded="false" />
@@ -549,10 +550,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1757">
-          <caret line="597" column="17" lean-forward="false" selection-start-line="597" selection-start-column="17" selection-end-line="597" selection-end-column="17" />
+        <state relative-caret-position="50">
+          <caret line="574" column="29" lean-forward="false" selection-start-line="574" selection-start-column="29" selection-end-line="574" selection-end-column="29" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#202#6698#0" expanded="false" />
             <element signature="e#244#273#0" expanded="false" />
             <element signature="e#313#559#0" expanded="false" />
             <element signature="e#600#626#0" expanded="false" />
@@ -567,12 +569,13 @@
             <element signature="e#2723#2884#0" expanded="false" />
             <element signature="e#2935#3098#0" expanded="false" />
             <element signature="e#6735#6816#0" expanded="false" />
+            <element signature="e#6857#7719#0" expanded="false" />
             <element signature="e#7020#7167#0" expanded="false" />
             <element signature="e#7200#7217#0" expanded="false" />
             <element signature="e#7251#7486#0" expanded="false" />
             <element signature="e#7525#7605#0" expanded="false" />
             <element signature="e#7645#7719#0" expanded="false" />
-            <element signature="e#8739#9061#0" expanded="false" />
+            <element signature="e#7755#8712#0" expanded="false" />
             <element signature="e#9099#12584#0" expanded="false" />
             <element signature="e#12621#16900#0" expanded="false" />
             <element signature="e#16927#17828#0" expanded="false" />
@@ -582,11 +585,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Core/core.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="127" column="22" lean-forward="false" selection-start-line="127" selection-start-column="22" selection-end-line="127" selection-end-column="22" />
+        <state relative-caret-position="159">
+          <caret line="94" column="13" lean-forward="false" selection-start-line="94" selection-start-column="13" selection-end-line="94" selection-end-column="13" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <element signature="e#1926#3068#0" expanded="false" />
           </folding>
         </state>
       </provider>

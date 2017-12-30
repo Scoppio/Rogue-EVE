@@ -571,13 +571,13 @@ class MapObjectsConstructor(object):
                                      self.object_templates, self.max_objecs_per_room)
 
     def get_random_object_template(self):
-        total = sum(w for c, a, w in self.object_templates)
+        total = sum(w for _, _, w in self.object_templates)
         r = uniform(0, total)
         upto = 0
-        for c, a, w in self.object_templates:
-            if upto + w >= r:
-                return c(*a)
-            upto += w
+        for obj_template, argument_template, weight in self.object_templates:
+            if upto + weight >= r:
+                return obj_template(*argument_template)
+            upto += weight
         else:
             assert False, "List is empty"
 

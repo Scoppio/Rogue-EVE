@@ -33,6 +33,7 @@ LIMIT_FPS = args.fps
 REALTIME = args.realtime
 LEGACY_MODE = args.legacy
 LOGLEVEL = {0: logging.DEBUG, 1:logging.INFO, 2: logging.WARNING, 3: logging.ERROR, 4: logging.CRITICAL}
+GAMESTATE = 'loading'
 
 # instantiating logger
 logging.basicConfig(filename='debug.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -45,6 +46,9 @@ logger.addHandler(ch)
 
 
 def handle_keys(movable_object):
+    global GAMESTATE
+    action = 'didnt-take-turn'
+    fov_recompute = False
 
     if REALTIME:
 
@@ -54,12 +58,12 @@ def handle_keys(movable_object):
                user_input = event
                keypress = True
         if not keypress:
-            return False, False
+            return action, fov_recompute
     else:
         # turn-based
         user_input = tdl.event.key_wait()
 
-    logger.debug("<User_Input key={} alt={} ctrl={} shift={}>".format(
+    logger.debug("User_Input [key={} alt={} ctrl={} shift={}]".format(
                   user_input.key, user_input.alt, user_input.control, user_input.shift)
     )
 
@@ -68,30 +72,34 @@ def handle_keys(movable_object):
         tdl.set_fullscreen(not tdl.get_fullscreen())
 
     elif user_input.key == 'ESCAPE':
+        action = 'exit'
         # exit game
-        return True, False
+        return action, fov_recompute
 
-    fov_recompute = True
-    # movement keys
-    if user_input.key == 'UP':
-        movable_object.move(Vector2(0, -1))
+    if GAMESTATE is 'playing':
+        fov_recompute = True
 
-    elif user_input.key == 'DOWN':
-        movable_object.move(Vector2(0, 1))
+        # movement keys
+        if user_input.key == 'UP':
+            movable_object.move(Vector2(0, -1))
+            action = 'move-up'
+        elif user_input.key == 'DOWN':
+            movable_object.move(Vector2(0, 1))
+            action = 'move-down'
+        elif user_input.key == 'LEFT':
+            movable_object.move(Vector2(-1, 0))
+            action = 'move-left'
+        elif user_input.key == 'RIGHT':
+            movable_object.move(Vector2(1, 0))
+            action = 'move-right'
+        else:
+            fov_recompute = False
 
-    elif user_input.key == 'LEFT':
-        movable_object.move(Vector2(-1, 0))
-
-    elif user_input.key == 'RIGHT':
-        movable_object.move(Vector2(1, 0))
-
-    else:
-        fov_recompute = False
-
-    return False, fov_recompute
+    return action, fov_recompute
 
 
 def main():
+    global GAMESTATE
     object_pool = ObjectPool()
 
     font = os.path.join("assets", "arial10x10.png")
@@ -123,6 +131,8 @@ def main():
     renderer = ConsoleBuffer(root, object_pool=object_pool, map=my_map, width=SCREEN_WIDTH, height=SCREEN_HEIGHT,
                                 origin=Vector2.zero(), target=Vector2.zero())
 
+    GAMESTATE='playing'
+
     while not tdl.event.is_window_closed():
 
         renderer.render_all()
@@ -131,11 +141,11 @@ def main():
 
         renderer.clear_all_objects()
 
-        exit_game, fov_recompute = handle_keys(player)
+        player_action, fov_recompute = handle_keys(player)
 
         renderer.set_fov_recompute_to(fov_recompute)
 
-        if exit_game:
+        if player_action == 'exit':
             break
 
 if __name__ == '__main__':
