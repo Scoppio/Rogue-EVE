@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6cdcd319-8bbb-4b24-a3a4-70a8118f51fe" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/snippets/loggingBoilerplate.py" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/Core/core.py" afterPath="$PROJECT_DIR$/Core/core.py" />
       <change beforePath="$PROJECT_DIR$/Core/models/GameObjects.py" afterPath="$PROJECT_DIR$/Core/models/GameObjects.py" />
+      <change beforePath="$PROJECT_DIR$/Core/utils/ObjectManager.py" afterPath="$PROJECT_DIR$/Core/utils/ObjectManager.py" />
+      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,14 +16,27 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="core.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="core.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Core/core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="43" column="70" lean-forward="true" selection-start-line="43" selection-start-column="70" selection-end-line="43" selection-end-column="70" />
+            <state relative-caret-position="102">
+              <caret line="84" column="20" lean-forward="true" selection-start-line="84" selection-start-column="20" selection-end-line="84" selection-end-column="20" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="136">
+                <caret line="8" column="22" lean-forward="false" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
+                <folding />
+              </first_editor>
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -48,19 +61,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GameObjects.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="GameObjects.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-67">
-              <caret line="376" column="0" lean-forward="true" selection-start-line="376" selection-start-column="0" selection-end-line="376" selection-end-column="0" />
+            <state relative-caret-position="273">
+              <caret line="468" column="49" lean-forward="false" selection-start-line="468" selection-start-column="49" selection-end-line="468" selection-end-column="49" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
-                <element signature="e#68#6575#0" expanded="false" />
-                <element signature="e#6612#6693#0" expanded="false" />
-                <element signature="e#6734#7479#0" expanded="false" />
-                <element signature="e#7515#8413#0" expanded="false" />
-                <element signature="e#8440#8732#0" expanded="false" />
-                <element signature="e#9606#10390#0" expanded="false" />
+                <element signature="e#151#6657#0" expanded="false" />
+                <element signature="e#6694#6775#0" expanded="false" />
+                <element signature="e#6816#7561#0" expanded="false" />
+                <element signature="e#7597#8495#0" expanded="false" />
+                <element signature="e#8522#8814#0" expanded="false" />
+                <element signature="e#9774#10558#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -70,8 +83,12 @@
         <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="17">
-              <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-              <folding />
+              <caret line="1" column="38" lean-forward="true" selection-start-line="1" selection-start-column="38" selection-end-line="4" selection-end-column="39" />
+              <folding>
+                <element signature="e#138#1695#0" expanded="false" />
+                <element signature="e#1734#2518#0" expanded="false" />
+                <element signature="e#2554#3717#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -110,12 +127,13 @@
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/Core/utils/NameGenerator.py" />
         <option value="$PROJECT_DIR$/Core/utils/IdGenerator.py" />
-        <option value="$PROJECT_DIR$/Core/utils/ObjectManager.py" />
-        <option value="$PROJECT_DIR$/Core/models/GameObjects.py" />
         <option value="$PROJECT_DIR$/Core/core.log" />
         <option value="$PROJECT_DIR$/Core/debug.log" />
         <option value="$PROJECT_DIR$/snippets/loggingBoilerplate.py" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/Core/utils/ObjectManager.py" />
         <option value="$PROJECT_DIR$/Core/core.py" />
+        <option value="$PROJECT_DIR$/Core/models/GameObjects.py" />
       </list>
     </option>
   </component>
@@ -251,7 +269,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="2" />
+      <option name="time" value="3" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -351,16 +369,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/tdl/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-327">
@@ -405,30 +413,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-67">
-          <caret line="376" column="0" lean-forward="true" selection-start-line="376" selection-start-column="0" selection-end-line="376" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-            <element signature="e#68#6575#0" expanded="false" />
-            <element signature="e#6612#6693#0" expanded="false" />
-            <element signature="e#6734#7479#0" expanded="false" />
-            <element signature="e#7515#8413#0" expanded="false" />
-            <element signature="e#8440#8732#0" expanded="false" />
-            <element signature="e#9606#10390#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Core/example.log">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -453,6 +437,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="136">
+            <caret line="8" column="22" lean-forward="false" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="38" lean-forward="true" selection-start-line="1" selection-start-column="38" selection-end-line="4" selection-end-column="39" />
+          <folding>
+            <element signature="e#138#1695#0" expanded="false" />
+            <element signature="e#1734#2518#0" expanded="false" />
+            <element signature="e#2554#3717#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/snippets/loggingBoilerplate.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -463,10 +470,26 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Core/core.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="43" column="70" lean-forward="true" selection-start-line="43" selection-start-column="70" selection-end-line="43" selection-end-column="70" />
+        <state relative-caret-position="102">
+          <caret line="84" column="20" lean-forward="true" selection-start-line="84" selection-start-column="20" selection-end-line="84" selection-end-column="20" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="273">
+          <caret line="468" column="49" lean-forward="false" selection-start-line="468" selection-start-column="49" selection-end-line="468" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#151#6657#0" expanded="false" />
+            <element signature="e#6694#6775#0" expanded="false" />
+            <element signature="e#6816#7561#0" expanded="false" />
+            <element signature="e#7597#8495#0" expanded="false" />
+            <element signature="e#8522#8814#0" expanded="false" />
+            <element signature="e#9774#10558#0" expanded="false" />
           </folding>
         </state>
       </provider>

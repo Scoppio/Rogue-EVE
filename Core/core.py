@@ -79,17 +79,17 @@ def main():
 
     collision_handler = CollisionHandler()
 
-    player = Character(Vector2(22, 22), collision_handler=collision_handler)
+    map_constructor = MapConstructor(SCREEN_WIDTH, SCREEN_HEIGHT)
+    map_constructor.add_room(Rect(20, 15, 10, 15)).add_room(Rect(50, 15, 10, 15)).populate_with_random_rooms()
+    my_map = map_constructor.build_map()
+    my_map.draw_with_chars()
 
-    npc = Character(Vector2(25, 22), 0, 0, '@', (255, 255, 0))
+    player = Character(my_map.get_rooms()[0].center(), collision_handler=collision_handler)
+
+    npc = Character(my_map.get_rooms()[1].center(), 0, 0, '@', (255, 255, 0))
 
     object_pool.append(player)
     object_pool.append(npc)
-
-    map_constructor = MapConstructor(SCREEN_WIDTH, SCREEN_HEIGHT)
-    map_constructor.add_room(Rect(20, 15, 10, 15)).add_room(Rect(50, 15, 10, 15))
-    my_map = map_constructor.build_map()
-    my_map.draw_with_chars()
 
     collision_handler.set_map(my_map)
     collision_handler.set_object_pool(object_pool)

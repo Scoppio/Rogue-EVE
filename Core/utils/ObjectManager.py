@@ -1,5 +1,9 @@
 import tdl
 from models.GameObjects import Vector2
+import logging
+
+logger = logging.getLogger('Rogue-EVE')
+
 
 class ObjectPool(object):
     class __ObjectPool(object):
@@ -72,14 +76,17 @@ class CollisionHandler(object):
 
     def is_blocked(self, x, y):
         if self.map.get_map()[x][y].blocked:
+            logger.debug("<CollisionHandler collided_with={} coord={} >".format(self.map.get_map()[x][y], Vector2(x,y)))
             return True
 
         # now check for any blocking objects
         for obj in self.object_pool.get_objects_as_list():
             if obj.blocks and obj.coord.X == x and obj.coord.Y == y:
+                logger.debug("<CollisionHandler collided_with={} >".format(obj, obj.coord))
                 return True
 
         return False
+
 
 class ConsoleBuffer(object):
     def __init__(self, root, object_pool = None, map = None, width: int = 0, height: int =0,
