@@ -101,16 +101,22 @@ class CollisionHandler(object):
 
     def is_blocked(self, x, y):
         if self.map.get_map()[x][y].blocked:
-            logger.debug("<CollisionHandler collided_with={} coord={} >".format(self.map.get_map()[x][y], Vector2(x,y)))
+            logger.debug("CollisionHandler [collided_with={} position={}]".format(self.map.get_map()[x][y], Vector2(x,y)))
             return True
 
         # now check for any blocking objects
         for obj in self.object_pool.get_objects_as_list():
             if obj.blocks and obj.coord.X == x and obj.coord.Y == y:
-                logger.debug("<CollisionHandler collided_with={} >".format(obj, obj.coord))
+                logger.debug("CollisionHandler [collided_with={} position={}]".format(obj.name, obj.coord))
                 return True
 
         return False
+
+    def collides_with(self, this, x, y):
+        for obj in self.object_pool.get_objects_as_list():
+            if obj.blocks and obj.coord.X == x and obj.coord.Y == y and this._id != obj._id:
+                logger.debug("CollisionHandler [collided_with={} position={}]".format(obj.name, obj.coord))
+                return obj
 
 
 class ConsoleBuffer(object):

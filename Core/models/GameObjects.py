@@ -262,7 +262,7 @@ class GameObject(DrawableObject):
 
 class Character(GameObject):
     def __init__(self, coord: Vector2, life: int=0, mana: int=0, char: str="@", color: tuple=(255, 255, 255),
-                 blocks=True, _id: str=None, collision_handler=None, torch=10, name='unnamed'):
+                 name='unnamed', blocks=True, _id: str=None, collision_handler=None, torch=10):
         super(Character, self).__init__(coord, char, color, name, blocks, _id)
         self.life = life
         self.mana = mana
@@ -596,5 +596,6 @@ class MapObjectsConstructor(object):
 
     def populate_map(self):
         for idx, room in enumerate(self.tile_map.get_rooms()):
-            # choose random number of monsters
-            self.populate_room(room)
+            if idx:
+                # choose random number of monsters
+                self.populate_room(room)

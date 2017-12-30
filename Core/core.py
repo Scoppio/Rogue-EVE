@@ -81,22 +81,42 @@ def handle_keys(movable_object):
 
         # movement keys
         if user_input.key == 'UP':
-            movable_object.move(Vector2(0, -1))
+            player_move_or_attack(movable_object, 0, -1)
             action = 'move-up'
         elif user_input.key == 'DOWN':
-            movable_object.move(Vector2(0, 1))
+            player_move_or_attack(movable_object, 0, 1)
             action = 'move-down'
         elif user_input.key == 'LEFT':
-            movable_object.move(Vector2(-1, 0))
+            player_move_or_attack(movable_object, -1, 0)
             action = 'move-left'
         elif user_input.key == 'RIGHT':
-            movable_object.move(Vector2(1, 0))
+            player_move_or_attack(movable_object, 1, 0)
             action = 'move-right'
         else:
             fov_recompute = False
 
     return action, fov_recompute
 
+
+def player_move_or_attack(player, dx, dy):
+    fov_recompute = False
+
+    # the coordinates the player is moving to/attacking
+    x = player.coord.X + dx
+    y = player.coord.Y + dy
+
+    # try to find an attackable object there
+
+    target = player.collision_handler.collides_with(player, x, y)
+
+    # attack if target found, move otherwise
+    if target is not None:
+        print('The ' + target.name + ' laughs at your puny efforts to attack him!')
+    else:
+        player.move(Vector2(dx, dy))
+        fov_recompute = True
+
+    return fov_recompute
 
 def main():
     global GAMESTATE
@@ -120,12 +140,12 @@ def main():
     collision_handler.set_object_pool(object_pool)
 
     MapObjectsConstructor(my_map, object_pool, collision_handler).add_object_template(
-        Character, (Vector2.zero(), 0, 0, 'o', Colors.dark_green), 3.0
+        Character, (Vector2.zero(), 0, 0, 'o', Colors.dark_green, 'orc'), 3.0
     ).add_object_template(
-        Character, (Vector2.zero(), 0, 0, 'T', Colors.dark_cyan), 1.0
+        Character, (Vector2.zero(), 0, 0, 'T', Colors.dark_cyan, 'Troll'), 1.0
     ).populate_map()
 
-    player = Character(my_map.get_rooms()[0].center(), collision_handler=collision_handler, color=Colors.white)
+    player = Character(my_map.get_rooms()[0].center(), collision_handler=collision_handler, color=Colors.white, name='Player')
     object_pool.add_player(player)
 
     renderer = ConsoleBuffer(root, object_pool=object_pool, map=my_map, width=SCREEN_WIDTH, height=SCREEN_HEIGHT,
@@ -147,6 +167,11 @@ def main():
 
         if player_action == 'exit':
             break
+            # let monsters take their turn
+        # elif GAMESTATE == 'playing' and player_action != 'didnt-take-turn':
+        #     for obj in object_pool.get_objects_as_list():
+        #         if obj != player:
+        #             print('The ' + obj.name + ' growls!')
 
 if __name__ == '__main__':
     main()
