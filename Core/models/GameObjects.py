@@ -370,20 +370,21 @@ class TileMap(DrawableObject):
                 fg_color = None
                 char = None
                 if not visible:
-                    if wall:
-                        if not self.legacy_mode:
-                            bg_color = self.color_dark_wall if explored else (0, 0, 0)
-                        else:
-                            fg_color = self.color_dark_wall if explored else (0, 0, 0)
-                            char = '#'
+                    if explored:
+                        if wall:
+                            if not self.legacy_mode:
+                                bg_color = self.color_dark_wall
+                            else:
+                                fg_color = self.color_dark_wall
+                                char = '#'
 
-                    else:
-                        if not self.legacy_mode:
-                            bg_color = self.color_dark_ground if explored else (0, 0, 0)
                         else:
-                            fg_color = self.color_dark_ground if explored else (0, 0, 0)
-                            char = '.'
-                else:
+                            if not self.legacy_mode:
+                                bg_color = self.color_dark_ground
+                            else:
+                                fg_color = self.color_dark_ground
+                                char = '.'
+                elif visible:
                     if wall:
                         if not self.legacy_mode:
                             bg_color = self.color_light_wall

@@ -3,6 +3,7 @@ import os
 from utils.ObjectManager import ObjectPool, CollisionHandler, ConsoleBuffer
 from models.GameObjects import Character, Vector2, MapConstructor, Rect
 import logging
+from utils import Colors
 
 # Based on the tutorial from RogueBasin for python3 with tdl
 # Adapted to use more objects and be more loosely tied, without global variables
@@ -86,13 +87,14 @@ def main():
     collision_handler = CollisionHandler()
 
     map_constructor = MapConstructor(SCREEN_WIDTH, SCREEN_HEIGHT)
-    map_constructor.add_room(Rect(20, 15, 10, 15)).add_room(Rect(50, 15, 10, 15)).populate_with_random_rooms()
+    #map_constructor.add_room(Rect(20, 15, 10, 15)).add_room(Rect(50, 15, 10, 15)).populate_with_random_rooms()
+    map_constructor.populate_with_random_rooms()
     my_map = map_constructor.build_map()
     my_map.draw_with_chars()
 
-    player = Character(my_map.get_rooms()[0].center(), collision_handler=collision_handler)
+    player = Character(my_map.get_rooms()[0].center(), collision_handler=collision_handler, color=Colors.white)
 
-    npc = Character(my_map.get_rooms()[1].center(), 0, 0, '@', (255, 255, 0))
+    npc = Character(my_map.get_rooms()[1].center(), 0, 0, '@', Colors.amber)
 
     object_pool.add_player(player)
     object_pool.append(npc)

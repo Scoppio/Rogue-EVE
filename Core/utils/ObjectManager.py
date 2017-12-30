@@ -111,7 +111,7 @@ class ConsoleBuffer(object):
         self.heigth = height
         self.width = width
         self.fov_recompute = True
-        self.fov_algorithm = 'BASIC'
+        self.fov_algorithm = 'SHADOW' # 'DIAMOND', 'BASIC'
         self.fov_light_walls = True
 
     def config_buffer(self, origin: Vector2, width: int, height: int, target: Vector2):

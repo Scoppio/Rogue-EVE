@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6cdcd319-8bbb-4b24-a3a4-70a8118f51fe" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/Core/utils/Colors.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/Core/core.py" afterPath="$PROJECT_DIR$/Core/core.py" />
       <change beforePath="$PROJECT_DIR$/Core/models/GameObjects.py" afterPath="$PROJECT_DIR$/Core/models/GameObjects.py" />
@@ -16,32 +17,81 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="core.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="core.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Core/core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="22" column="20" lean-forward="false" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
+            <state relative-caret-position="85">
+              <caret line="94" column="110" lean-forward="false" selection-start-line="94" selection-start-column="110" selection-end-line="94" selection-end-column="110" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <element signature="e#912#2054#0" expanded="false" />
+                <element signature="e#937#2079#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GameObjects.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Colors.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/utils/Colors.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="341">
+              <caret line="220" column="0" lean-forward="true" selection-start-line="220" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="colorsys.py" pinned="false" current-in-tab="false">
+        <entry file="file://D:/Python36/Lib/colorsys.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-59">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="requirements.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/requirements.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="2" column="10" lean-forward="false" selection-start-line="2" selection-start-column="10" selection-end-line="2" selection-end-column="10" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GameObjects.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="137">
-              <caret line="491" column="0" lean-forward="true" selection-start-line="491" selection-start-column="0" selection-end-line="491" selection-end-column="0" />
+            <state relative-caret-position="686">
+              <caret line="319" column="8" lean-forward="false" selection-start-line="319" selection-start-column="8" selection-end-line="319" selection-end-column="8" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
                 <element signature="e#169#6675#0" expanded="false" />
                 <element signature="e#6712#6793#0" expanded="false" />
                 <element signature="e#6834#7579#0" expanded="false" />
                 <element signature="e#7615#8550#0" expanded="false" />
-                <element signature="e#10736#12419#0" expanded="false" />
-                <element signature="e#16783#17684#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ObjectManager.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="113" column="36" lean-forward="false" selection-start-line="113" selection-start-column="36" selection-end-line="113" selection-end-column="36" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+                <element signature="e#138#1966#0" expanded="false" />
+                <element signature="e#685#717#0" expanded="false" />
+                <element signature="e#770#793#0" expanded="false" />
+                <element signature="e#843#868#0" expanded="false" />
+                <element signature="e#917#938#0" expanded="false" />
+                <element signature="e#990#1211#0" expanded="false" />
+                <element signature="e#1262#1449#0" expanded="false" />
+                <element signature="e#1498#1688#0" expanded="false" />
+                <element signature="e#2005#2789#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -78,9 +128,10 @@
         <option value="$PROJECT_DIR$/Core/debug.log" />
         <option value="$PROJECT_DIR$/snippets/loggingBoilerplate.py" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/Core/utils/ObjectManager.py" />
-        <option value="$PROJECT_DIR$/Core/core.py" />
         <option value="$PROJECT_DIR$/Core/models/GameObjects.py" />
+        <option value="$PROJECT_DIR$/Core/utils/ObjectManager.py" />
+        <option value="$PROJECT_DIR$/Core/utils/Colors.py" />
+        <option value="$PROJECT_DIR$/Core/core.py" />
       </list>
     </option>
   </component>
@@ -118,6 +169,18 @@
               <item name="Rogue-EVE" type="b2602c69:ProjectViewProjectNode" />
               <item name="Rogue-EVE" type="462c0819:PsiDirectoryNode" />
               <item name="Core" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Rogue-EVE" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Rogue-EVE" type="462c0819:PsiDirectoryNode" />
+              <item name="Core" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Rogue-EVE" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Rogue-EVE" type="462c0819:PsiDirectoryNode" />
+              <item name="Core" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Rogue-EVE" type="b2602c69:ProjectViewProjectNode" />
@@ -263,7 +326,7 @@
           <caret line="102" column="90" lean-forward="false" selection-start-line="102" selection-start-column="90" selection-end-line="102" selection-end-column="90" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <element signature="e#912#2054#0" expanded="false" />
+            <element signature="e#937#2079#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -305,14 +368,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
           <caret line="49" column="33" lean-forward="false" selection-start-line="49" selection-start-column="33" selection-end-line="49" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/requirements.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="10" lean-forward="false" selection-start-line="2" selection-start-column="10" selection-end-line="2" selection-end-column="10" />
           <folding />
         </state>
       </provider>
@@ -420,10 +475,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="686">
+          <caret line="319" column="8" lean-forward="false" selection-start-line="319" selection-start-column="8" selection-end-line="319" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#169#6675#0" expanded="false" />
+            <element signature="e#6712#6793#0" expanded="false" />
+            <element signature="e#6834#7579#0" expanded="false" />
+            <element signature="e#7615#8550#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-33">
-          <caret line="139" column="68" lean-forward="true" selection-start-line="139" selection-start-column="68" selection-end-line="139" selection-end-column="68" />
+        <state relative-caret-position="136">
+          <caret line="113" column="36" lean-forward="false" selection-start-line="113" selection-start-column="36" selection-end-line="113" selection-end-column="36" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
             <element signature="e#138#1966#0" expanded="false" />
@@ -439,29 +508,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/core.py">
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="22" column="20" lean-forward="false" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-            <element signature="e#912#2054#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="34">
+          <caret line="2" column="10" lean-forward="false" selection-start-line="2" selection-start-column="10" selection-end-line="2" selection-end-column="10" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
+    <entry file="file://D:/Python36/Lib/colorsys.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="491" column="0" lean-forward="true" selection-start-line="491" selection-start-column="0" selection-end-line="491" selection-end-column="0" />
+        <state relative-caret-position="-59">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/utils/Colors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="341">
+          <caret line="220" column="0" lean-forward="true" selection-start-line="220" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="94" column="110" lean-forward="false" selection-start-line="94" selection-start-column="110" selection-end-line="94" selection-end-column="110" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
-            <element signature="e#169#6675#0" expanded="false" />
-            <element signature="e#6712#6793#0" expanded="false" />
-            <element signature="e#6834#7579#0" expanded="false" />
-            <element signature="e#7615#8550#0" expanded="false" />
-            <element signature="e#10736#12419#0" expanded="false" />
-            <element signature="e#16783#17684#0" expanded="false" />
+            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#937#2079#0" expanded="false" />
           </folding>
         </state>
       </provider>
