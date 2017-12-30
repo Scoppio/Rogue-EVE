@@ -3,6 +3,8 @@ import numbers
 import math
 from random import randint
 import logging
+import itertools
+
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -260,10 +262,11 @@ class GameObject(DrawableObject):
 
 class Character(GameObject):
     def __init__(self, coord: Vector2, life: int=0, mana: int=0, char: str="@", color: tuple=(255, 255, 255),
-                 blocks=True, _id: str=None, collision_handler=None):
+                 blocks=True, _id: str=None, collision_handler=None, torch=10):
         super(Character, self).__init__(coord, char, color, _id)
         self.life = life
         self.mana = mana
+        self.torch = torch
         self.collision_handler = collision_handler
         self.blocks = blocks
 
@@ -286,6 +289,7 @@ class Tile(object):
     # a tile of the map and its properties
     def __init__(self, blocked, block_sight=None):
         self.blocked = blocked
+        self.explored = False
 
         # by default, if a tile is blocked, it also blocks sight
         if block_sight is None:
@@ -295,14 +299,20 @@ class Tile(object):
 
 
 class TileMap(DrawableObject):
-    def __init__(self, map, rooms, dark_color, not_so_dark_color):
+    def __init__(self, map, rooms, color_dark_wall, color_light_wall, color_dark_ground, color_light_ground):
         self.tile_map = map
         self.rooms = rooms
-        self.height = len(map)
-        self.width = len(map[0])
-        self.dark_color = (0, 0, 100)
-        self.not_so_dark_color = (50, 50, 150)
+        self.height = len(map[0])
+        self.width = len(map)
+        self.color_dark_wall = color_dark_wall
+        self.color_light_wall = color_light_wall
+        self.color_dark_ground = color_dark_ground
+        self.color_light_ground = color_light_ground
         self.legacy_mode = False
+        self.visible_tiles = None
+
+    def set_visible_tiles(self, visible_tiles):
+        self.visible_tiles = visible_tiles
 
     def draw_with_color(self):
         self.legacy_mode = False
@@ -329,36 +339,76 @@ class TileMap(DrawableObject):
         return "<TileMap height={height} width={width} legacy_mode={alt_print}>" \
             .format(height=self.height, width=self.width, alt_print=self.legacy_mode)
 
+    def totals(self):
+        total_tiles = list(itertools.chain(*self.tile_map))
+        total_explored = sum([tile.explored for tile in total_tiles])
+        print("Total explored: {}".format(total_explored))
+
+    def is_visible_tile(self, x, y):
+        if x >= self.width or x < 0:
+            return False
+        elif y >= self.height or y < 0:
+            return False
+        elif self.tile_map[x][y].blocked:
+            return False
+        elif self.tile_map[x][y].block_sight:
+            return False
+        else:
+            return True
+
     def draw(self, console):
-        for x in range(len(self.tile_map)):
-            for y in range(len(self.tile_map[0])):
+        for x in range(self.width):
+            for y in range(self.height):
+                visible = (x, y) in self.visible_tiles
                 wall = self.tile_map[x][y].block_sight
+                explored = self.tile_map[x][y].explored
+
+                if visible:
+                    self.tile_map[x][y].explored = True
+
                 bg_color = None
                 fg_color = None
                 char = None
-                if wall:
-                    if not self.legacy_mode:
-                        bg_color = self.not_so_dark_color
-                    else:
-                        fg_color = self.not_so_dark_color
-                        char = '#'
+                if not visible:
+                    if wall:
+                        if not self.legacy_mode:
+                            bg_color = self.color_dark_wall if explored else (0, 0, 0)
+                        else:
+                            fg_color = self.color_dark_wall if explored else (0, 0, 0)
+                            char = '#'
 
-                else:
-                    if not self.legacy_mode:
-                        bg_color = self.dark_color
                     else:
-                        fg_color = self.dark_color
-                        char = '.'
+                        if not self.legacy_mode:
+                            bg_color = self.color_dark_ground if explored else (0, 0, 0)
+                        else:
+                            fg_color = self.color_dark_ground if explored else (0, 0, 0)
+                            char = '.'
+                else:
+                    if wall:
+                        if not self.legacy_mode:
+                            bg_color = self.color_light_wall
+                        else:
+                            fg_color = self.color_light_wall
+                            char = '#'
+
+                    else:
+                        if not self.legacy_mode:
+                            bg_color = self.color_light_ground
+                        else:
+                            fg_color = self.color_light_ground
+                            char = '.'
 
                 console.draw_char(x, y, char, fg=fg_color, bg=bg_color)
-
+        self.totals()
 
 class MapConstructor(object):
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.dark_color = (0, 0, 100)
-        self.not_so_dark_color = (50, 50, 150)
+        self.color_dark_wall = (0, 0, 100)
+        self.color_light_wall = (130, 110, 50)
+        self.color_dark_ground = (50, 50, 150)
+        self.color_light_ground = (200, 180, 50)
         self.rooms= []
         self.room_max_size = 10
         self.room_min_size = 6
@@ -377,14 +427,6 @@ class MapConstructor(object):
 
     def get_height(self, height):
         return self.height
-
-    def set_dark_color(self, color):
-        self.dark_color = color
-        return self
-
-    def set_not_so_dark_color(self, color):
-        self.not_so_dark_color = color
-        return self
 
     def add_room(self, room, ignore_intersection=False):
         if len(self.rooms) < self.max_rooms:
@@ -469,7 +511,8 @@ class MapConstructor(object):
                     create_v_tunnel(prev_vector.Y, new_vector.Y, prev_vector.X)
                     create_h_tunnel(prev_vector.X, new_vector.X, new_vector.Y)
 
-        return TileMap(my_map, self.rooms, self.dark_color, self.not_so_dark_color)
+        return TileMap(my_map, self.rooms, self.color_dark_wall, self.color_light_wall,
+                       self.color_dark_ground, self.color_light_ground)
 
 
 class Rect(object):

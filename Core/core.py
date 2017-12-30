@@ -15,10 +15,11 @@ import logging
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
 LIMIT_FPS = 20
+REALTIME = True
 
 # instantiating logger
 logging.basicConfig(filename='debug.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.DEBUG
+                        level=logging.DEBUG
                     )
 
 logger = logging.getLogger('Rogue-EVE')
@@ -27,19 +28,19 @@ logger.addHandler(ch)
 
 
 def handle_keys(movable_object):
-    """
-    #realtime
 
-    keypress = False
-    for event in tdl.event.get():
-        if event.type == 'KEYDOWN':
-           user_input = event
-           keypress = True
-    if not keypress:
-        return
-    """
-    # turn-based
-    user_input = tdl.event.key_wait()
+    if REALTIME:
+
+        keypress = False
+        for event in tdl.event.get():
+            if event.type == 'KEYDOWN':
+               user_input = event
+               keypress = True
+        if not keypress:
+            return False, False
+    else:
+        # turn-based
+        user_input = tdl.event.key_wait()
 
     logger.debug("<User_Input key={} alt={} ctrl={} shift={}>".format(
                   user_input.key, user_input.alt, user_input.control, user_input.shift)
@@ -50,8 +51,10 @@ def handle_keys(movable_object):
         tdl.set_fullscreen(not tdl.get_fullscreen())
 
     elif user_input.key == 'ESCAPE':
-        return True  # exit game
+        # exit game
+        return True, False
 
+    fov_recompute = True
     # movement keys
     if user_input.key == 'UP':
         movable_object.move(Vector2(0, -1))
@@ -65,7 +68,10 @@ def handle_keys(movable_object):
     elif user_input.key == 'RIGHT':
         movable_object.move(Vector2(1, 0))
 
-    return False
+    else:
+        fov_recompute = False
+
+    return False, fov_recompute
 
 
 def main():
@@ -74,7 +80,7 @@ def main():
     font = os.path.join("assets", "arial10x10.png")
 
     tdl.set_font(font, greyscale=True, altLayout=True)
-
+    tdl.setFPS(LIMIT_FPS)
     root = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
 
     collision_handler = CollisionHandler()
@@ -88,7 +94,7 @@ def main():
 
     npc = Character(my_map.get_rooms()[1].center(), 0, 0, '@', (255, 255, 0))
 
-    object_pool.append(player)
+    object_pool.add_player(player)
     object_pool.append(npc)
 
     collision_handler.set_map(my_map)
@@ -103,9 +109,11 @@ def main():
 
         tdl.flush()
 
-        renderer.clar_all_objects()
+        renderer.clear_all_objects()
 
-        exit_game = handle_keys(player)
+        exit_game, fov_recompute = handle_keys(player)
+
+        renderer.set_fov_recompute_to(fov_recompute)
 
         if exit_game:
             break

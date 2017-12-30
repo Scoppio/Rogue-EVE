@@ -9,11 +9,21 @@ class ObjectPool(object):
     class __ObjectPool(object):
         def __init__(self):
             self.object_poll = {}
+            self.player = None
 
         def __str__(self):
             return repr(self)
 
+        def get_player(self):
+            return self.player
+
+        def add_player(self, player):
+            """Add the player"""
+            self.player = player
+            self.append(player)
+
         def append(self, obj):
+            """For non-player objects"""
             self.object_poll[obj._id] = obj
 
         def get_objects_as_list(self):
@@ -100,6 +110,9 @@ class ConsoleBuffer(object):
         self.target = target
         self.heigth = height
         self.width = width
+        self.fov_recompute = True
+        self.fov_algorithm = 'BASIC'
+        self.fov_light_walls = True
 
     def config_buffer(self, origin: Vector2, width: int, height: int, target: Vector2):
         self.console = tdl.Console(width, height)
@@ -108,9 +121,29 @@ class ConsoleBuffer(object):
         self.heigth = height
         self.width = width
 
+    def set_fov_recompute_to(self, val: bool):
+        self.fov_recompute = val
+
+    def reset_fov_recompute(self):
+        self.fov_recompute = False
+
+    def fov_must_recompute(self):
+        return self.fov_recompute
+
     def render_all(self):
-        if self.map:
-            self.map.draw(self.console)
+        if self.fov_must_recompute():
+            # recompute FOV if needed (the player moved or something)
+            self.reset_fov_recompute()
+            player = self.object_pool.get_player()
+            visible_tiles = tdl.map.quickFOV(player.coord.X, player.coord.Y,
+                                             self.map.is_visible_tile,
+                                             fov=self.fov_algorithm,
+                                             radius=player.torch,
+                                             lightWalls=self.fov_light_walls)
+
+            self.map.set_visible_tiles(visible_tiles)
+            if self.map:
+                self.map.draw(self.console)
 
         if self.object_pool:
             for obj in self.object_pool.get_objects_as_list():
@@ -118,7 +151,7 @@ class ConsoleBuffer(object):
 
         self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.heigth, self.target.X, self.target.Y)
 
-    def clar_all_objects(self):
+    def clear_all_objects(self):
         if self.object_pool:
             for obj in self.object_pool.get_objects_as_list():
                 obj.clear(self.console)
