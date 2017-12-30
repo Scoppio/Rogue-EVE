@@ -1,10 +1,10 @@
 import uuid
 import numbers
 import math
-from random import randint
+from random import randint, uniform
 import logging
 import itertools
-
+from utils import Colors
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -112,7 +112,7 @@ class Vector2(object):
             self.Y = value
 
     def __str__(self):
-        return "<Vector2 X=" + str(self.X) + " Y=" + str(self.Y) + ">"
+        return "(X=" + str(self.X) + " Y=" + str(self.Y)+")"
 
     def __len__(self):
         return 2
@@ -236,22 +236,22 @@ class DrawableObject(object):
 
 
 class GameObject(DrawableObject):
-    def __init__(self, coord: Vector2, char: str ='@', color: tuple=(255, 255, 255), _id: str=None):
-        if _id:
-            self._id = _id
-        else:
-            self._id = uuid.uuid4()
-
+    def __init__(self, coord: Vector2, char: str ='@', color: tuple=(255, 255, 255),
+                 name: str='unnamed', blocks: bool=False, _id: str=None):
+        self._id = _id
         self.coord = coord
         self.char = char
         self.color = color
+        self.blocks = blocks
+        self.name = name
 
     def __str__(self):
         return repr(self)
 
     def __repr__(self):
-        return "<GameObject _id={_id} coord={coord} char={char} color={color}>" \
-            .format(_id=self._id, coord=self.coord, char=self.char, color=self.color)
+        return "GameObject {name} _id={_id} coord={coord} char={char} color={color} blocks={blocks}".format(
+                name=self.name, _id=self._id, coord=self.coord, char=self.char, color=self.color, blocks=self.blocks
+                )
 
     def draw(self, console):
         console.draw_char(self.coord.X, self.coord.Y, self.char, bg=None, fg=self.color)
@@ -262,20 +262,19 @@ class GameObject(DrawableObject):
 
 class Character(GameObject):
     def __init__(self, coord: Vector2, life: int=0, mana: int=0, char: str="@", color: tuple=(255, 255, 255),
-                 blocks=True, _id: str=None, collision_handler=None, torch=10):
-        super(Character, self).__init__(coord, char, color, _id)
+                 blocks=True, _id: str=None, collision_handler=None, torch=10, name='unnamed'):
+        super(Character, self).__init__(coord, char, color, name, blocks, _id)
         self.life = life
         self.mana = mana
         self.torch = torch
         self.collision_handler = collision_handler
-        self.blocks = blocks
 
     def __str__(self):
         return repr(self)
 
     def __repr__(self):
-        return "<Character _id={_id} coord={coord} char={char} color={color} life={life} mana={mana}>" \
-            .format(_id=self._id, coord=self.coord, char=self.char, color=self.color, life=self.life, mana=self.mana)
+        return "Character {name} _id={_id} coord={coord} char={char} color={color} life={life} mana={mana}" \
+            .format(name=self.name, _id=self._id, coord=self.coord, char=self.char, color=self.color, life=self.life, mana=self.mana)
 
     def move(self, step: Vector2):
         if self.collision_handler:
@@ -317,7 +316,7 @@ class TileMap(DrawableObject):
     def draw_with_color(self):
         self.legacy_mode = False
 
-    def draw_with_chars(self):
+    def set_legacy_mode(self):
         self.legacy_mode = True
 
     def get_width(self):
@@ -401,6 +400,7 @@ class TileMap(DrawableObject):
 
                 console.draw_char(x, y, char, fg=fg_color, bg=bg_color)
         self.totals()
+
 
 class MapConstructor(object):
     def __init__(self, width, height):
@@ -546,3 +546,55 @@ class Rect(object):
         cond4 = self.y2 >= other.y1
 
         return cond1 and cond2 and cond3 and cond4
+
+
+class MapObjectsConstructor(object):
+    def __init__(self, tile_map, object_pool, collision_handler, object_templates=list(), max_objecs_per_room: int=3):
+        self.tile_map = tile_map
+        self.object_pool = object_pool
+        self.collision_handler = collision_handler
+        self.object_templates = object_templates
+        self.max_objecs_per_room = max_objecs_per_room
+
+    def add_object_template(self, obj_template, args, weight=1.0):
+        """
+        You need to give an object template and a weight so the system makes random choices based on a probability
+        distribution of the weight of the objects
+        """
+        self.object_templates.append((obj_template, args, weight))
+        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
+                                     self.object_templates, self.max_objecs_per_room)
+
+    def set_max_objects_per_room(self, value):
+        self.max_objecs_per_room = value
+        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
+                                     self.object_templates, self.max_objecs_per_room)
+
+    def get_random_object_template(self):
+        total = sum(w for c, a, w in self.object_templates)
+        r = uniform(0, total)
+        upto = 0
+        for c, a, w in self.object_templates:
+            if upto + w >= r:
+                return c(*a)
+            upto += w
+        else:
+            assert False, "List is empty"
+
+    def populate_room(self, room):
+        num_objects = randint(0, self.max_objecs_per_room)
+
+        for i in range(num_objects):
+            # choose random spot for this object
+            coord = Vector2(randint(room.x1, room.x2), randint(room.y1, room.y2))
+            if not self.collision_handler.is_blocked(coord.X, coord.Y):
+                prototype = self.get_random_object_template()
+                prototype.coord = coord
+                prototype.collision_handler = self.collision_handler
+
+                self.object_pool.append(prototype)
+
+    def populate_map(self):
+        for idx, room in enumerate(self.tile_map.get_rooms()):
+            # choose random number of monsters
+            self.populate_room(room)

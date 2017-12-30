@@ -8,23 +8,38 @@ logger = logging.getLogger('Rogue-EVE')
 class ObjectPool(object):
     class __ObjectPool(object):
         def __init__(self):
+            self.id_counter = 0
             self.object_poll = {}
             self.player = None
 
         def __str__(self):
             return repr(self)
 
+        def identify_object(self):
+            ret = self.id_counter
+            self.id_counter += 1
+            return ret
+
         def get_player(self):
             return self.player
 
         def add_player(self, player):
             """Add the player"""
+            player._id = self.identify_object()
             self.player = player
             self.append(player)
 
+        def remove_player(self):
+            self.delete_by_id(self.player._id)
+            self.player = None
+
         def append(self, obj):
             """For non-player objects"""
-            self.object_poll[obj._id] = obj
+            if obj._id is None:
+                obj._id = self.identify_object()
+
+            if obj._id not in self.object_poll.keys():
+                self.object_poll[obj._id] = obj
 
         def get_objects_as_list(self):
             return self.object_poll.values()
@@ -113,6 +128,7 @@ class ConsoleBuffer(object):
         self.fov_recompute = True
         self.fov_algorithm = 'SHADOW' # 'DIAMOND', 'BASIC'
         self.fov_light_walls = True
+        self.visible_tiles = None
 
     def config_buffer(self, origin: Vector2, width: int, height: int, target: Vector2):
         self.console = tdl.Console(width, height)
@@ -135,19 +151,20 @@ class ConsoleBuffer(object):
             # recompute FOV if needed (the player moved or something)
             self.reset_fov_recompute()
             player = self.object_pool.get_player()
-            visible_tiles = tdl.map.quickFOV(player.coord.X, player.coord.Y,
+            self.visible_tiles = tdl.map.quickFOV(player.coord.X, player.coord.Y,
                                              self.map.is_visible_tile,
                                              fov=self.fov_algorithm,
                                              radius=player.torch,
                                              lightWalls=self.fov_light_walls)
 
-            self.map.set_visible_tiles(visible_tiles)
+            self.map.set_visible_tiles(self.visible_tiles)
             if self.map:
                 self.map.draw(self.console)
 
         if self.object_pool:
             for obj in self.object_pool.get_objects_as_list():
-                obj.draw(self.console)
+                if (obj.coord.X, obj.coord.Y) in self.visible_tiles:
+                    obj.draw(self.console)
 
         self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.heigth, self.target.X, self.target.Y)
 
