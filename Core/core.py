@@ -1,7 +1,7 @@
 import tdl
 import os
 from utils.ObjectManager import ObjectPool, CollisionHandler, ConsoleBuffer
-from models.GameObjects import Character, Vector2, MapConstructor, Rect, MapObjectsConstructor
+from models.GameObjects import Character, Vector2, MapConstructor, Fighter, MapObjectsConstructor, BasicMonsterAI
 import logging
 from utils import Colors
 import argparse
@@ -77,75 +77,89 @@ def handle_keys(movable_object):
         return action, fov_recompute
 
     if GAMESTATE is 'playing':
-        fov_recompute = True
+        fov_recompute = False
 
         # movement keys
         if user_input.key == 'UP':
-            player_move_or_attack(movable_object, 0, -1)
+            fov_recompute = movable_object.move_or_attack(Vector2(0, -1))
             action = 'move-up'
         elif user_input.key == 'DOWN':
-            player_move_or_attack(movable_object, 0, 1)
+            fov_recompute = movable_object.move_or_attack(Vector2(0, 1))
             action = 'move-down'
         elif user_input.key == 'LEFT':
-            player_move_or_attack(movable_object, -1, 0)
+            fov_recompute = movable_object.move_or_attack(Vector2(-1, 0))
             action = 'move-left'
         elif user_input.key == 'RIGHT':
-            player_move_or_attack(movable_object, 1, 0)
+            fov_recompute = movable_object.move_or_attack(Vector2(1, 0))
             action = 'move-right'
-        else:
-            fov_recompute = False
 
     return action, fov_recompute
 
 
-def player_move_or_attack(player, dx, dy):
-    fov_recompute = False
-
-    # the coordinates the player is moving to/attacking
-    x = player.coord.X + dx
-    y = player.coord.Y + dy
-
-    # try to find an attackable object there
-
-    target = player.collision_handler.collides_with(player, x, y)
-
-    # attack if target found, move otherwise
-    if target is not None:
-        print('The ' + target.name + ' laughs at your puny efforts to attack him!')
-    else:
-        player.move(Vector2(dx, dy))
-        fov_recompute = True
-
-    return fov_recompute
-
 def main():
     global GAMESTATE
-    object_pool = ObjectPool()
 
+    # General tools for management of the game
+
+    # setup to start the TDL and small consoles
     font = os.path.join("assets", "arial10x10.png")
-
     tdl.set_font(font, greyscale=True, altLayout=True)
     tdl.setFPS(LIMIT_FPS)
     root = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
 
-    collision_handler = CollisionHandler()
+    # Now start the setup of the object managers
 
+    # ObjectPool keeps track of all the objects on the scene
+    object_pool = ObjectPool()
+    # Starting up the collision handler, which manages all the objects collision events
+    collision_handler = CollisionHandler()
+    # A map constructor, that randomly create rooms with (not yet implemented) many different strategies
     map_constructor = MapConstructor(SCREEN_WIDTH, SCREEN_HEIGHT)
     map_constructor.populate_with_random_rooms()
     my_map = map_constructor.build_map()
     if LEGACY_MODE:
+        # Legacy mode makes the map be drawn using chars instead of colored blocks
         my_map.set_legacy_mode()
 
+    # Adding the object pool and the map to the collision handler so they interact
     collision_handler.set_map(my_map)
     collision_handler.set_object_pool(object_pool)
 
+    # Map objects constructor is a special factory that randomly populates the map with object templates
+    # and does deal with weighted distributions, It makes everything in place, by reference
+
     MapObjectsConstructor(my_map, object_pool, collision_handler).add_object_template(
-        Character, (Vector2.zero(), 0, 0, 'o', Colors.dark_green, 'orc'), 3.0
+        Character,
+        {
+            'char': 'o',
+            'color': Colors.dark_fuchsia,
+            'name': 'orc',
+            'ai': BasicMonsterAI(),
+            'fighter': Fighter(hp=10, defense=0, power=3)
+        },
+        3.0
     ).add_object_template(
-        Character, (Vector2.zero(), 0, 0, 'T', Colors.dark_cyan, 'Troll'), 1.0
+        Character,
+        {
+            'char': 'T',
+            'color': Colors.dark_crimson,
+            'name': 'Troll',
+            'ai': BasicMonsterAI(),
+            'fighter': Fighter(hp=16, defense=1, power=4)
+        },
+        1.0
     ).populate_map()
 
-    player = Character(my_map.get_rooms()[0].center(), collision_handler=collision_handler, color=Colors.white, name='Player')
+    for obj in object_pool.get_objects_as_list():
+        print(obj.ai, obj.fighter)
+
+    # Creation of the player
+    fighter_component = Fighter(hp=30, defense=2, power=5)
+    player = Character(my_map.get_rooms()[0].center(),
+                       collision_handler=collision_handler,
+                       color=Colors.white,
+                       name='Player',
+                       fighter=fighter_component)
     object_pool.add_player(player)
 
     renderer = ConsoleBuffer(root, object_pool=object_pool, map=my_map, width=SCREEN_WIDTH, height=SCREEN_HEIGHT,

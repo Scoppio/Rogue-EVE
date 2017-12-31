@@ -4,6 +4,7 @@ import math
 from random import randint, uniform
 import logging
 import itertools
+import copy
 from utils import Colors
 
 logger = logging.getLogger('Rogue-EVE')
@@ -236,8 +237,14 @@ class DrawableObject(object):
 
 
 class GameObject(DrawableObject):
-    def __init__(self, coord: Vector2, char: str ='@', color: tuple=(255, 255, 255),
-                 name: str='unnamed', blocks: bool=False, _id: str=None):
+    def __init__(self,
+                 coord: Vector2,
+                 char: str ='@',
+                 color: tuple=(255, 255, 255),
+                 name: str='unnamed',
+                 blocks: bool=False,
+                 _id: str=None
+                 ):
         self._id = _id
         self.coord = coord
         self.char = char
@@ -260,14 +267,50 @@ class GameObject(DrawableObject):
         console.draw_char(self.coord.X, self.coord.Y, ' ', bg=None, fg=self.color)
 
 
+class BasicMonsterAI(object):
+    def __init__(self):
+        self.owner = None
+
+    # AI for a basic monster.
+    def take_turn(self):
+        print('The ' + self.owner.name + ' growls!')
+
+
+class Fighter(object):
+    def __init__(self, hp, defense, power):
+        self.owner = None
+        self.max_hp = hp
+        self.hp = hp
+        self.defense = defense
+        self.power = power
+
+
 class Character(GameObject):
-    def __init__(self, coord: Vector2, life: int=0, mana: int=0, char: str="@", color: tuple=(255, 255, 255),
-                 name='unnamed', blocks=True, _id: str=None, collision_handler=None, torch=10):
+    def __init__(self,
+                 coord: Vector2=None,
+                 char: str="@",
+                 color: tuple=(255, 255, 255),
+                 name='unnamed',
+                 fighter=None,
+                 ai=None,
+                 blocks=True,
+                 _id: str=None,
+                 collision_handler=None,
+                 torch=10
+                 ):
         super(Character, self).__init__(coord, char, color, name, blocks, _id)
-        self.life = life
-        self.mana = mana
         self.torch = torch
         self.collision_handler = collision_handler
+
+        self.fighter = copy.copy(fighter)
+        if self.fighter:
+            # let the fighter component know who owns it
+            self.fighter.owner = self
+
+        self.ai = copy.copy(ai)
+        if self.ai:
+            # let the AI component know who owns it
+            self.ai.owner = self
 
     def __str__(self):
         return repr(self)
@@ -282,6 +325,27 @@ class Character(GameObject):
                 return
 
         self.coord = self.coord + step
+
+    def move_or_attack(self, step):
+        """
+        Decides for movement or attack, and return if the field of view has to be recomputed
+        :param step:
+        :return fov_recompute flag:
+        """
+        fov_recompute = False
+
+        # try to find an attackable object on the coordinates the player is moving to/attacking
+
+        target = self.collision_handler.collides_with(self, (self.coord + step).X, (self.coord + step).Y)
+
+        # attack if target found, move otherwise
+        if target is not None:
+            print('The ' + target.name + ' laughs at your puny efforts to attack him!')
+        else:
+            self.move(step)
+            fov_recompute = True
+
+        return fov_recompute
 
 
 class Tile(object):
@@ -576,7 +640,7 @@ class MapObjectsConstructor(object):
         upto = 0
         for obj_template, argument_template, weight in self.object_templates:
             if upto + weight >= r:
-                return obj_template(*argument_template)
+                return obj_template(**argument_template)
             upto += weight
         else:
             assert False, "List is empty"
