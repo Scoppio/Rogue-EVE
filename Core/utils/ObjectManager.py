@@ -78,7 +78,7 @@ class ObjectPool(object):
                 # raise KeyError
 
         def find_by_tag(self, tag):
-            return [obj for obj in self.get_objects_as_list() if obj.tag == tag]
+            return [obj for obj in self.get_objects_as_list() if tag in obj.tags]
 
     instance = None
 

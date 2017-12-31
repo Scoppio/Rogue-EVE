@@ -247,7 +247,7 @@ class GameObject(DrawableObject):
                  name: str='unnamed',
                  blocks: bool=False,
                  _id: str=None,
-                 tag=None
+                 tags=[]
                  ):
         self._id = _id
         self.coord = coord
@@ -256,7 +256,7 @@ class GameObject(DrawableObject):
         self.blocks = blocks
         self.name = name
         self.object_pool = None
-        self.tag = tag
+        self.tags = tags
 
     def __str__(self):
         return repr(self)
@@ -331,9 +331,9 @@ class Character(GameObject):
                  _id: str=None,
                  collision_handler=None,
                  torch=10,
-                 tag=None
+                 tags=[]
                  ):
-        super(Character, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tag=tag)
+        super(Character, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags)
         self.torch = torch
         self.collision_handler = collision_handler
 

@@ -137,7 +137,7 @@ def main():
             'name': 'orc',
             'ai': BasicMonsterAI(interest_tag='player'),
             'fighter': Fighter(hp=10, defense=0, power=3),
-            'tag':'monster'
+            'tags':['monster', 'orc', 'small']
         },
         3.0
     ).add_object_template(
@@ -148,7 +148,7 @@ def main():
             'name': 'Troll',
             'ai': BasicMonsterAI(interest_tag='player'),
             'fighter': Fighter(hp=16, defense=1, power=4),
-            'tag': 'monster'
+            'tags': ['monster', 'troll', 'big']
         },
         1.0
     ).populate_map()
@@ -160,7 +160,7 @@ def main():
                        color=Colors.white,
                        name='Player',
                        fighter=fighter_component,
-                       tag='player')
+                       tags=['player'])
     object_pool.add_player(player)
 
     renderer = ConsoleBuffer(root, object_pool=object_pool, map=my_map, width=SCREEN_WIDTH, height=SCREEN_HEIGHT,
