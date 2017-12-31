@@ -128,7 +128,6 @@ def main():
 
     # Map objects constructor is a special factory that randomly populates the map with object templates
     # and does deal with weighted distributions, It makes everything in place, by reference
-
     MapObjectsConstructor(my_map, object_pool, collision_handler).add_object_template(
         Character,
         {
@@ -137,7 +136,7 @@ def main():
             'name': 'orc',
             'ai': BasicMonsterAI(interest_tag='player'),
             'fighter': Fighter(hp=10, defense=0, power=3),
-            'tags':['monster', 'orc', 'small']
+            'tags': ['monster', 'orc', 'small']
         },
         3.0
     ).add_object_template(
@@ -163,10 +162,11 @@ def main():
                        tags=['player'])
     object_pool.add_player(player)
 
-    renderer = ConsoleBuffer(root, object_pool=object_pool, map=my_map, width=SCREEN_WIDTH, height=SCREEN_HEIGHT,
-                                origin=Vector2.zero(), target=Vector2.zero())
+    renderer = ConsoleBuffer(root, object_pool=object_pool, map=my_map,
+                             width=SCREEN_WIDTH, height=SCREEN_HEIGHT,
+                             origin=Vector2.zero(), target=Vector2.zero())
 
-    GAMESTATE='playing'
+    GAMESTATE = 'playing'
 
     while not tdl.event.is_window_closed():
 
@@ -188,11 +188,6 @@ def main():
                 if obj.ai:
                     obj.ai.take_turn()
 
-            # let monsters take their turn
-        # elif GAMESTATE == 'playing' and player_action != 'didnt-take-turn':
-        #     for obj in object_pool.get_objects_as_list():
-        #         if obj != player:
-        #             print('The ' + obj.name + ' growls!')
 
 if __name__ == '__main__':
     main()
