@@ -257,6 +257,7 @@ class GameObject(DrawableObject):
         self.name = name
         self.object_pool = None
         self.tags = tags
+        self.z_index = 1
 
     def __str__(self):
         return repr(self)
@@ -319,6 +320,7 @@ class DeathMethods(object):
         # for added effect, transform the player into a corpse!
         player.char = '%'
         player.color = Colors.dark_red
+        player.z_index = 0
 
     @staticmethod
     def monster_death(monster):
@@ -331,6 +333,7 @@ class DeathMethods(object):
         monster.fighter = None
         monster.ai = None
         monster.name = 'remains of ' + monster.name
+        monster.z_index = 0
 
 
 class Fighter(object):
@@ -421,7 +424,7 @@ class Character(GameObject):
         target = self.collision_handler.collides_with(self, (self.coord + step).X, (self.coord + step).Y)
 
         # attack if target found, move otherwise
-        if target is not None:
+        if target is not None and target.fighter:
             #print('The ' + target.name + ' laughs at your puny efforts to attack him!')
             self.fighter.attack(target)
         else:

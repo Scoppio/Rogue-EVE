@@ -180,10 +180,16 @@ class ConsoleBuffer(object):
             if self.map:
                 self.map.draw(self.console)
 
-        if self.object_pool:
-            for obj in self.object_pool.get_objects_as_list():
+        if self.object_pool and self.object_pool.get_objects_as_list():
+            sorted_objects_list = sorted(self.object_pool.get_objects_as_list(), key=lambda x: x.z_index, reverse=False)
+
+            for obj in sorted_objects_list:
                 if (obj.coord.X, obj.coord.Y) in self.visible_tiles:
                     obj.draw(self.console)
+
+            if self.object_pool.get_player():
+                player = self.object_pool.get_player()
+                player.draw(self.console)
 
         # GUI HERE
         self.console.draw_str(1, self.heigth - 2, 'HP: ' + str(player.fighter.hp) + '/' +
