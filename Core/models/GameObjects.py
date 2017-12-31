@@ -144,10 +144,13 @@ class Vector2(object):
         """Gets the normalized Vector"""
         length = self.length()
         if length > 0:
-            self.X /= length
-            self.Y /= length
+            return Vector2(int(self.X / length), int(self.Y / length))
         else:
             print("Length 0, cannot normalize.")
+            return Vector2.zero()
+
+    def as_tuple(self):
+        return (self.X, self.Y)
 
     def normalize_copy(self):
         """Create a copy of this Vector, normalize it, and return it."""
@@ -170,7 +173,7 @@ class Vector2(object):
         """Calculate the dot product between two Vectors"""
         if isinstance(vec1, Vector2) \
                 and isinstance(vec2, Vector2):
-            return ((vec1.X * vec2.X) + (vec1.Y * vec2.Y))
+            return (vec1.X * vec2.X) + (vec1.Y * vec2.Y)
         else:
             raise TypeError("vec1 and vec2 must be Vector2's")
 
@@ -243,7 +246,8 @@ class GameObject(DrawableObject):
                  color: tuple=(255, 255, 255),
                  name: str='unnamed',
                  blocks: bool=False,
-                 _id: str=None
+                 _id: str=None,
+                 tag=None
                  ):
         self._id = _id
         self.coord = coord
@@ -251,13 +255,16 @@ class GameObject(DrawableObject):
         self.color = color
         self.blocks = blocks
         self.name = name
+        self.object_pool = None
+        self.tag = tag
 
     def __str__(self):
         return repr(self)
 
     def __repr__(self):
-        return "GameObject {name} _id={_id} coord={coord} char={char} color={color} blocks={blocks}".format(
-                name=self.name, _id=self._id, coord=self.coord, char=self.char, color=self.color, blocks=self.blocks
+        return "GameObject {tag} {name} _id={_id} coord={coord} char={char} color={color} blocks={blocks}".format(
+                tag=self.tag, name=self.name, _id=self._id, coord=self.coord, char=self.char, color=self.color,
+                blocks=self.blocks
                 )
 
     def draw(self, console):
@@ -268,12 +275,39 @@ class GameObject(DrawableObject):
 
 
 class BasicMonsterAI(object):
-    def __init__(self):
+    def __init__(self, interest_tag='player'):
         self.owner = None
+        self.interest_tag=interest_tag
+        self.visible_tiles_ref = None
 
     # AI for a basic monster.
     def take_turn(self):
-        print('The ' + self.owner.name + ' growls!')
+        # a basic monster takes its turn. If you can see it, it can see you
+        monster = self.owner
+        visible_tiles = self.owner.collision_handler.map.get_visible_tiles()
+
+        if (monster.coord.X, monster.coord.Y) in visible_tiles:
+            closest_point_of_interest = self.get_closest_point_of_interest()
+            # print("closes point of interest for tag {} {}".format(self.interest_tag, closest_point_of_interest))
+
+            # move towards player if far away
+            if closest_point_of_interest['dist'] >= 2:
+                monster.move_towards(closest_point_of_interest['obj'].coord)
+
+            # close enough, attack! (if the player is still alive.)
+            elif closest_point_of_interest['obj'].fighter.hp > 0:
+                print('The attack of the ' + monster.name + ' bounces off your shiny metal armor!')
+
+    def get_closest_point_of_interest(self):
+        points_of_interest = self.owner.object_pool.find_by_tag(self.interest_tag)
+        closest_point_of_interest = {'obj': None, 'dist': 1000000}
+        for poi in points_of_interest:
+            dist = Vector2.distance(self.owner.coord, poi.coord)
+            if dist < closest_point_of_interest['dist']:
+                closest_point_of_interest['dist'] = dist
+                closest_point_of_interest['obj'] = poi
+
+        return closest_point_of_interest
 
 
 class Fighter(object):
@@ -296,9 +330,10 @@ class Character(GameObject):
                  blocks=True,
                  _id: str=None,
                  collision_handler=None,
-                 torch=10
+                 torch=10,
+                 tag=None
                  ):
-        super(Character, self).__init__(coord, char, color, name, blocks, _id)
+        super(Character, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tag=tag)
         self.torch = torch
         self.collision_handler = collision_handler
 
@@ -316,8 +351,9 @@ class Character(GameObject):
         return repr(self)
 
     def __repr__(self):
-        return "Character {name} _id={_id} coord={coord} char={char} color={color} life={life} mana={mana}" \
-            .format(name=self.name, _id=self._id, coord=self.coord, char=self.char, color=self.color, life=self.life, mana=self.mana)
+        return "Character {name} _id={_id} coord={coord} char={char} color={color}".format(
+            name=self.name, _id=self._id, coord=self.coord, char=self.char, color=self.color
+        )
 
     def move(self, step: Vector2):
         if self.collision_handler:
@@ -346,6 +382,18 @@ class Character(GameObject):
             fov_recompute = True
 
         return fov_recompute
+
+    def move_towards(self, target: Vector2):
+        # vector from this object to the target, and distance
+
+        distance = Vector2.distance(self.coord, target)
+        #math.sqrt((target - self.coord).X ** 2 + (target - self.coord).Y ** 2)
+
+        # normalize it to length 1 (preserving direction), then round it and
+        # convert to integer so the movement is restricted to the map grid
+        dx = int(round((target - self.coord).X / distance))
+        dy = int(round((target - self.coord).Y / distance))
+        self.move(Vector2(dx, dy))
 
 
 class Tile(object):
@@ -391,6 +439,9 @@ class TileMap(DrawableObject):
 
     def get_map(self):
         return self.tile_map
+
+    def get_visible_tiles(self):
+        return self.visible_tiles
 
     def get_rooms(self):
         return self.rooms

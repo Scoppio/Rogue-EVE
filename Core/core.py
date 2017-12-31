@@ -47,7 +47,7 @@ logger.addHandler(ch)
 
 def handle_keys(movable_object):
     global GAMESTATE
-    action = 'didnt-take-turn'
+    action = 'nop'
     fov_recompute = False
 
     if REALTIME:
@@ -61,6 +61,7 @@ def handle_keys(movable_object):
             return action, fov_recompute
     else:
         # turn-based
+        action = 'didnt-take-turn'
         user_input = tdl.event.key_wait()
 
     logger.debug("User_Input [key={} alt={} ctrl={} shift={}]".format(
@@ -134,8 +135,9 @@ def main():
             'char': 'o',
             'color': Colors.dark_fuchsia,
             'name': 'orc',
-            'ai': BasicMonsterAI(),
-            'fighter': Fighter(hp=10, defense=0, power=3)
+            'ai': BasicMonsterAI(interest_tag='player'),
+            'fighter': Fighter(hp=10, defense=0, power=3),
+            'tag':'monster'
         },
         3.0
     ).add_object_template(
@@ -144,14 +146,12 @@ def main():
             'char': 'T',
             'color': Colors.dark_crimson,
             'name': 'Troll',
-            'ai': BasicMonsterAI(),
-            'fighter': Fighter(hp=16, defense=1, power=4)
+            'ai': BasicMonsterAI(interest_tag='player'),
+            'fighter': Fighter(hp=16, defense=1, power=4),
+            'tag': 'monster'
         },
         1.0
     ).populate_map()
-
-    for obj in object_pool.get_objects_as_list():
-        print(obj.ai, obj.fighter)
 
     # Creation of the player
     fighter_component = Fighter(hp=30, defense=2, power=5)
@@ -159,7 +159,8 @@ def main():
                        collision_handler=collision_handler,
                        color=Colors.white,
                        name='Player',
-                       fighter=fighter_component)
+                       fighter=fighter_component,
+                       tag='player')
     object_pool.add_player(player)
 
     renderer = ConsoleBuffer(root, object_pool=object_pool, map=my_map, width=SCREEN_WIDTH, height=SCREEN_HEIGHT,
@@ -181,6 +182,12 @@ def main():
 
         if player_action == 'exit':
             break
+
+        if GAMESTATE == 'playing' and player_action != 'didnt-take-turn':
+            for obj in object_pool.find_by_tag('monster'):
+                if obj.ai:
+                    obj.ai.take_turn()
+
             # let monsters take their turn
         # elif GAMESTATE == 'playing' and player_action != 'didnt-take-turn':
         #     for obj in object_pool.get_objects_as_list():

@@ -40,6 +40,7 @@ class ObjectPool(object):
 
             if obj._id not in self.object_poll.keys():
                 self.object_poll[obj._id] = obj
+                obj.object_pool = self
 
         def get_objects_as_list(self):
             return self.object_poll.values()
@@ -73,8 +74,11 @@ class ObjectPool(object):
             if key in self.object_poll.keys():
                 return self.object_poll[key]
             else:
-                print("Key not present in the object pool")
+                logger.error("Key not present in the object pool")
                 # raise KeyError
+
+        def find_by_tag(self, tag):
+            return [obj for obj in self.get_objects_as_list() if obj.tag == tag]
 
     instance = None
 
@@ -99,6 +103,9 @@ class CollisionHandler(object):
     def set_object_pool(self, object_pool):
         self.object_pool = object_pool
 
+    def get_visible_tiles(self):
+        return self.map.get_map().visible_tiles
+
     def is_blocked(self, x, y):
         if self.map.get_map()[x][y].blocked:
             logger.debug("CollisionHandler [collided_with={} position={}]".format(self.map.get_map()[x][y], Vector2(x,y)))
@@ -106,7 +113,7 @@ class CollisionHandler(object):
 
         # now check for any blocking objects
         for obj in self.object_pool.get_objects_as_list():
-            if obj.blocks and obj.coord.X == x and obj.coord.Y == y:
+            if obj.blocks and obj.coord == Vector2(x,y):
                 logger.debug("CollisionHandler [collided_with={} position={}]".format(obj.name, obj.coord))
                 return True
 
