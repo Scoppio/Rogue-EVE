@@ -296,7 +296,7 @@ class BasicMonsterAI(object):
 
             # close enough, attack! (if the player is still alive.)
             elif closest_point_of_interest['obj'].fighter.hp > 0:
-                print('The attack of the ' + monster.name + ' bounces off your shiny metal armor!')
+                monster.fighter.attack(closest_point_of_interest['obj'])
 
     def get_closest_point_of_interest(self):
         points_of_interest = self.owner.object_pool.find_by_tag(self.interest_tag)
@@ -317,6 +317,22 @@ class Fighter(object):
         self.hp = hp
         self.defense = defense
         self.power = power
+
+    def take_damage(self, damage):
+        # apply damage if possible
+        if damage > 0:
+            self.hp -= damage
+
+    def attack(self, target):
+        # a simple formula for attack damage
+        damage = self.power - target.fighter.defense
+
+        if damage > 0:
+            # make the target take some damage
+            print(self.owner.name.capitalize() + ' attacks ' + target.name + ' for ' + str(damage) + ' hit points.')
+            target.fighter.take_damage(damage)
+        else:
+            print(self.owner.name.capitalize() + ' attacks ' + target.name + ' but it has no effect!')
 
 
 class Character(GameObject):
@@ -376,7 +392,8 @@ class Character(GameObject):
 
         # attack if target found, move otherwise
         if target is not None:
-            print('The ' + target.name + ' laughs at your puny efforts to attack him!')
+            #print('The ' + target.name + ' laughs at your puny efforts to attack him!')
+            self.fighter.attack(target)
         else:
             self.move(step)
             fov_recompute = True
