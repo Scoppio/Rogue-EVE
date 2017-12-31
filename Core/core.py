@@ -8,7 +8,7 @@ import argparse
 
 # Based on the tutorial from RogueBasin for python3 with tdl
 # Adapted to use more objects and be more loosely tied, without global variables
-# http://www.roguebasin.com/index.php?title=Roguelike_Tutorial,_using_python3%2Btdl,_part_3
+# http://www.roguebasin.com/index.php?title=Roguelike_Tutorial,_using_python3%2Btdl,_part_6
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-l", "--loglevel", type=int, default=2,
