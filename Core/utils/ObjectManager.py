@@ -5,6 +5,11 @@ import logging
 logger = logging.getLogger('Rogue-EVE')
 
 
+class GameState(object):
+    def __init__(self, state):
+        self.state = state
+
+
 class ObjectPool(object):
     class __ObjectPool(object):
         def __init__(self):
@@ -160,15 +165,16 @@ class ConsoleBuffer(object):
         return self.fov_recompute
 
     def render_all(self):
+        player = self.object_pool.get_player()
+
         if self.fov_must_recompute():
             # recompute FOV if needed (the player moved or something)
             self.reset_fov_recompute()
-            player = self.object_pool.get_player()
             self.visible_tiles = tdl.map.quickFOV(player.coord.X, player.coord.Y,
-                                             self.map.is_visible_tile,
-                                             fov=self.fov_algorithm,
-                                             radius=player.torch,
-                                             lightWalls=self.fov_light_walls)
+                                                  self.map.is_visible_tile,
+                                                  fov=self.fov_algorithm,
+                                                  radius=player.torch,
+                                                  lightWalls=self.fov_light_walls)
 
             self.map.set_visible_tiles(self.visible_tiles)
             if self.map:
@@ -178,6 +184,10 @@ class ConsoleBuffer(object):
             for obj in self.object_pool.get_objects_as_list():
                 if (obj.coord.X, obj.coord.Y) in self.visible_tiles:
                     obj.draw(self.console)
+
+        # GUI HERE
+        self.console.draw_str(1, self.heigth - 2, 'HP: ' + str(player.fighter.hp) + '/' +
+                              str(player.fighter.max_hp) + ' ')
 
         self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.heigth, self.target.X, self.target.Y)
 

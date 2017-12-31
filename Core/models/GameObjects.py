@@ -310,18 +310,47 @@ class BasicMonsterAI(object):
         return closest_point_of_interest
 
 
+class DeathMethods(object):
+    @staticmethod
+    def player_death(player):
+        # the game ended!
+        print('You died!')
+        player.game_state.state = 'dead'
+        # for added effect, transform the player into a corpse!
+        player.char = '%'
+        player.color = Colors.dark_red
+
+    @staticmethod
+    def monster_death(monster):
+        # transform it into a nasty corpse! it doesn't block, can't be
+        # attacked and doesn't move
+        print(monster.name.capitalize() + ' is dead!')
+        monster.char = '%'
+        monster.color = Colors.dark_red
+        monster.blocks = False
+        monster.fighter = None
+        monster.ai = None
+        monster.name = 'remains of ' + monster.name
+
+
 class Fighter(object):
-    def __init__(self, hp, defense, power):
+    def __init__(self, hp, defense, power, death_function):
         self.owner = None
         self.max_hp = hp
         self.hp = hp
         self.defense = defense
         self.power = power
+        self.death_function = death_function
 
     def take_damage(self, damage):
         # apply damage if possible
         if damage > 0:
             self.hp -= damage
+        # check for death. if there's a death function, call it
+        if self.hp <= 0:
+            function = self.death_function
+            if function is not None:
+                function(self.owner)
 
     def attack(self, target):
         # a simple formula for attack damage
@@ -347,12 +376,13 @@ class Character(GameObject):
                  _id: str=None,
                  collision_handler=None,
                  torch=10,
-                 tags=list()
+                 tags=list(),
+                 game_state=None
                  ):
         super(Character, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags)
         self.torch = torch
         self.collision_handler = collision_handler
-
+        self.game_state = game_state
         self.fighter = copy.copy(fighter)
         if self.fighter:
             # let the fighter component know who owns it
@@ -402,9 +432,7 @@ class Character(GameObject):
 
     def move_towards(self, target: Vector2):
         # vector from this object to the target, and distance
-
         distance = Vector2.distance(self.coord, target)
-        #math.sqrt((target - self.coord).X ** 2 + (target - self.coord).Y ** 2)
 
         # normalize it to length 1 (preserving direction), then round it and
         # convert to integer so the movement is restricted to the map grid

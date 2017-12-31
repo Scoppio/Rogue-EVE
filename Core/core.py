@@ -1,7 +1,7 @@
 import tdl
 import os
-from utils.ObjectManager import ObjectPool, CollisionHandler, ConsoleBuffer
-from models.GameObjects import Character, Vector2, MapConstructor, Fighter, MapObjectsConstructor, BasicMonsterAI
+from utils.ObjectManager import ObjectPool, CollisionHandler, ConsoleBuffer, GameState
+from models.GameObjects import Character, Vector2, MapConstructor, Fighter, MapObjectsConstructor, BasicMonsterAI, DeathMethods
 import logging
 from utils import Colors
 import argparse
@@ -33,7 +33,6 @@ LIMIT_FPS = args.fps
 REALTIME = args.realtime
 LEGACY_MODE = args.legacy
 LOGLEVEL = {0: logging.DEBUG, 1:logging.INFO, 2: logging.WARNING, 3: logging.ERROR, 4: logging.CRITICAL}
-GAMESTATE = 'loading'
 
 # instantiating logger
 logging.basicConfig(filename='debug.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -46,9 +45,10 @@ logger.addHandler(ch)
 
 
 def handle_keys(movable_object):
-    global GAMESTATE
+
     action = 'nop'
     fov_recompute = False
+    user_input = None
 
     if REALTIME:
 
@@ -77,7 +77,9 @@ def handle_keys(movable_object):
         # exit game
         return action, fov_recompute
 
-    if GAMESTATE is 'playing':
+    print(movable_object.game_state, movable_object.game_state == 'playing')
+
+    if movable_object.game_state.state == 'playing':
         fov_recompute = False
 
         # movement keys
@@ -98,7 +100,8 @@ def handle_keys(movable_object):
 
 
 def main():
-    global GAMESTATE
+
+    games_tate = GameState('loading')
 
     # General tools for management of the game
 
@@ -135,7 +138,7 @@ def main():
             'color': Colors.dark_fuchsia,
             'name': 'orc',
             'ai': BasicMonsterAI(interest_tag='player'),
-            'fighter': Fighter(hp=10, defense=0, power=3),
+            'fighter': Fighter(hp=10, defense=0, power=3, death_function=DeathMethods.monster_death),
             'tags': ['monster', 'orc', 'small']
         },
         3.0
@@ -146,27 +149,28 @@ def main():
             'color': Colors.dark_crimson,
             'name': 'Troll',
             'ai': BasicMonsterAI(interest_tag='player'),
-            'fighter': Fighter(hp=16, defense=1, power=4),
+            'fighter': Fighter(hp=16, defense=1, power=4, death_function=DeathMethods.monster_death),
             'tags': ['monster', 'troll', 'big']
         },
         1.0
     ).populate_map()
 
     # Creation of the player
-    fighter_component = Fighter(hp=30, defense=2, power=5)
+    fighter_component = Fighter(hp=30, defense=2, power=5, death_function=DeathMethods.player_death)
     player = Character(my_map.get_rooms()[0].center(),
                        collision_handler=collision_handler,
                        color=Colors.white,
                        name='Player',
                        fighter=fighter_component,
-                       tags=['player'])
+                       tags=['player'],
+                       game_state=games_tate)
     object_pool.add_player(player)
 
     renderer = ConsoleBuffer(root, object_pool=object_pool, map=my_map,
                              width=SCREEN_WIDTH, height=SCREEN_HEIGHT,
                              origin=Vector2.zero(), target=Vector2.zero())
 
-    GAMESTATE = 'playing'
+    games_tate.state = 'playing'
 
     while not tdl.event.is_window_closed():
 
@@ -183,7 +187,7 @@ def main():
         if player_action == 'exit':
             break
 
-        if GAMESTATE == 'playing' and player_action != 'didnt-take-turn':
+        if games_tate.state == 'playing' and player_action != 'didnt-take-turn':
             for obj in object_pool.find_by_tag('monster'):
                 if obj.ai:
                     obj.ai.take_turn()
