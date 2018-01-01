@@ -1,6 +1,11 @@
 import tdl
 from models.GameObjects import Vector2
+from utils import Colors
 import logging
+import textwrap
+from utils import Messenger
+from utils.MouseController import mouse_controller
+
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -8,93 +13,6 @@ logger = logging.getLogger('Rogue-EVE')
 class GameState(object):
     def __init__(self, state):
         self.state = state
-
-
-class ObjectPool(object):
-    class __ObjectPool(object):
-        def __init__(self):
-            self.id_counter = 0
-            self.object_poll = {}
-            self.player = None
-
-        def __str__(self):
-            return repr(self)
-
-        def identify_object(self):
-            ret = self.id_counter
-            self.id_counter += 1
-            return ret
-
-        def get_player(self):
-            return self.player
-
-        def add_player(self, player):
-            """Add the player"""
-            player._id = self.identify_object()
-            self.player = player
-            self.append(player)
-
-        def remove_player(self):
-            self.delete_by_id(self.player._id)
-            self.player = None
-
-        def append(self, obj):
-            """For non-player objects"""
-            if obj._id is None:
-                obj._id = self.identify_object()
-
-            if obj._id not in self.object_poll.keys():
-                self.object_poll[obj._id] = obj
-                obj.object_pool = self
-
-        def get_objects_as_list(self):
-            return self.object_poll.values()
-
-        def get_objects_as_dict(self):
-            return self.object_poll
-
-        def __delitem__(self, key):
-            del self.object_poll[key]
-
-        def __delete__(self, key):
-            self.object_poll = {}
-
-        def delete_object(self, obj):
-            key_to_delete = None
-            for key, val in self.object_poll.items():
-                if val == obj:
-                    key_to_delete = key
-                    break;
-
-            del self.object_poll[key_to_delete]
-
-        def delete_by_id(self, key):
-            if key in self.object_poll.keys():
-                del self.object_poll[key]
-            else:
-                print("Key not present in the object pool")
-                # raise KeyError
-
-        def find_by_id(self, key):
-            if key in self.object_poll.keys():
-                return self.object_poll[key]
-            else:
-                logger.error("Key not present in the object pool")
-                # raise KeyError
-
-        def find_by_tag(self, tag):
-            return [obj for obj in self.get_objects_as_list() if tag in obj.tags]
-
-    instance = None
-
-    def __init__(self):
-        if not ObjectPool.instance:
-            ObjectPool.instance = ObjectPool.__ObjectPool()
-        #else:
-        #    ObjectPool.instance.val = arg
-
-    def __getattr__(self, name):
-        return getattr(self.instance, name)
 
 
 class CollisionHandler(object):
@@ -132,28 +50,37 @@ class CollisionHandler(object):
 
 
 class ConsoleBuffer(object):
-    def __init__(self, root, object_pool = None, map = None, width: int = 0, height: int =0,
-                 origin: Vector2=None, target: Vector2=None):
-
+    def __init__(self,
+                 root,
+                 object_pool=None,
+                 map=None,
+                 width: int = 0,
+                 height: int = 0,
+                 origin: Vector2 = None,
+                 target: Vector2 = None,
+                 console: object = None,
+                 ):
         self.object_pool = object_pool
         self.map = map
         self.root = root
-        self.console = tdl.Console(width, height)
+        if console:
+            self.console = console
+        else:
+            self.console = tdl.Console(width, height)
         self.origin = origin
         self.target = target
-        self.heigth = height
+        self.height = height
         self.width = width
         self.fov_recompute = True
-        self.fov_algorithm = 'SHADOW' # 'DIAMOND', 'BASIC'
+        self.fov_algorithm = 'SHADOW'
         self.fov_light_walls = True
         self.visible_tiles = None
-
-    def config_buffer(self, origin: Vector2, width: int, height: int, target: Vector2):
-        self.console = tdl.Console(width, height)
-        self.origin = origin
-        self.target = target
-        self.heigth = height
-        self.width = width
+        self.bars = []
+        self.game_msg = None
+        self.message_height = None
+        self.message_width = None
+        self.message_origin_x = None
+        self.message_origin_y = None
 
     def set_fov_recompute_to(self, val: bool):
         self.fov_recompute = val
@@ -164,7 +91,56 @@ class ConsoleBuffer(object):
     def fov_must_recompute(self):
         return self.fov_recompute
 
-    def render_all(self):
+    def add_bar(self, x, y, total_width, name, value_name, maximum_value_name, obj, bar_color, back_color):
+
+        self.bars.append(
+            {'x': x,
+             'y': y,
+             'value_name': value_name,
+             'maximum_value_name': maximum_value_name,
+             'total_width': total_width,
+             'name': name,
+             'obj': obj,
+             'bar_color': bar_color,
+             'back_color': back_color
+             }
+        )
+
+    def render_gui(self):
+
+        # prepare to render the GUI panel
+        self.console.clear(fg=Colors.white, bg=Colors.black)
+
+        for args in self.bars:
+            # render a bar (HP, experience, etc). first calculate the width of the bar
+            obj = args['obj']
+            value = obj.__getattribute__(args['value_name'])
+            maximum = obj.__getattribute__(args['maximum_value_name'])
+            bar_width = int(float(value) / maximum * args['total_width'])
+
+            # render the background first
+            self.console.draw_rect(args['x'], args['y'], args['total_width'], 1, None, bg=args['back_color'])
+
+            # now render the bar on top
+            if bar_width > 0:
+                self.console.draw_rect(args['x'], args['y'], bar_width, 1, None, bg=args['bar_color'])
+
+            # finally, some centered text with the values
+            text = args['name'] + ': ' + str(value) + '/' + str(maximum)
+            x_centered = args['x'] + (args['total_width'] - len(text)) // 2
+            self.console.draw_str(x_centered, args['y'], text, fg=Colors.white, bg=None)
+
+        y = self.message_origin_y
+        for (line, color) in self.game_msg:
+            self.console.draw_str(self.message_origin_x, y, line, bg=None, fg=color)
+            y += 1
+
+        self.console.draw_str(1, 0, mouse_controller.get_names_under_mouse(), bg=None, fg=Colors.light_gray)
+
+        # blit the contents of "panel" to the root console
+        self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X, self.target.Y)
+
+    def render_all_objects(self):
         player = self.object_pool.get_player()
 
         if self.fov_must_recompute():
@@ -191,13 +167,30 @@ class ConsoleBuffer(object):
                 player = self.object_pool.get_player()
                 player.draw(self.console)
 
-        # GUI HERE
-        self.console.draw_str(1, self.heigth - 2, 'HP: ' + str(player.fighter.hp) + '/' +
-                              str(player.fighter.max_hp) + ' ')
-
-        self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.heigth, self.target.X, self.target.Y)
+        self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X, self.target.Y)
 
     def clear_all_objects(self):
         if self.object_pool:
             for obj in self.object_pool.get_objects_as_list():
                 obj.clear(self.console)
+
+    def add_message_console(self, message_width, message_height, message_origin_x, message_origin_y):
+        Messenger.message_handler = self
+        self.game_msg = []
+        self.message_width = message_width
+        self.message_height = message_height
+        self.message_origin_x = message_origin_x
+        self.message_origin_y = message_origin_y
+
+    def send_message(self, new_msg, color=Colors.white):
+        # split the message if necessary, among multiple lines
+        new_msg_lines = textwrap.wrap(new_msg, self.message_width)
+
+        for line in new_msg_lines:
+            # if the buffer is full, remove the first line to make room for the new one
+            if len(self.game_msg) == self.message_height:
+                self.game_msg = self.game_msg[1:]
+
+            # add the new line as a tuple, with the text and the color
+            self.game_msg.append((line, color))
+

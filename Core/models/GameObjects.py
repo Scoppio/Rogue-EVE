@@ -6,6 +6,7 @@ import logging
 import itertools
 import copy
 from utils import Colors
+from utils.Messenger import send_message
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -351,6 +352,7 @@ class Fighter(object):
             self.hp -= damage
         # check for death. if there's a death function, call it
         if self.hp <= 0:
+            self.hp = 0
             function = self.death_function
             if function is not None:
                 function(self.owner)
@@ -361,10 +363,15 @@ class Fighter(object):
 
         if damage > 0:
             # make the target take some damage
-            print(self.owner.name.capitalize() + ' attacks ' + target.name + ' for ' + str(damage) + ' hit points.')
+            send_message(self.owner.name.capitalize() +
+                         ' attacks ' + target.name + ' for ' + str(damage) + ' hit points.',
+                         Colors.light_blue)
+            # print(self.owner.name.capitalize() + ' attacks ' + target.name + ' for ' + str(damage) + ' hit points.')
             target.fighter.take_damage(damage)
         else:
-            print(self.owner.name.capitalize() + ' attacks ' + target.name + ' but it has no effect!')
+            send_message(self.owner.name.capitalize() + ' attacks ' + target.name + ' but it has no effect!',
+                         Colors.light_blue)
+            # print(self.owner.name.capitalize() + ' attacks ' + target.name + ' but it has no effect!')
 
 
 class Character(GameObject):
