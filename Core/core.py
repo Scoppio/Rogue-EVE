@@ -7,7 +7,8 @@ from utils.Messenger import send_message
 from utils.ObjectManager import CollisionHandler, ConsoleBuffer, GameState
 from utils.ObjectPool import object_pool
 from utils.MouseController import mouse_controller
-from models.GameObjects import Character, Vector2, MapConstructor, Fighter, MapObjectsConstructor, BasicMonsterAI, DeathMethods
+from models.GameObjects import Character, Vector2, Fighter, BasicMonsterAI, DeathMethods
+from models.MapObjects import MapConstructor, MapObjectsConstructor
 
 # Based on the tutorial from RogueBasin for python3 with tdl
 # Adapted to use more objects and be more loosely tied, without many global variables and constants
@@ -77,10 +78,8 @@ def handle_keys(movable_object):
     if not keypress:
         return action, fov_recompute
 
-
     logger.debug("User_Input [key={} alt={} ctrl={} shift={}]".format(
-        user_input.key, user_input.alt, user_input.control, user_input.shift)
-    )
+        user_input.key, user_input.alt, user_input.control, user_input.shift))
 
     if user_input.key == 'ENTER' and user_input.alt:
         # Alt+Enter: toggle fullscreen
@@ -127,13 +126,14 @@ def main():
     # ObjectPool keeps track of all the objects on the scene
     # Starting up the collision handler, which manages all the objects collision events
     collision_handler = CollisionHandler()
+
     # A map constructor, that randomly create rooms with (not yet implemented) many different strategies
-    map_constructor = MapConstructor(MAP_SIZE[0],MAP_SIZE[1])
-    map_constructor.populate_with_random_rooms()
-    my_map = map_constructor.build_map()
-    if LEGACY_MODE:
-        # Legacy mode makes the map be drawn using chars instead of colored blocks
-        my_map.set_legacy_mode()
+    # Legacy mode makes the map be drawn using chars instead of colored blocks
+    my_map = MapConstructor(MAP_SIZE[0],MAP_SIZE[1]).make_random_map(
+        strategy="random",
+        maximum_number_of_tries=15,
+        legacy_mode=LEGACY_MODE
+    )
 
     # Adding the object pool and the map to the collision handler so they interact
     collision_handler.set_map(my_map)
@@ -143,7 +143,11 @@ def main():
     mouse_controller.set_map(my_map)
     # Map objects constructor is a special factory that randomly populates the map with object templates
     # and does deal with weighted distributions, It makes everything in place, by reference
-    MapObjectsConstructor(my_map, object_pool, collision_handler).add_object_template(
+    MapObjectsConstructor(
+        my_map,
+        object_pool,
+        collision_handler
+    ).add_object_template(
         Character,
         {
             'char': 'o',
@@ -169,6 +173,7 @@ def main():
 
     # Creation of the player
     fighter_component = Fighter(hp=30, defense=2, power=5, death_function=DeathMethods.player_death)
+
     player = Character(my_map.get_rooms()[0].center(),
                        collision_handler=collision_handler,
                        color=Colors.white,

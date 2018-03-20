@@ -72,7 +72,7 @@ class ObjectPool(object):
         if key in self.object_poll.keys():
             return self.object_poll[key]
         else:
-            logger.error("Key not present in the object pool")
+            logger.warning("Key {key} not present in the object pool".format(key=key))
             # raise KeyError
 
     def find_by_tag(self, tag):
