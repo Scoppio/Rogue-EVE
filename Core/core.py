@@ -126,66 +126,74 @@ def main():
     tdl.setFPS(LIMIT_FPS)
     root = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
 
-    # Now start the setup of the object managers
-
-    # ObjectPool keeps track of all the objects on the scene
-    # Starting up the collision handler, which manages all the objects collision events
-    collision_handler = CollisionHandler()
-
     # A map constructor, that randomly create rooms with (not yet implemented) many different strategies
     # Legacy mode makes the map be drawn using chars instead of colored blocks
-    my_map = MapConstructor(MAP_SIZE[0],MAP_SIZE[1]).make_random_map(
+    my_map = MapConstructor(
+        MAP_SIZE[0],
+        MAP_SIZE[1]
+    ).make_random_map(
         strategy="random",
         maximum_number_of_tries=15,
         legacy_mode=LEGACY_MODE
     )
 
+    # Now start the setup of the object managers
+    # ObjectPool keeps track of all the objects on the scene
+    # Starting up the collision handler, which manages all the objects collision events
     # Adding the object pool and the map to the collision handler so they interact
-    collision_handler.set_map(my_map)
-    collision_handler.set_object_pool(object_pool)
+    collision_handler = CollisionHandler(map=my_map, object_pool=object_pool)
 
     # Add the map to the mouse so it understand what is visible and what is not
     mouse_controller.set_map(my_map)
 
-    # Map objects constructor is a special factory that randomly populates the map with object templates
-    # and does deal with weighted distributions, It makes everything in place, by reference
-
+    # Before we start the map objects constructor we load the level data that is being hold on a file
+    # With all the information necessary to build the monsters from the template
     game_objects = loadGameObjectFromFile(LEVEL_DATA)
 
+    # Map objects constructor is a special factory that randomly populates the map with object templates
+    # and does deal with weighted distributions, It makes everything in place, by reference
     MapObjectsConstructor(my_map, object_pool, collision_handler).add_object_templates(game_objects).populate_map()
+
     # Creation of the player
     fighter_component = Fighter(hp=30, defense=2, power=5, death_function=DeathMethods.player_death)
-
-    player = Character(my_map.get_rooms()[0].center(),
-                       collision_handler=collision_handler,
-                       color=Colors.white,
-                       name='Player',
-                       fighter=fighter_component,
-                       tags=['player'],
-                       game_state=games_tate)
+    player_starting_position = my_map.get_rooms()[0].center()
+    player = Character(
+        player_starting_position,
+        collision_handler=collision_handler,
+        color=Colors.white,
+        name='Player',
+        fighter=fighter_component,
+        tags=['player'],
+        game_state=games_tate
+    )
 
     object_pool.add_player(player)
 
-    map_renderer = ConsoleBuffer(root,
-                                 object_pool=object_pool,
-                                 map=my_map,
-                                 width=MAP_SIZE[0],
-                                 height=MAP_SIZE[1],
-                                 origin=Vector2.zero(),
-                                 target=Vector2.zero()
-                                 )
+    map_renderer = ConsoleBuffer(
+        root,
+        object_pool=object_pool,
+        map=my_map,
+        width=MAP_SIZE[0],
+        height=MAP_SIZE[1],
+        origin=Vector2.zero(),
+        target=Vector2.zero()
+    )
 
-    lower_gui_renderer = ConsoleBuffer(root,
-                                       origin=Vector2(0, SCREEN_HEIGHT-PANEL_HEIGHT),
-                                       target=Vector2(0, 0),
-                                       width=SCREEN_WIDTH,
-                                       height=PANEL_HEIGHT)
+    lower_gui_renderer = ConsoleBuffer(
+        root,
+        origin=Vector2(0, SCREEN_HEIGHT-PANEL_HEIGHT),
+        target=Vector2(0, 0),
+        width=SCREEN_WIDTH,
+        height=PANEL_HEIGHT
+    )
 
     lower_gui_renderer.add_message_console(MSG_WIDTH, MSG_HEIGHT, MSG_X, MSG_Y)
 
-    lower_gui_renderer.add_bar(1, 1, BAR_WIDTH, 'HP', 'hp', 'max_hp', player.fighter,
-                               Colors.light_red, Colors.darker_red
-                               )
+    lower_gui_renderer.add_bar(
+        1, 1, BAR_WIDTH, 'HP', 'hp',
+        'max_hp', player.fighter,
+        Colors.light_red, Colors.darker_red
+    )
 
     # a warm welcoming message!
     send_message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', Colors.red)
