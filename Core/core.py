@@ -9,6 +9,7 @@ from utils.ObjectPool import object_pool
 from utils.MouseController import mouse_controller
 from models.GameObjects import Character, Vector2, Fighter, BasicMonsterAI, DeathMethods
 from models.MapObjects import MapConstructor, MapObjectsConstructor
+from utils.YamlDeserializer import loadGameObjectFromFile
 
 # Based on the tutorial from RogueBasin for python3 with tdl
 # Adapted to use more objects and be more loosely tied, without many global variables and constants
@@ -25,6 +26,8 @@ parser.add_argument("--realtime", help="run the game in realtime as oposed to tu
                     action="store_true")
 parser.add_argument("--legacy", help="Prints the tiles as characters",
                     action="store_true")
+parser.add_argument("-L", "--level_file", type=str, default='test_1.yaml',
+                    help="Selects a different level file to use")
 
 args = parser.parse_args()
 #########################################
@@ -50,6 +53,8 @@ LIMIT_FPS = args.fps
 REALTIME = args.realtime
 LEGACY_MODE = args.legacy
 LOGLEVEL = {0: logging.DEBUG, 1:logging.INFO, 2: logging.WARNING, 3: logging.ERROR, 4: logging.CRITICAL}
+dirname = os.path.dirname(__file__)
+LEVEL_DATA = os.path.join(dirname, "gamedata", args.level_file)
 
 # instantiating logger
 logging.basicConfig(filename='debug.log',
@@ -141,36 +146,13 @@ def main():
 
     # Add the map to the mouse so it understand what is visible and what is not
     mouse_controller.set_map(my_map)
+
     # Map objects constructor is a special factory that randomly populates the map with object templates
     # and does deal with weighted distributions, It makes everything in place, by reference
-    MapObjectsConstructor(
-        my_map,
-        object_pool,
-        collision_handler
-    ).add_object_template(
-        Character,
-        {
-            'char': 'o',
-            'color': Colors.dark_fuchsia,
-            'name': 'orc',
-            'ai': BasicMonsterAI(interest_tag='player'),
-            'fighter': Fighter(hp=10, defense=0, power=3, death_function=DeathMethods.monster_death),
-            'tags': ['monster', 'orc', 'small']
-        },
-        3.0
-    ).add_object_template(
-        Character,
-        {
-            'char': 'T',
-            'color': Colors.dark_crimson,
-            'name': 'Troll',
-            'ai': BasicMonsterAI(interest_tag='player'),
-            'fighter': Fighter(hp=16, defense=1, power=4, death_function=DeathMethods.monster_death),
-            'tags': ['monster', 'troll', 'big']
-        },
-        1.0
-    ).populate_map()
 
+    game_objects = loadGameObjectFromFile(LEVEL_DATA)
+
+    MapObjectsConstructor(my_map, object_pool, collision_handler).add_object_templates(game_objects).populate_map()
     # Creation of the player
     fighter_component = Fighter(hp=30, defense=2, power=5, death_function=DeathMethods.player_death)
 

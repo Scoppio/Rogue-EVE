@@ -303,6 +303,17 @@ class MapObjectsConstructor(object):
         return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
                                      self.object_templates, self.max_objecs_per_room)
 
+    def add_object_templates(self, object_templates):
+        """
+        You need to give an object template and a weight so the system makes random choices based on a probability
+        distribution of the weight of the objects
+        """
+        for item in object_templates:
+            self.object_templates.append((item["obj_template"], item["args"], item["weight"]))
+
+        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
+                                     self.object_templates, self.max_objecs_per_room)
+
     def set_max_objects_per_room(self, value):
         self.max_objecs_per_room = value
         return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,

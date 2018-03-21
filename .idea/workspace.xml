@@ -2,13 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6cdcd319-8bbb-4b24-a3a4-70a8118f51fe" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/Core/utils/Messenger.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/Core/utils/MouseController.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/Core/utils/ObjectPool.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/Core/gamedata/test_1.yaml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/Core/gamedata/test_2.yaml" />
+      <change beforePath="$PROJECT_DIR$/.idea/Rogue-EVE.iml" afterPath="$PROJECT_DIR$/.idea/Rogue-EVE.iml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/Core/core.py" afterPath="$PROJECT_DIR$/Core/core.py" />
-      <change beforePath="$PROJECT_DIR$/Core/models/GameObjects.py" afterPath="$PROJECT_DIR$/Core/models/GameObjects.py" />
-      <change beforePath="$PROJECT_DIR$/Core/utils/ObjectManager.py" afterPath="$PROJECT_DIR$/Core/utils/ObjectManager.py" />
+      <change beforePath="$PROJECT_DIR$/Core/models/MapObjects.py" afterPath="$PROJECT_DIR$/Core/models/MapObjects.py" />
+      <change beforePath="$PROJECT_DIR$/Core/utils/YamlImporter.py" afterPath="$PROJECT_DIR$/Core/utils/YamlDeserializer.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -22,12 +22,99 @@
       <file leaf-file-name="core.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Core/core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2397">
-              <caret line="141" column="79" lean-forward="false" selection-start-line="141" selection-start-column="79" selection-end-line="141" selection-end-column="79" />
+            <state relative-caret-position="1540">
+              <caret line="152" column="53" lean-forward="true" selection-start-line="152" selection-start-column="53" selection-end-line="152" selection-end-column="53" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
-                <element signature="e#5544#5856#0" expanded="false" />
-                <element signature="e#5924#6238#0" expanded="false" />
+                <element signature="e#2728#4246#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test_2.yaml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/gamedata/test_2.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="459">
+              <caret line="27" column="34" lean-forward="true" selection-start-line="27" selection-start-column="34" selection-end-line="27" selection-end-column="34" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MapObjects.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/models/MapObjects.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="333">
+              <caret line="312" column="0" lean-forward="true" selection-start-line="312" selection-start-column="0" selection-end-line="312" selection-end-column="0" />
+              <folding>
+                <element signature="e#2400#4126#0" expanded="false" />
+                <element signature="e#4905#5513#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="YamlDeserializer.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/utils/YamlDeserializer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="282">
+              <caret line="120" column="26" lean-forward="false" selection-start-line="120" selection-start-column="26" selection-end-line="120" selection-end-column="26" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+                <element signature="e#982#1656#0" expanded="false" />
+                <element signature="e#1691#2234#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test_1.yaml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/gamedata/test_1.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="391">
+              <caret line="23" column="22" lean-forward="true" selection-start-line="23" selection-start-column="22" selection-end-line="23" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Colors.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/utils/Colors.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3740">
+              <caret line="220" column="0" lean-forward="false" selection-start-line="220" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GameObjects.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="629">
+              <caret line="293" column="40" lean-forward="false" selection-start-line="293" selection-start-column="40" selection-end-line="293" selection-end-column="40" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+                <element signature="e#190#6788#0" expanded="false" />
+                <element signature="e#301#547#0" expanded="false" />
+                <element signature="e#588#614#0" expanded="false" />
+                <element signature="e#654#900#0" expanded="false" />
+                <element signature="e#941#967#0" expanded="false" />
+                <element signature="e#1007#1258#0" expanded="false" />
+                <element signature="e#1299#1325#0" expanded="false" />
+                <element signature="e#1369#1720#0" expanded="false" />
+                <element signature="e#1765#2140#0" expanded="false" />
+                <element signature="e#2331#2602#0" expanded="false" />
+                <element signature="e#2635#2667#0" expanded="false" />
+                <element signature="e#2711#2872#0" expanded="false" />
+                <element signature="e#2923#3086#0" expanded="false" />
+                <element signature="e#6825#6906#0" expanded="false" />
+                <element signature="e#6947#8063#0" expanded="false" />
+                <element signature="e#7869#7949#0" expanded="false" />
+                <element signature="e#7989#8063#0" expanded="false" />
+                <element signature="e#10452#11868#0" expanded="false" />
+                <element signature="e#11904#14631#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -43,62 +130,18 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MouseController.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Core/utils/MouseController.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
-              <caret line="30" column="18" lean-forward="true" selection-start-line="30" selection-start-column="18" selection-end-line="30" selection-end-column="18" />
-              <folding>
-                <element signature="e#0#40#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GameObjects.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="35" lean-forward="true" selection-start-line="3" selection-start-column="35" selection-end-line="4" selection-end-column="14" />
-              <folding>
-                <element signature="e#255#6853#0" expanded="false" />
-                <element signature="e#366#612#0" expanded="false" />
-                <element signature="e#653#679#0" expanded="false" />
-                <element signature="e#719#965#0" expanded="false" />
-                <element signature="e#1006#1032#0" expanded="false" />
-                <element signature="e#1072#1323#0" expanded="false" />
-                <element signature="e#1364#1390#0" expanded="false" />
-                <element signature="e#1434#1785#0" expanded="false" />
-                <element signature="e#1830#2205#0" expanded="false" />
-                <element signature="e#2396#2667#0" expanded="false" />
-                <element signature="e#2700#2732#0" expanded="false" />
-                <element signature="e#2776#2937#0" expanded="false" />
-                <element signature="e#2988#3151#0" expanded="false" />
-                <element signature="e#6890#6971#0" expanded="false" />
-                <element signature="e#7012#8128#0" expanded="false" />
-                <element signature="e#7934#8014#0" expanded="false" />
-                <element signature="e#8054#8128#0" expanded="false" />
-                <element signature="e#9738#10479#0" expanded="false" />
-                <element signature="e#11961#14688#0" expanded="false" />
-                <element signature="e#14715#15037#0" expanded="false" />
-                <element signature="e#16902#18628#0" expanded="false" />
-                <element signature="e#22971#23872#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="ObjectPool.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Core/utils/ObjectPool.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="21" column="26" lean-forward="false" selection-start-line="21" selection-start-column="26" selection-end-line="21" selection-end-column="26" />
+            <state relative-caret-position="918">
+              <caret line="69" column="0" lean-forward="false" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
               <folding>
                 <element signature="e#1063#1086#0" expanded="false" />
                 <element signature="e#1128#1153#0" expanded="false" />
                 <element signature="e#1194#1215#0" expanded="false" />
                 <element signature="e#1259#1460#0" expanded="false" />
                 <element signature="e#1503#1674#0" expanded="false" />
+                <element signature="e#1715#1920#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -107,41 +150,12 @@
       <file leaf-file-name="ObjectManager.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
-              <caret line="22" column="8" lean-forward="false" selection-start-line="22" selection-start-column="8" selection-end-line="22" selection-end-column="8" />
+            <state relative-caret-position="102">
+              <caret line="12" column="15" lean-forward="false" selection-start-line="12" selection-start-column="6" selection-end-line="12" selection-end-column="15" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <element signature="e#258#311#0" expanded="false" />
                 <element signature="e#2901#3247#0" expanded="false" />
                 <element signature="e#6238#6361#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="playground.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Core/playground.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="183">
-              <caret line="366" column="67" lean-forward="true" selection-start-line="366" selection-start-column="67" selection-end-line="366" selection-end-column="67" />
-              <folding>
-                <element signature="e#24#33#0" expanded="true" />
-                <element signature="e#834#1193#0" expanded="false" />
-                <element signature="e#1212#1764#0" expanded="false" />
-                <element signature="e#1789#3946#0" expanded="false" />
-                <element signature="e#3968#5121#0" expanded="false" />
-                <element signature="e#5148#5664#0" expanded="false" />
-                <element signature="e#5693#5928#0" expanded="false" />
-                <element signature="e#5958#6212#0" expanded="false" />
-                <element signature="e#6251#6392#0" expanded="false" />
-                <element signature="e#6431#6594#0" expanded="false" />
-                <element signature="e#9235#10480#0" expanded="false" />
-                <element signature="e#10567#11142#0" expanded="false" />
-                <element signature="e#13979#14381#0" expanded="false" />
-                <element signature="e#14423#14907#0" expanded="false" />
-                <element signature="e#14933#15957#0" expanded="false" />
-                <element signature="e#15990#16208#0" expanded="false" />
-                <element signature="e#16243#16615#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -161,13 +175,19 @@
       <find>Mdict</find>
       <find>normalize</find>
       <find>grow</find>
-      <find>REALTIME</find>
       <find>get_names_under_mouse</find>
       <find>arial</find>
       <find>global my_map</find>
       <find>ObjectPool</find>
       <find>object_pool</find>
       <find>is_visible_tile</find>
+      <find>realtime</find>
+      <find>REALTIME</find>
+      <find>import numbers</find>
+      <find>numbers</find>
+      <find>BasicMons</find>
+      <find>number</find>
+      <find>MonsterAI</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -190,12 +210,17 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/Core/utils/Messager.py" />
-        <option value="$PROJECT_DIR$/Core/models/GameObjects.py" />
         <option value="$PROJECT_DIR$/Core/playground.py" />
         <option value="$PROJECT_DIR$/Core/utils/ObjectManager.py" />
-        <option value="$PROJECT_DIR$/Core/utils/ObjectPool.py" />
         <option value="$PROJECT_DIR$/Core/utils/MouseController.py" />
+        <option value="$PROJECT_DIR$/Core/models/GameObjects.py" />
+        <option value="$PROJECT_DIR$/Core/utils/ObjectPool.py" />
+        <option value="$PROJECT_DIR$/Core/utils/YamlImporter.py" />
+        <option value="$PROJECT_DIR$/Core/gamedata/test_1.yaml" />
+        <option value="$PROJECT_DIR$/Core/utils/YamlDeserializer.py" />
+        <option value="$PROJECT_DIR$/Core/models/MapObjects.py" />
         <option value="$PROJECT_DIR$/Core/core.py" />
+        <option value="$PROJECT_DIR$/Core/gamedata/test_2.yaml" />
       </list>
     </option>
   </component>
@@ -220,6 +245,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -232,31 +259,24 @@
               <item name="Rogue-EVE" type="462c0819:PsiDirectoryNode" />
               <item name="Core" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Rogue-EVE" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Rogue-EVE" type="462c0819:PsiDirectoryNode" />
-              <item name="Core" type="462c0819:PsiDirectoryNode" />
-              <item name="utils" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/Core/playground.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Core/utils/YamlImporter.py" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Gabriela\PycharmProjects\Rogue-EVE\Core" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Gabriela\PycharmProjects\Rogue-EVE\Core" />
       <recent name="C:\Users\Gabriela\PycharmProjects\Rogue-EVE\assets" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Doomsday\Documents\GitHub\Rogue-EVE\Core\gamedata" />
+      <recent name="C:\Users\Gabriela\PycharmProjects\Rogue-EVE\Core" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -296,21 +316,40 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\Gabriela\PycharmProjects\Rogue-EVE\venv\Scripts\python.exe" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Core" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Rogue-EVE" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Core/core.py" />
-      <option name="PARAMETERS" value="-l 3 -s 90x60" />
+      <option name="PARAMETERS" value="-l 3 -s 90x60 -L test_2.yaml" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
-    <list size="2">
+    <configuration name="YamlTest" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Doomsday\Documents\GitHub\Rogue-EVE\venv\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Core/utils" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="Rogue-EVE" />
+      <option name="SCRIPT_NAME" value="C:\Users\Doomsday\Documents\GitHub\Rogue-EVE\Core\utils\YamlDeserializer.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="Python.Run" />
-      <item index="1" class="java.lang.String" itemvalue="Python.Playground" />
+      <item index="1" class="java.lang.String" itemvalue="Python.YamlTest" />
+      <item index="2" class="java.lang.String" itemvalue="Python.Playground" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
@@ -330,15 +369,16 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <frame x="-8" y="-8" width="1376" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14934114" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14926471" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32861635" sideWeight="0.5029412" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32861635" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32913387" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2625786" sideWeight="0.4970588" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -348,7 +388,6 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -357,78 +396,11 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="15" />
+      <option name="time" value="21" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Core/utils/Colors.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3740">
-          <caret line="220" column="0" lean-forward="true" selection-start-line="220" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Python36/Lib/colorsys.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/requirements.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="10" lean-forward="false" selection-start-line="2" selection-start-column="10" selection-end-line="2" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5423">
-          <caret line="319" column="8" lean-forward="false" selection-start-line="319" selection-start-column="8" selection-end-line="319" selection-end-column="8" />
-          <folding>
-            <element signature="e#255#6853#0" expanded="false" />
-            <element signature="e#366#612#0" expanded="false" />
-            <element signature="e#653#679#0" expanded="false" />
-            <element signature="e#719#965#0" expanded="false" />
-            <element signature="e#1006#1032#0" expanded="false" />
-            <element signature="e#1072#1323#0" expanded="false" />
-            <element signature="e#1364#1390#0" expanded="false" />
-            <element signature="e#1434#1785#0" expanded="false" />
-            <element signature="e#1830#2205#0" expanded="false" />
-            <element signature="e#2396#2667#0" expanded="false" />
-            <element signature="e#2700#2732#0" expanded="false" />
-            <element signature="e#2776#2937#0" expanded="false" />
-            <element signature="e#2988#3151#0" expanded="false" />
-            <element signature="e#6890#6971#0" expanded="false" />
-            <element signature="e#7012#8128#0" expanded="false" />
-            <element signature="e#7934#8014#0" expanded="false" />
-            <element signature="e#8054#8128#0" expanded="false" />
-            <element signature="e#9738#10479#0" expanded="false" />
-            <element signature="e#11961#14688#0" expanded="false" />
-            <element signature="e#14715#15037#0" expanded="false" />
-            <element signature="e#16902#18628#0" expanded="false" />
-            <element signature="e#22971#23872#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="113" column="36" lean-forward="false" selection-start-line="113" selection-start-column="36" selection-end-line="113" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-            <element signature="e#258#311#0" expanded="false" />
-            <element signature="e#2901#3247#0" expanded="false" />
-            <element signature="e#6238#6361#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/snippets/tcpServer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
@@ -436,13 +408,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Python36/Lib/uuid.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1785">
-          <caret line="105" column="8" lean-forward="false" selection-start-line="105" selection-start-column="8" selection-end-line="105" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://D:/Python36/Lib/uuid.py" />
     <entry file="file://$PROJECT_DIR$/Core/utils/IdGenerator.py" />
     <entry file="file://$PROJECT_DIR$/Core/assets/references/menu_background.png">
       <provider selected="true" editor-type-id="images">
@@ -460,8 +426,7 @@
           <caret line="102" column="90" lean-forward="false" selection-start-line="102" selection-start-column="90" selection-end-line="102" selection-end-column="90" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
-            <element signature="e#5544#5856#0" expanded="false" />
-            <element signature="e#5924#6238#0" expanded="false" />
+            <element signature="e#2728#4246#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -499,13 +464,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Python36/Lib/uuid.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1785">
-          <caret line="105" column="8" lean-forward="false" selection-start-line="105" selection-start-column="8" selection-end-line="105" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://D:/Python36/Lib/uuid.py" />
     <entry file="file://$PROJECT_DIR$/snippets/tcpServer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
@@ -514,32 +473,10 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Core/utils/IdGenerator.py" />
-    <entry file="file://$PROJECT_DIR$/Core/assets/references/menu_background.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/assets/references/example_gui.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Core/example.log" />
     <entry file="file://$PROJECT_DIR$/Core/core.log" />
-    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/tdl/map.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="238" column="28" lean-forward="false" selection-start-line="238" selection-start-column="20" selection-end-line="238" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/tdl/style.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/tdl/map.py" />
+    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/tdl/style.py" />
     <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -548,21 +485,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Python36/Lib/colorsys.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/utils/Colors.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3740">
-          <caret line="220" column="0" lean-forward="false" selection-start-line="220" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://D:/Python36/Lib/colorsys.py" />
     <entry file="file://$PROJECT_DIR$/snippets/loggingBoilerplate.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -570,13 +493,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/debug.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1742697">
-          <caret line="4" column="129" lean-forward="true" selection-start-line="4" selection-start-column="129" selection-end-line="4" selection-end-column="129" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/debug.log" />
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -587,14 +504,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2017.3/system/python_stubs/2122143253/builtins.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="3601" column="8" lean-forward="false" selection-start-line="3601" selection-start-column="8" selection-end-line="3601" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2017.3/system/python_stubs/2122143253/builtins.py" />
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="109">
@@ -602,88 +512,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/tdl/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="1147" column="0" lean-forward="false" selection-start-line="1147" selection-start-column="0" selection-end-line="1147" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="22" column="8" lean-forward="false" selection-start-line="22" selection-start-column="8" selection-end-line="22" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-            <element signature="e#258#311#0" expanded="false" />
-            <element signature="e#2901#3247#0" expanded="false" />
-            <element signature="e#6238#6361#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="35" lean-forward="true" selection-start-line="3" selection-start-column="35" selection-end-line="4" selection-end-column="14" />
-          <folding>
-            <element signature="e#255#6853#0" expanded="false" />
-            <element signature="e#366#612#0" expanded="false" />
-            <element signature="e#653#679#0" expanded="false" />
-            <element signature="e#719#965#0" expanded="false" />
-            <element signature="e#1006#1032#0" expanded="false" />
-            <element signature="e#1072#1323#0" expanded="false" />
-            <element signature="e#1364#1390#0" expanded="false" />
-            <element signature="e#1434#1785#0" expanded="false" />
-            <element signature="e#1830#2205#0" expanded="false" />
-            <element signature="e#2396#2667#0" expanded="false" />
-            <element signature="e#2700#2732#0" expanded="false" />
-            <element signature="e#2776#2937#0" expanded="false" />
-            <element signature="e#2988#3151#0" expanded="false" />
-            <element signature="e#6890#6971#0" expanded="false" />
-            <element signature="e#7012#8128#0" expanded="false" />
-            <element signature="e#7934#8014#0" expanded="false" />
-            <element signature="e#8054#8128#0" expanded="false" />
-            <element signature="e#9738#10479#0" expanded="false" />
-            <element signature="e#11961#14688#0" expanded="false" />
-            <element signature="e#14715#15037#0" expanded="false" />
-            <element signature="e#16902#18628#0" expanded="false" />
-            <element signature="e#22971#23872#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/utils/ObjectPool.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="21" column="26" lean-forward="false" selection-start-line="21" selection-start-column="26" selection-end-line="21" selection-end-column="26" />
-          <folding>
-            <element signature="e#1063#1086#0" expanded="false" />
-            <element signature="e#1128#1153#0" expanded="false" />
-            <element signature="e#1194#1215#0" expanded="false" />
-            <element signature="e#1259#1460#0" expanded="false" />
-            <element signature="e#1503#1674#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/tdl/__init__.py" />
     <entry file="file://$PROJECT_DIR$/Core/utils/MouseController.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="30" column="18" lean-forward="true" selection-start-line="30" selection-start-column="18" selection-end-line="30" selection-end-column="18" />
-          <folding>
-            <element signature="e#0#40#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="222">
+          <caret line="15" column="22" lean-forward="true" selection-start-line="15" selection-start-column="22" selection-end-line="15" selection-end-column="22" />
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/assets/references/example_gui.jpg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/assets/references/menu_background.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Core/playground.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="366" column="67" lean-forward="true" selection-start-line="366" selection-start-column="67" selection-end-line="366" selection-end-column="67" />
+        <state relative-caret-position="4097">
+          <caret line="580" column="27" lean-forward="false" selection-start-line="580" selection-start-column="27" selection-end-line="580" selection-end-column="27" />
           <folding>
-            <element signature="e#24#33#0" expanded="true" />
+            <element signature="e#24#33#0" expanded="false" />
             <element signature="e#834#1193#0" expanded="false" />
             <element signature="e#1212#1764#0" expanded="false" />
             <element signature="e#1789#3946#0" expanded="false" />
@@ -695,12 +547,21 @@
             <element signature="e#6431#6594#0" expanded="false" />
             <element signature="e#9235#10480#0" expanded="false" />
             <element signature="e#10567#11142#0" expanded="false" />
+            <element signature="e#11599#13930#0" expanded="false" />
             <element signature="e#13979#14381#0" expanded="false" />
             <element signature="e#14423#14907#0" expanded="false" />
             <element signature="e#14933#15957#0" expanded="false" />
             <element signature="e#15990#16208#0" expanded="false" />
             <element signature="e#16243#16615#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/utils/Colors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3740">
+          <caret line="220" column="0" lean-forward="false" selection-start-line="220" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -712,14 +573,116 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/core.py">
+    <entry file="file://$PROJECT_DIR$/Core/utils/ObjectPool.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2397">
-          <caret line="141" column="79" lean-forward="false" selection-start-line="141" selection-start-column="79" selection-end-line="141" selection-end-column="79" />
+        <state relative-caret-position="918">
+          <caret line="69" column="0" lean-forward="false" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
+          <folding>
+            <element signature="e#1063#1086#0" expanded="false" />
+            <element signature="e#1128#1153#0" expanded="false" />
+            <element signature="e#1194#1215#0" expanded="false" />
+            <element signature="e#1259#1460#0" expanded="false" />
+            <element signature="e#1503#1674#0" expanded="false" />
+            <element signature="e#1715#1920#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/utils/ObjectManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="12" column="15" lean-forward="false" selection-start-line="12" selection-start-column="6" selection-end-line="12" selection-end-column="15" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#2901#3247#0" expanded="false" />
+            <element signature="e#6238#6361#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/models/GameObjects.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="629">
+          <caret line="293" column="40" lean-forward="false" selection-start-line="293" selection-start-column="40" selection-end-line="293" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+            <element signature="e#190#6788#0" expanded="false" />
+            <element signature="e#301#547#0" expanded="false" />
+            <element signature="e#588#614#0" expanded="false" />
+            <element signature="e#654#900#0" expanded="false" />
+            <element signature="e#941#967#0" expanded="false" />
+            <element signature="e#1007#1258#0" expanded="false" />
+            <element signature="e#1299#1325#0" expanded="false" />
+            <element signature="e#1369#1720#0" expanded="false" />
+            <element signature="e#1765#2140#0" expanded="false" />
+            <element signature="e#2331#2602#0" expanded="false" />
+            <element signature="e#2635#2667#0" expanded="false" />
+            <element signature="e#2711#2872#0" expanded="false" />
+            <element signature="e#2923#3086#0" expanded="false" />
+            <element signature="e#6825#6906#0" expanded="false" />
+            <element signature="e#6947#8063#0" expanded="false" />
+            <element signature="e#7869#7949#0" expanded="false" />
+            <element signature="e#7989#8063#0" expanded="false" />
+            <element signature="e#10452#11868#0" expanded="false" />
+            <element signature="e#11904#14631#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/gamedata/level1.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/gamedata/test_1.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" column="22" lean-forward="true" selection-start-line="23" selection-start-column="22" selection-end-line="23" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/utils/YamlDeserializer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="282">
+          <caret line="120" column="26" lean-forward="false" selection-start-line="120" selection-start-column="26" selection-end-line="120" selection-end-column="26" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
-            <element signature="e#5544#5856#0" expanded="false" />
-            <element signature="e#5924#6238#0" expanded="false" />
+            <element signature="e#982#1656#0" expanded="false" />
+            <element signature="e#1691#2234#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/models/MapObjects.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="333">
+          <caret line="312" column="0" lean-forward="true" selection-start-line="312" selection-start-column="0" selection-end-line="312" selection-end-column="0" />
+          <folding>
+            <element signature="e#2400#4126#0" expanded="false" />
+            <element signature="e#4905#5513#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/gamedata/test_2.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="27" column="34" lean-forward="true" selection-start-line="27" selection-start-column="34" selection-end-line="27" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1540">
+          <caret line="152" column="53" lean-forward="true" selection-start-line="152" selection-start-column="53" selection-end-line="152" selection-end-column="53" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#2728#4246#0" expanded="false" />
           </folding>
         </state>
       </provider>
