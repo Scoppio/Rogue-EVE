@@ -3,6 +3,7 @@ from models.GameObjects import Vector2
 from utils import Colors
 import logging
 import textwrap
+from models.EnumStatus import EGameState
 from utils import Messenger
 from utils.MouseController import mouse_controller
 
@@ -11,7 +12,7 @@ logger = logging.getLogger('Rogue-EVE')
 
 
 class GameState(object):
-    def __init__(self, state):
+    def __init__(self, state: EGameState):
         self.state = state
 
 

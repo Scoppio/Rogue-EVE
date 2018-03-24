@@ -7,9 +7,10 @@ from utils.Messenger import send_message
 from utils.ObjectManager import CollisionHandler, ConsoleBuffer, GameState
 from utils.ObjectPool import object_pool
 from utils.MouseController import mouse_controller
-from models.GameObjects import Character, Vector2, Fighter, BasicMonsterAI, DeathMethods
+from models.GameObjects import Character, Vector2, Fighter, DeathMethods
+from models.EnumStatus import EGameState, EAction
 from models.MapObjects import MapConstructor, MapObjectsConstructor
-from utils.YamlDeserializer import loadGameObjectFromFile
+from utils.YamlDeserializer import loadMonstersFile
 
 # Based on the tutorial from RogueBasin for python3 with tdl
 # Adapted to use more objects and be more loosely tied, without many global variables and constants
@@ -20,7 +21,7 @@ parser.add_argument("-l", "--loglevel", type=int, default=2,
                     help="increase output verbosity")
 parser.add_argument("-s", "--screensize", type=str, default='80x50',
                     help="sets the size of the screen in tiles using the pattern WxH. Ex.: 80x50, 100x75")
-parser.add_argument("--fps", type=int, default=20,
+parser.add_argument("--fps", type=int, default=7,
                     help="Defines the fps, and therefore the speed of the game")
 parser.add_argument("--realtime", help="run the game in realtime as oposed to turn based",
                     action="store_true")
@@ -68,7 +69,7 @@ logger.addHandler(ch)
 
 
 def handle_keys(movable_object):
-    action = 'didnt-take-turn'
+    action = EAction.DIDNT_TAKE_TURN
     fov_recompute = False
     user_input = None
 
@@ -91,34 +92,49 @@ def handle_keys(movable_object):
         tdl.set_fullscreen(not tdl.get_fullscreen())
 
     elif user_input.key == 'ESCAPE':
-        action = 'exit'
+        action = EAction.EXIT
         # exit game
         return action, fov_recompute
 
-    if movable_object.game_state.state == 'playing':
+    if movable_object.game_state.state == EGameState.PLAYING:
         fov_recompute = False
 
         # movement keys
         if user_input.key == 'UP':
             fov_recompute = movable_object.move_or_attack(Vector2(0, -1))
-            action = 'move-up'
+            action = EAction.MOVE_UP
         elif user_input.key == 'DOWN':
             fov_recompute = movable_object.move_or_attack(Vector2(0, 1))
-            action = 'move-down'
+            action = EAction.MOVE_DOWN
         elif user_input.key == 'LEFT':
             fov_recompute = movable_object.move_or_attack(Vector2(-1, 0))
-            action = 'move-left'
+            action = EAction.MOVE_LEFT
         elif user_input.key == 'RIGHT':
             fov_recompute = movable_object.move_or_attack(Vector2(1, 0))
-            action = 'move-right'
+            action = EAction.MOVE_RIGHT
 
     return action, fov_recompute
+
+
+def run_ai_turn(games_tate, player_action):
+    monster_action = True
+
+    if REALTIME:
+        if player_action != EAction.DIDNT_TAKE_TURN:
+            monster_action = True
+    else:
+        if player_action == EAction.DIDNT_TAKE_TURN:
+            monster_action = False
+    if games_tate.state == EGameState.PLAYING and monster_action:
+        for obj in object_pool.find_by_tag('monster'):
+            if obj.ai:
+                obj.ai.take_turn()
 
 
 def main():
 
     # General tools for management of the game
-    games_tate = GameState('loading')
+    game_state = GameState(EGameState.LOADING)
 
     # setup to start the TDL and small consoles
     font = os.path.join("assets", "arial10x10.png")
@@ -148,7 +164,7 @@ def main():
 
     # Before we start the map objects constructor we load the level data that is being hold on a file
     # With all the information necessary to build the monsters from the template
-    game_objects = loadGameObjectFromFile(LEVEL_DATA)
+    game_objects = loadMonstersFile(LEVEL_DATA)
 
     # Map objects constructor is a special factory that randomly populates the map with object templates
     # and does deal with weighted distributions, It makes everything in place, by reference
@@ -164,7 +180,7 @@ def main():
         name='Player',
         fighter=fighter_component,
         tags=['player'],
-        game_state=games_tate
+        game_state=game_state
     )
 
     object_pool.add_player(player)
@@ -198,7 +214,7 @@ def main():
     # a warm welcoming message!
     send_message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', Colors.red)
 
-    games_tate.state = 'playing'
+    game_state.state = EGameState.PLAYING
 
     while not tdl.event.is_window_closed():
 
@@ -213,13 +229,10 @@ def main():
 
         map_renderer.set_fov_recompute_to(fov_recompute)
 
-        if player_action == 'exit':
+        if player_action == EAction.EXIT:
             break
 
-        if games_tate.state == 'playing' and player_action != 'didnt-take-turn':
-            for obj in object_pool.find_by_tag('monster'):
-                if obj.ai:
-                    obj.ai.take_turn()
+        run_ai_turn(game_state, player_action)
 
 
 if __name__ == '__main__':

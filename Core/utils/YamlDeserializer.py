@@ -103,7 +103,7 @@ def _deserialize_yaml(**kwargs):
                 logger.error("An error occurred, the weight is not valid " + value)
     return output_dict
 
-def loadGameObjectFromFile(file: str):
+def loadMonstersFile(file: str):
     with open(file, 'r') as stream:
         try:
             le_test = load(stream)
