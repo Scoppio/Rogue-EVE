@@ -1,39 +1,16 @@
 ---
-- type: Character
-  args:
-      char: o
-      color: dark_fuchsia
-      name: orc
-      ai:
-          BasicMonsterAI:
-              interest_tag: player
-      fighter:
-          Fighter:
-              hp: 10
-              defense: 0
-              power: 2
-              death_function: monster_death
-      tags:
-          - monster
-          - orc
-          - small
-  weight: 3.0
-- type: Character
-  args:
-      char: T
-      color: dark_blue
-      name: Troll
-      ai:
-          BasicMonsterAI:
-              interest_tag: player
-      fighter:
-          Fighter:
-              hp: 20
-              defense: 1
-              power: 5
-              death_function: monster_death
-      tags:
-          - monster
-          - troll
-          - big
-  weight: 1.0
+coord:
+  - 0
+  - 0
+char: "@"
+color: white
+name: player
+blocks: True
+fighter:
+  hp: 160
+  defense: 3
+  power: 5
+  death_function: player_death
+torch: 9
+tags:
+  - player

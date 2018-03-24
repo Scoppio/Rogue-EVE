@@ -2,6 +2,7 @@ import numbers
 import math
 import logging
 import copy
+import yaml
 from utils import Colors
 from utils.Messenger import send_message
 
@@ -265,6 +266,30 @@ class GameObject(DrawableObject):
                 tags=self.tags, name=self.name, _id=self._id, coord=self.coord, char=self.char, color=self.color,
                 blocks=self.blocks
                 )
+    @staticmethod
+    def load(yaml_file=None, hard_values=None):
+        if yaml_file:
+            with open(yaml_file) as stream:
+                values = yaml.safe_load(stream)
+
+            if not values:
+                raise RuntimeError("File could not be read")
+        else:
+            values = hard_values
+
+        if values["color"] in [a for a in dir(Colors) if "__" not in a]:
+            color = eval("Colors." + values["color"])
+        else:
+            color = Colors.dark_crimson
+
+        return GameObject(
+            coord=Vector2(values["coord"][0], values["coord"][1]),
+            char=values["char"],
+            color=color,
+            name=values["name"],
+            blocks=values["blocks"],
+            tags=values["tags"]
+            )
 
     def draw(self, console):
         console.draw_char(self.coord.X, self.coord.Y, self.char, bg=None, fg=self.color)
@@ -370,6 +395,30 @@ class Fighter(object):
                          Colors.light_blue)
             # print(self.owner.name.capitalize() + ' attacks ' + target.name + ' but it has no effect!')
 
+    @staticmethod
+    def load(yaml_file=None, hard_values=None):
+        if yaml_file:
+            with open(yaml_file) as stream:
+                values = yaml.safe_load(stream)
+
+            if not values:
+                raise RuntimeError("File could not be read")
+        else:
+            values = hard_values
+
+        death_function = None
+
+        if "death_function" in values.keys():
+            if values["death_function"] in [a for a in dir(DeathMethods) if "__" not in a]:
+                death_function = eval("DeathMethods." + values["death_function"])
+
+        return Fighter(
+            values["hp"],
+            values["defense"],
+            values["power"],
+            death_function
+        )
+
 
 class Character(GameObject):
     def __init__(self,
@@ -385,7 +434,7 @@ class Character(GameObject):
                  torch=10,
                  tags=list(),
                  game_state=None
-                 ):
+            ):
         super(Character, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags)
         self.torch = torch
         self.collision_handler = collision_handler
@@ -446,3 +495,45 @@ class Character(GameObject):
         dx = int(round((target - self.coord).X / distance))
         dy = int(round((target - self.coord).Y / distance))
         self.move(Vector2(dx, dy))
+
+    @staticmethod
+    def load(yaml_file=None, hard_values=None, collision_handler=None, game_state=None):
+        if yaml_file:
+            with open(yaml_file) as stream:
+                values = yaml.safe_load(stream)
+
+            if not values:
+                raise RuntimeError("File could not be read")
+        else:
+            values = hard_values
+
+        fighter = None
+        if values["fighter"]:
+            fighter = Fighter.load(hard_values=values["fighter"])
+
+        if values["color"] in [a for a in dir(Colors) if "__" not in a]:
+            color = eval("Colors." + values["color"])
+        else:
+            color = Colors.white
+
+        ai = None
+        if "ai" in values.keys():
+            ai = BasicMonsterAI(interest_tag=values["ai"]["interest_tag"])
+
+        torch = 0
+        if "torch" in values.keys():
+            torch = values["torch"]
+
+        return Character(
+            coord=Vector2(values["coord"][0], values["coord"][1]),
+            char=values["char"],
+            color=color,
+            name=values["name"],
+            fighter=fighter,
+            ai=ai,
+            blocks=values["blocks"],
+            collision_handler=collision_handler,
+            torch=torch,
+            tags=values["tags"],
+            game_state=game_state
+        )

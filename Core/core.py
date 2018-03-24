@@ -10,7 +10,6 @@ from utils.MouseController import mouse_controller
 from models.GameObjects import Character, Vector2, Fighter, DeathMethods
 from models.EnumStatus import EGameState, EAction
 from models.MapObjects import MapConstructor, MapObjectsConstructor
-from utils.YamlDeserializer import loadMonstersFile
 
 # Based on the tutorial from RogueBasin for python3 with tdl
 # Adapted to use more objects and be more loosely tied, without many global variables and constants
@@ -27,8 +26,10 @@ parser.add_argument("--realtime", help="run the game in realtime as oposed to tu
                     action="store_true")
 parser.add_argument("--legacy", help="Prints the tiles as characters",
                     action="store_true")
-parser.add_argument("-L", "--level_file", type=str, default='test_1.yaml',
+parser.add_argument("-L", "--level_file", type=str, default='test_3.yaml',
                     help="Selects a different level file to use")
+parser.add_argument("-P", "--player_file", type=str, default='player.yaml',
+                    help="Selects a different player file to use")
 
 args = parser.parse_args()
 #########################################
@@ -56,6 +57,7 @@ LEGACY_MODE = args.legacy
 LOGLEVEL = {0: logging.DEBUG, 1:logging.INFO, 2: logging.WARNING, 3: logging.ERROR, 4: logging.CRITICAL}
 dirname = os.path.dirname(__file__)
 LEVEL_DATA = os.path.join(dirname, "gamedata", args.level_file)
+PLAYER_DATA = os.path.join(dirname, "gamedata", args.player_file)
 
 # instantiating logger
 logging.basicConfig(filename='debug.log',
@@ -72,7 +74,6 @@ def handle_keys(movable_object):
     action = EAction.DIDNT_TAKE_TURN
     fov_recompute = False
     user_input = None
-
     keypress = False
     for event in tdl.event.get():
         if event.type == 'KEYDOWN':
@@ -164,24 +165,13 @@ def main():
 
     # Before we start the map objects constructor we load the level data that is being hold on a file
     # With all the information necessary to build the monsters from the template
-    game_objects = loadMonstersFile(LEVEL_DATA)
-
     # Map objects constructor is a special factory that randomly populates the map with object templates
     # and does deal with weighted distributions, It makes everything in place, by reference
-    MapObjectsConstructor(my_map, object_pool, collision_handler).add_object_templates(game_objects).populate_map()
+    MapObjectsConstructor(my_map, object_pool, collision_handler).load_object_templates(LEVEL_DATA).populate_map()
 
     # Creation of the player
-    fighter_component = Fighter(hp=30, defense=2, power=5, death_function=DeathMethods.player_death)
-    player_starting_position = my_map.get_rooms()[0].center()
-    player = Character(
-        player_starting_position,
-        collision_handler=collision_handler,
-        color=Colors.white,
-        name='Player',
-        fighter=fighter_component,
-        tags=['player'],
-        game_state=game_state
-    )
+    player = Character.load(yaml_file=PLAYER_DATA, game_state=game_state, collision_handler=collision_handler)
+    player.coord = my_map.get_rooms()[0].center()
 
     object_pool.add_player(player)
 

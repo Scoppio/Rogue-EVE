@@ -1,0 +1,43 @@
+---
+- type: Character
+  params:
+      coord:
+        - 0
+        - 0
+      char: o
+      color: dark_fuchsia
+      name: orc
+      blocks: True
+      ai:
+          interest_tag: player
+      fighter:
+          hp: 10
+          defense: 0
+          power: 2
+          death_function: monster_death
+      tags:
+          - monster
+          - orc
+          - small
+  weight: 3.0
+- type: Character
+  params:
+      coord:
+        - 0
+        - 0
+      char: T
+      color: dark_blue
+      name: Troll
+      blocks: True
+      ai:
+         interest_tag: player
+      fighter:
+          hp: 20
+          defense: 1
+          power: 5
+          death_function: monster_death
+      tags:
+          - monster
+          - troll
+          - big
+  weight: 1.0

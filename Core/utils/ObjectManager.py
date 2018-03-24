@@ -143,7 +143,7 @@ class ConsoleBuffer(object):
 
     def render_all_objects(self):
         player = self.object_pool.get_player()
-
+        print(player.name, player.torch)
         if self.fov_must_recompute():
             # recompute FOV if needed (the player moved or something)
             self.reset_fov_recompute()

@@ -1,5 +1,7 @@
 from random import randint, uniform
 import itertools
+import yaml
+from models import GameObjects
 from models.GameObjects import DrawableObject, Vector2
 import logging
 
@@ -294,25 +296,24 @@ class MapObjectsConstructor(object):
         self.object_templates = object_templates
         self.max_objecs_per_room = max_objecs_per_room
 
-    def add_object_template(self, obj_template, args, weight=1.0):
-        """
-        You need to give an object template and a weight so the system makes random choices based on a probability
-        distribution of the weight of the objects
-        """
-        self.object_templates.append((obj_template, args, weight))
-        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
-                                     self.object_templates, self.max_objecs_per_room)
+    def load_object_templates(self, yaml_file):
+        with open(yaml_file) as stream:
+            objects = yaml.safe_load(stream)
 
-    def add_object_templates(self, object_templates):
-        """
-        You need to give an object template and a weight so the system makes random choices based on a probability
-        distribution of the weight of the objects
-        """
-        for item in object_templates:
-            self.object_templates.append((item["obj_template"], item["args"], item["weight"]))
+        if not objects:
+            raise RuntimeError("File could not be read")
+
+        for obj in objects:
+            if obj["type"] in [a for a in dir(GameObjects) if "__" not in a]:
+                obj_template = eval("GameObjects." + obj["type"])
+
+                self.object_templates.append((obj_template, obj["params"], obj["weight"]))
+            else:
+                logger.warning("Object {} is not recognizable as a GameObject", obj["type"])
 
         return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
-                                     self.object_templates, self.max_objecs_per_room)
+                                 self.object_templates, self.max_objecs_per_room)
+
 
     def set_max_objects_per_room(self, value):
         self.max_objecs_per_room = value
@@ -325,7 +326,7 @@ class MapObjectsConstructor(object):
         upto = 0
         for obj_template, argument_template, weight in self.object_templates:
             if upto + weight >= r:
-                return obj_template(**argument_template)
+                return obj_template.load(hard_values=argument_template)
             upto += weight
         else:
             assert False, "List is empty"
