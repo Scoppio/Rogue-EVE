@@ -7,7 +7,7 @@ from utils.Messenger import send_message
 from utils.ObjectManager import CollisionHandler, ConsoleBuffer, GameState
 from utils.ObjectPool import object_pool
 from utils.MouseController import mouse_controller
-from models.GameObjects import Character, Vector2, Fighter, DeathMethods
+from models.GameObjects import Character, Vector2
 from models.EnumStatus import EGameState, EAction
 from models.MapObjects import MapConstructor, MapObjectsConstructor
 
@@ -175,7 +175,7 @@ def main():
 
     object_pool.add_player(player)
 
-    map_renderer = ConsoleBuffer(
+    viewport = ConsoleBuffer(
         root,
         object_pool=object_pool,
         map=my_map,
@@ -208,16 +208,16 @@ def main():
 
     while not tdl.event.is_window_closed():
 
-        map_renderer.render_all_objects()
+        viewport.render_all_objects()
         lower_gui_renderer.render_gui()
 
         tdl.flush()
 
-        map_renderer.clear_all_objects()
+        viewport.clear_all_objects()
 
         player_action, fov_recompute = handle_keys(player)
 
-        map_renderer.set_fov_recompute_to(fov_recompute)
+        viewport.set_fov_recompute_to(fov_recompute)
 
         if player_action == EAction.EXIT:
             break
