@@ -14,3 +14,4 @@ class EAction(Enum):
     MOVE_DOWN = 3
     MOVE_LEFT = 4
     MOVE_RIGHT = 5
+    DEAD = 99

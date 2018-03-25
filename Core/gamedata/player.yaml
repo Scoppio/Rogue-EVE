@@ -1,7 +1,4 @@
 ---
-coord:
-  - 0
-  - 0
 char: "@"
 color: white
 name: player

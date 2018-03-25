@@ -3,10 +3,10 @@ import tdl
 import logging
 import argparse
 from utils import Colors
-from utils.Messenger import send_message
-from utils.ObjectManager import CollisionHandler, ConsoleBuffer, GameState
-from utils.ObjectPool import object_pool
-from utils.MouseController import mouse_controller
+from managers.Messenger import send_message
+from managers.ObjectManager import CollisionHandler, ConsoleBuffer, GameState
+from managers.ObjectPool import object_pool
+from managers.MouseController import mouse_controller
 from models.GameObjects import Character, Vector2
 from models.EnumStatus import EGameState, EAction
 from models.MapObjects import MapConstructor, MapObjectsConstructor
@@ -26,7 +26,7 @@ parser.add_argument("--realtime", help="run the game in realtime as oposed to tu
                     action="store_true")
 parser.add_argument("--legacy", help="Prints the tiles as characters",
                     action="store_true")
-parser.add_argument("-L", "--level_file", type=str, default='test_3.yaml',
+parser.add_argument("-L", "--level_file", type=str, default='map_data1.yaml',
                     help="Selects a different level file to use")
 parser.add_argument("-P", "--player_file", type=str, default='player.yaml',
                     help="Selects a different player file to use")
@@ -40,7 +40,6 @@ SCREEN_WIDTH = int(args.screensize.split('x')[0])
 SCREEN_HEIGHT = int(args.screensize.split('x')[1])
 
 #sizes and coordinates relevant for the GUI
-
 BAR_WIDTH = 20
 PANEL_HEIGHT = 7
 PANEL_Y = SCREEN_HEIGHT - PANEL_HEIGHT
@@ -55,15 +54,19 @@ LIMIT_FPS = args.fps
 REALTIME = args.realtime
 LEGACY_MODE = args.legacy
 LOGLEVEL = {0: logging.DEBUG, 1:logging.INFO, 2: logging.WARNING, 3: logging.ERROR, 4: logging.CRITICAL}
-dirname = os.path.dirname(__file__)
-LEVEL_DATA = os.path.join(dirname, "gamedata", args.level_file)
-PLAYER_DATA = os.path.join(dirname, "gamedata", args.player_file)
+
+# loading gamedata, level objects, player information, etc.
+gamedata_dir = os.path.join(os.path.dirname(__file__), "gamedata")
+
+LEVEL_DATA = os.path.join(gamedata_dir, args.level_file)
+PLAYER_DATA = os.path.join(gamedata_dir, args.player_file)
 
 # instantiating logger
-logging.basicConfig(filename='debug.log',
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=LOGLEVEL[args.loglevel]
-                    )
+logging.basicConfig(
+    filename='debug.log',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=LOGLEVEL[args.loglevel]
+)
 
 logger = logging.getLogger('Rogue-EVE')
 ch = logging.StreamHandler()
@@ -117,7 +120,7 @@ def handle_keys(movable_object):
     return action, fov_recompute
 
 
-def run_ai_turn(games_tate, player_action):
+def run_ai_turn(game_state, player_action):
     monster_action = True
 
     if REALTIME:
@@ -126,7 +129,7 @@ def run_ai_turn(games_tate, player_action):
     else:
         if player_action == EAction.DIDNT_TAKE_TURN:
             monster_action = False
-    if games_tate.state == EGameState.PLAYING and monster_action:
+    if game_state == EGameState.PLAYING and monster_action:
         for obj in object_pool.find_by_tag('monster'):
             if obj.ai:
                 obj.ai.take_turn()
@@ -170,8 +173,8 @@ def main():
     MapObjectsConstructor(my_map, object_pool, collision_handler).load_object_templates(LEVEL_DATA).populate_map()
 
     # Creation of the player
-    player = Character.load(yaml_file=PLAYER_DATA, game_state=game_state, collision_handler=collision_handler)
-    player.coord = my_map.get_rooms()[0].center()
+    player = Character.load(yaml_file=PLAYER_DATA, coord=my_map.get_rooms()[0].center(),
+                       collision_handler=collision_handler)
 
     object_pool.add_player(player)
 
@@ -204,7 +207,7 @@ def main():
     # a warm welcoming message!
     send_message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', Colors.red)
 
-    game_state.state = EGameState.PLAYING
+    game_state.set_state(EGameState.PLAYING)
 
     while not tdl.event.is_window_closed():
 

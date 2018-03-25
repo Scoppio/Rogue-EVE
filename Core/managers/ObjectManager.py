@@ -4,9 +4,8 @@ from utils import Colors
 import logging
 import textwrap
 from models.EnumStatus import EGameState
-from utils import Messenger
-from utils.MouseController import mouse_controller
-
+from managers import Messenger
+from managers.MouseController import mouse_controller
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -14,6 +13,15 @@ logger = logging.getLogger('Rogue-EVE')
 class GameState(object):
     def __init__(self, state: EGameState):
         self.state = state
+
+    def get_state(self):
+        return self.state
+
+    def set_state(self, state):
+        self.state = state
+
+    def __cmp__(self, other: EGameState):
+        return self.state == other
 
 
 class CollisionHandler(object):
@@ -32,12 +40,13 @@ class CollisionHandler(object):
 
     def is_blocked(self, x, y):
         if self.map.get_map()[x][y].blocked:
-            logger.debug("CollisionHandler [collided_with={} position={}]".format(self.map.get_map()[x][y], Vector2(x,y)))
+            logger.debug(
+                "CollisionHandler [collided_with={} position={}]".format(self.map.get_map()[x][y], Vector2(x, y)))
             return True
 
         # now check for any blocking objects
         for obj in self.object_pool.get_objects_as_list():
-            if obj.blocks and obj.coord == Vector2(x,y):
+            if obj.blocks and obj.coord == Vector2(x, y):
                 logger.debug("CollisionHandler [collided_with={} position={}]".format(obj.name, obj.coord))
                 return True
 
@@ -139,11 +148,12 @@ class ConsoleBuffer(object):
         self.console.draw_str(1, 0, mouse_controller.get_names_under_mouse(), bg=None, fg=Colors.light_gray)
 
         # blit the contents of "panel" to the root console
-        self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X, self.target.Y)
+        self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X,
+                       self.target.Y)
 
     def render_all_objects(self):
         player = self.object_pool.get_player()
-        
+
         if self.fov_must_recompute():
             # recompute FOV if needed (the player moved or something)
             self.reset_fov_recompute()
@@ -168,7 +178,8 @@ class ConsoleBuffer(object):
                 player = self.object_pool.get_player()
                 player.draw(self.console)
 
-        self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X, self.target.Y)
+        self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X,
+                       self.target.Y)
 
     def clear_all_objects(self):
         if self.object_pool:
@@ -194,4 +205,3 @@ class ConsoleBuffer(object):
 
             # add the new line as a tuple, with the text and the color
             self.game_msg.append((line, color))
-

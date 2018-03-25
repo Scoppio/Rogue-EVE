@@ -1,0 +1,63 @@
+---
+metadata:
+  name: test level 1
+  created-at: 2018-03-24
+  revision: 1
+  author: Lucas Coppio
+  contact: "@DeveloperCoppio"
+max-rooms: 9
+max-room-items: 2
+max-room-monsters: 5
+map-size:
+  height: 70
+  width: 80
+items:
+  - type: GameObject
+    params:
+        char: "!"
+        color: violet
+        name: healing potion
+        blocks: False
+        tags:
+            - item
+            - small
+            - potion
+    weight: 1.0
+
+monsters:
+  - type: Character
+    params:
+        char: o
+        color: dark_fuchsia
+        name: orc
+        blocks: True
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 10
+            defense: 0
+            power: 2
+            death_function: monster_death
+        tags:
+            - monster
+            - orc
+            - small
+    weight: 3.0
+  - type: Character
+    params:
+        char: T
+        color: dark_blue
+        name: Troll
+        blocks: True
+        ai:
+           interest_tag: player
+        fighter:
+            hp: 20
+            defense: 1
+            power: 5
+            death_function: monster_death
+        tags:
+            - monster
+            - troll
+            - big
+    weight: 1.0

@@ -4,7 +4,8 @@ import logging
 import copy
 import yaml
 from utils import Colors
-from utils.Messenger import send_message
+from models.EnumStatus import EGameState
+from managers.Messenger import send_message
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -266,6 +267,7 @@ class GameObject(DrawableObject):
                 tags=self.tags, name=self.name, _id=self._id, coord=self.coord, char=self.char, color=self.color,
                 blocks=self.blocks
                 )
+
     @staticmethod
     def load(yaml_file=None, hard_values=None):
         if yaml_file:
@@ -283,13 +285,16 @@ class GameObject(DrawableObject):
             color = Colors.dark_crimson
 
         return GameObject(
-            coord=Vector2(values["coord"][0], values["coord"][1]),
+            coord=Vector2.zero(),
             char=values["char"],
             color=color,
             name=values["name"],
             blocks=values["blocks"],
             tags=values["tags"]
             )
+
+    def set_z_index(self, value):
+        self.z_index = value
 
     def draw(self, console):
         console.draw_char(self.coord.X, self.coord.Y, self.char, bg=None, fg=self.color)
@@ -339,7 +344,7 @@ class DeathMethods(object):
     def player_death(player):
         """ the game ended!"""
         print('You died!')
-        player.game_state.state = 'dead'
+        player.game_state.set_state(EGameState.DEAD)
         # for added effect, transform the player into a corpse!
         player.char = '%'
         player.color = Colors.dark_red
@@ -497,7 +502,7 @@ class Character(GameObject):
         self.move(Vector2(dx, dy))
 
     @staticmethod
-    def load(yaml_file=None, hard_values=None, collision_handler=None, game_state=None):
+    def load(yaml_file=None, hard_values=None, coord=Vector2.zero(), collision_handler=None, game_state=None):
         if yaml_file:
             with open(yaml_file) as stream:
                 values = yaml.safe_load(stream)
@@ -525,7 +530,7 @@ class Character(GameObject):
             torch = values["torch"]
 
         return Character(
-            coord=Vector2(values["coord"][0], values["coord"][1]),
+            coord=coord,
             char=values["char"],
             color=color,
             name=values["name"],

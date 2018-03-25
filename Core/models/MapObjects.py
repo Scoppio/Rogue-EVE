@@ -289,42 +289,97 @@ class Rect(object):
 
 
 class MapObjectsConstructor(object):
-    def __init__(self, tile_map, object_pool, collision_handler, object_templates=list(), max_objecs_per_room: int=3):
+    """MapObjectsConstructor is a special factory that receives the templates of monsters and items,
+    and automatically populates the map necessary objects with the proper references for those newly added
+    objects to the map, collision handler and object pool
+    """
+    def __init__(self, tile_map, object_pool, collision_handler, object_templates=list(), max_monster_per_room: int=0, max_items_per_room: int=0):
         self.tile_map = tile_map
         self.object_pool = object_pool
         self.collision_handler = collision_handler
         self.object_templates = object_templates
-        self.max_objecs_per_room = max_objecs_per_room
+        self.max_monsters_per_room = max_monster_per_room
+        self.max_items_per_room=max_items_per_room
+
+    def _append_template(self, obj):
+        """Runs the proper safe evals on the object to create the template and add to the template list"""
+        if obj["type"] in [a for a in dir(GameObjects) if "__" not in a]:
+            obj_template = eval("GameObjects." + obj["type"])
+            self.object_templates.append((obj_template, obj["params"], obj["weight"]))
+        else:
+            logger.warning("Object {} is not recognizable as a GameObject", obj["type"])
 
     def load_object_templates(self, yaml_file):
+        """Load an yaml object with the template for the level"""
         with open(yaml_file) as stream:
-            objects = yaml.safe_load(stream)
+            map_data = yaml.safe_load(stream)
 
-        if not objects:
+        if not map_data:
             raise RuntimeError("File could not be read")
 
-        for obj in objects:
-            if obj["type"] in [a for a in dir(GameObjects) if "__" not in a]:
-                obj_template = eval("GameObjects." + obj["type"])
+        print(map_data)
 
-                self.object_templates.append((obj_template, obj["params"], obj["weight"]))
-            else:
-                logger.warning("Object {} is not recognizable as a GameObject", obj["type"])
+        if map_data["max-room-items"]:
+            print("max-room-items: {}".format(map_data["max-room-items"]))
+            self.max_items_per_room = map_data["max-room-items"]
+
+        if map_data["max-room-monsters"]:
+            print("max-room-monsters: {} ".format(map_data["max-room-monsters"]))
+            self.max_monsters_per_room = map_data["max-room-monsters"]
+
+        for obj in map_data["items"]:
+            self._append_template(obj)
+
+        for obj in map_data["monsters"]:
+            self._append_template(obj)
 
         return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
-                                 self.object_templates, self.max_objecs_per_room)
+                                     self.object_templates, self.max_monsters_per_room, self.max_items_per_room)
 
+    def _append_object_template(self, level_template, key):
+        if key in level_template.keys():
+            for obj in level_template[key]:
+                if obj["type"] in [a for a in dir(GameObjects) if "__" not in a]:
+                    obj_template = eval("GameObjects." + obj["type"])
+
+                    self.object_templates.append((obj_template, obj["params"], obj["weight"]))
+                else:
+                    logger.warning("Object {} is not recognizable as a GameObject", obj["type"])
+
+    def load_level_template(self, yaml_file):
+
+        with open(yaml_file) as stream:
+            level_template = yaml.safe_load(stream)
+
+        if not level_template:
+            raise RuntimeError("File could not be read")
+
+        self._append_object_template(level_template, "items")
+        self._append_object_template(level_template, "monsters")
+
+        self.max_monsters_per_room = level_template["max-room-monsters"]
+        self.max_items_per_room =  level_template["max-room-items"]
+
+        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
+                                     self.object_templates, self.max_monsters_per_room, self.max_items_per_room)
 
     def set_max_objects_per_room(self, value):
-        self.max_objecs_per_room = value
+        self.max_monsters_per_room = value
         return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
-                                     self.object_templates, self.max_objecs_per_room)
+                                     self.object_templates, self.max_monsters_per_room, self.max_items_per_room)
 
-    def get_random_object_template(self):
-        total = sum(w for _, _, w in self.object_templates)
+    def set_max_items_per_room(self, value):
+        self.max_items_per_room = value
+        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
+                                     self.object_templates, self.max_monsters_per_room, self.max_items_per_room)
+
+    def get_random_object_template(self, tag):
+        filtered_template_list = [template for template in self.object_templates if tag in template[1]["tags"]]
+
+        total = sum(w for _, _, w in filtered_template_list)
         r = uniform(0, total)
         upto = 0
-        for obj_template, argument_template, weight in self.object_templates:
+        for obj_template, argument_template, weight in filtered_template_list:
             if upto + weight >= r:
                 return obj_template.load(hard_values=argument_template)
             upto += weight
@@ -332,16 +387,22 @@ class MapObjectsConstructor(object):
             assert False, "List is empty"
 
     def populate_room(self, room):
-        num_objects = randint(0, self.max_objecs_per_room)
 
+        self._place_object(room, self.max_items_per_room, "item", 2)
+        self._place_object(room, self.max_monsters_per_room, "monster", 1)
+
+    def _place_object(self, room, max_objects, tag, z_index):
+
+        num_objects = randint(0, max_objects)
+        print("Trying to put {} {} on room {}".format(num_objects, tag, room))
         for i in range(num_objects):
             # choose random spot for this object
-            coord = Vector2(randint(room.x1, room.x2), randint(room.y1, room.y2))
+            coord = Vector2(randint(room.x1+1, room.x2-1), randint(room.y1+1, room.y2-1))
+
             if not self.collision_handler.is_blocked(coord.X, coord.Y):
-                prototype = self.get_random_object_template()
+                prototype = self.get_random_object_template(tag)
                 prototype.coord = coord
                 prototype.collision_handler = self.collision_handler
-
                 self.object_pool.append(prototype)
 
     def populate_map(self):

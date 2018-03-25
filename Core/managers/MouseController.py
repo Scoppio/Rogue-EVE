@@ -1,4 +1,4 @@
-from utils.ObjectPool import object_pool
+from managers.ObjectPool import object_pool
 import logging
 
 logger = logging.getLogger('Rogue-EVE')
