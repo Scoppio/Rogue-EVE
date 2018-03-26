@@ -576,9 +576,7 @@ class Item(GameObject):
             if len(player.get_inventory()) >= 26:
                 send_message('Your inventory is full, cannot pick up ' + self.name + '.', Colors.red)
             else:
-                print(self)
                 player.get_inventory().append(self)
-                print("remember to remove this item from the object pool!")
                 send_message('You picked up a ' + self.name + '!', Colors.green)
                 return True
         return False

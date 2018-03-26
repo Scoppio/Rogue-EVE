@@ -3,7 +3,8 @@ import tdl
 import logging
 import argparse
 from utils import Colors
-from managers import ObjectManager, ObjectPool, Messenger as ms, InputPeripherals
+from managers import ObjectManager, ObjectPool, Messenger as ms
+from managers.GenericControllerObjects import GameController
 from models.GameObjects import Character, Vector2, Item
 from models.EnumStatus import EGameState, EAction
 from models.MapObjects import MapConstructor, MapObjectsConstructor
@@ -70,85 +71,11 @@ ch = logging.StreamHandler()
 logger.addHandler(ch)
 
 
-def handle_keys(movable_object, mouse_controller, object_pool):
-
-    action = EAction.DIDNT_TAKE_TURN
-    fov_recompute = False
-    user_input = None
-    keypress = False
-
-    for event in tdl.event.get():
-        if event.type == 'KEYDOWN':
-            user_input = event
-            keypress = True
-
-        if event.type == 'MOUSEMOTION':
-            mouse_controller.set_mouse_coord(event.cell)
-
-    if not keypress:
-        return action, fov_recompute
-
-    logger.debug("User_Input [key={} alt={} ctrl={} shift={}]".format(
-        user_input.key, user_input.alt, user_input.control, user_input.shift))
-
-    if user_input.key == 'ENTER' and user_input.alt:
-        # Alt+Enter: toggle fullscreen
-        tdl.set_fullscreen(not tdl.get_fullscreen())
-
-    elif user_input.key == 'ESCAPE':
-        action = EAction.EXIT
-        # exit game
-        return action, fov_recompute
-
-    if movable_object.game_state.state == EGameState.PLAYING:
-        fov_recompute = False
-
-        # movement keys
-        if user_input.key == 'UP':
-            fov_recompute = movable_object.move_or_attack(Vector2(0, -1))
-            action = EAction.MOVE_UP
-        elif user_input.key == 'DOWN':
-            fov_recompute = movable_object.move_or_attack(Vector2(0, 1))
-            action = EAction.MOVE_DOWN
-        elif user_input.key == 'LEFT':
-            fov_recompute = movable_object.move_or_attack(Vector2(-1, 0))
-            action = EAction.MOVE_LEFT
-        elif user_input.key == 'RIGHT':
-            fov_recompute = movable_object.move_or_attack(Vector2(1, 0))
-            action = EAction.MOVE_RIGHT
-
-        elif user_input.text == 'g':
-            # pick up an item
-            for obj in [item for item in object_pool.get_objects_as_list()
-                        if type(item) == Item
-                           and item.coord == movable_object.coord]:
-                obj.pick_up(movable_object)
-                object_pool.delete_by_id(obj._id)
-                break
-
-    return action, fov_recompute
-
-
-def run_ai_turn(game_state, player_action, object_pool):
-    monster_action = True
-
-    if REALTIME:
-        if player_action != EAction.DIDNT_TAKE_TURN:
-            monster_action = True
-    else:
-        if player_action == EAction.DIDNT_TAKE_TURN:
-            monster_action = False
-
-    if game_state.get_state() == EGameState.PLAYING and monster_action:
-        for obj in object_pool.find_by_tag('monster'):
-            if obj.ai:
-                obj.ai.take_turn()
-
+def menu(header, options, width):
+    pass
 
 def main():
-    object_pool = ObjectPool.ObjectPool()
-    # General tools for management of the game
-    game_state = ObjectManager.GameState(EGameState.LOADING)
+
 
     # setup to start the TDL and small consoles
     font = os.path.join("assets", "arial10x10.png")
@@ -156,47 +83,52 @@ def main():
     tdl.setFPS(LIMIT_FPS)
     root = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
 
+    # Start to setup the object which will handle most of the generally accessed stuff
+    game = GameController()
+    game.set_object_pool(ObjectPool.ObjectPool())
+    # General tools for management of the game
+    game.game_state = ObjectManager.GameState(EGameState.LOADING)
+
     # A map constructor, that randomly create rooms with (not yet implemented) many different strategies
     # Legacy mode makes the map be drawn using chars instead of colored blocks
-    my_map = MapConstructor(
-        MAP_SIZE[0],
-        MAP_SIZE[1]
-    ).make_random_map(
-        strategy="random",
-        maximum_number_of_tries=15,
-        legacy_mode=LEGACY_MODE
+    game.set_map(
+        MapConstructor(
+            MAP_SIZE[0],
+            MAP_SIZE[1]
+        ).make_random_map(
+            strategy="random",
+            maximum_number_of_tries=15,
+            legacy_mode=LEGACY_MODE
+        )
     )
 
     # Now start the setup of the object managers
     # ObjectPool keeps track of all the objects on the scene
     # Starting up the collision handler, which manages all the objects collision events
     # Adding the object pool and the map to the collision handler so they interact
-    collision_handler = ObjectManager.CollisionHandler(map=my_map, object_pool=object_pool)
-
-    # Add the map to the mouse so it understand what is visible and what is not
-    mouse_controller = InputPeripherals.MouseController(map=my_map, object_pool=object_pool)
 
     # Before we start the map objects constructor we load the level data that is being hold on a file
     # With all the information necessary to build the monsters from the template
     # Map objects constructor is a special factory that randomly populates the map with object templates
     # and does deal with weighted distributions, It makes everything in place, by reference
-    MapObjectsConstructor(my_map, object_pool, collision_handler).load_object_templates(LEVEL_DATA).populate_map()
+
+    MapObjectsConstructor(game_instance=game).load_object_templates(LEVEL_DATA).populate_map()
     inventory = []
     # Creation of the player
-    player = Character.load(yaml_file=PLAYER_DATA, coord=my_map.get_rooms()[0].center(),
-                       collision_handler=collision_handler, inventory=inventory, game_state=game_state)
-
-    object_pool.add_player(player)
+    player = Character.load(yaml_file=PLAYER_DATA, coord=game.map.get_rooms()[0].center(),
+                       collision_handler=game.collision_handler, inventory=inventory, game_state=game.game_state)
+    game.player = player
+    game.object_pool.add_player(player)
 
     viewport = ObjectManager.ConsoleBuffer(
         root,
-        object_pool=object_pool,
-        map=my_map,
+        object_pool=game.object_pool,
+        map=game.map,
         width=MAP_SIZE[0],
         height=MAP_SIZE[1],
         origin=Vector2.zero(),
         target=Vector2.zero(),
-        mouse_controller=mouse_controller
+        mouse_controller=game.mouse_controller
     )
 
     lower_gui_renderer = ObjectManager.ConsoleBuffer(
@@ -205,7 +137,7 @@ def main():
         target=Vector2(0, 0),
         width=SCREEN_WIDTH,
         height=PANEL_HEIGHT,
-        mouse_controller=mouse_controller
+        mouse_controller=game.mouse_controller
     )
 
     lower_gui_renderer.add_message_console(MSG_WIDTH, MSG_HEIGHT, MSG_X, MSG_Y)
@@ -219,7 +151,7 @@ def main():
     # a warm welcoming message!
     ms.send_message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', Colors.red)
 
-    game_state.set_state(EGameState.PLAYING)
+    game.game_state.set_state(EGameState.PLAYING)
 
     while not tdl.event.is_window_closed():
 
@@ -230,14 +162,14 @@ def main():
 
         viewport.clear_all_objects()
 
-        player_action, fov_recompute = handle_keys(player, mouse_controller, object_pool)
+        game.handle_keys()
 
-        viewport.set_fov_recompute_to(fov_recompute)
+        viewport.set_fov_recompute_to(game.fov_recompute)
 
-        if player_action == EAction.EXIT:
+        if game.player_action == EAction.EXIT:
             break
 
-        run_ai_turn(game_state, player_action, object_pool)
+        game.run_ai_turn()
 
 
 if __name__ == '__main__':

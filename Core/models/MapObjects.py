@@ -294,10 +294,16 @@ class MapObjectsConstructor(object):
     and automatically populates the map necessary objects with the proper references for those newly added
     objects to the map, collision handler and object pool
     """
-    def __init__(self, tile_map, object_pool, collision_handler, object_templates=list(), max_monster_per_room: int=0, max_items_per_room: int=0):
-        self.tile_map = tile_map
-        self.object_pool = object_pool
-        self.collision_handler = collision_handler
+    def __init__(self, tile_map=None, object_pool=None, collision_handler=None, object_templates=list(), max_monster_per_room: int=0, max_items_per_room: int=0, game_instance=None):
+        if game_instance:
+            self.tile_map = game_instance.map
+            self.object_pool = game_instance.object_pool
+            self.collision_handler = game_instance.collision_handler
+        else:
+            self.tile_map = tile_map
+            self.object_pool = object_pool
+            self.collision_handler = collision_handler
+
         self.object_templates = object_templates
         self.max_monsters_per_room = max_monster_per_room
         self.max_items_per_room=max_items_per_room
