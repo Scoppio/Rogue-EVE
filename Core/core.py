@@ -2,6 +2,7 @@ import os
 import tdl
 import logging
 import argparse
+import textwrap
 from pathlib import Path
 from utils import Colors
 from managers import ObjectManager, ObjectPool, Messenger as ms
@@ -87,7 +88,15 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 
 def menu(header, options, width):
-    pass
+    if len(options) > 26:
+        raise ValueError('Cannot have a menu with more than 26 options.')
+    # calculate total height for the header (after textwrap) and one line per option
+    header_wrapped = []
+    for header_line in header.splitlines():
+        header_wrapped.extend(textwrap.wrap(header_line, width))
+    header_height = len(header_wrapped)
+    height = len(options) + header_height
+
 
 def main():
 
@@ -99,10 +108,13 @@ def main():
     root = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
 
     # Start to setup the object which will handle most of the generally accessed stuff
-    game = GameContext()
+    # GameContext will keep setup of the object managers
+    # ObjectPool keeps track of all the objects on the scene
+    # Starting up the collision handler, which manages all the objects collision events
+    # Adding the object pool and the map to the collision handler so they interact
+    game = GameContext(game_state=ObjectManager.GameState(EGameState.LOADING))
+
     game.set_object_pool(ObjectPool.ObjectPool())
-    # General tools for management of the game
-    game.game_state = ObjectManager.GameState(EGameState.LOADING)
 
     # A map constructor, that randomly create rooms with (not yet implemented) many different strategies
     # Legacy mode makes the map be drawn using chars instead of colored blocks
@@ -116,11 +128,6 @@ def main():
             legacy_mode=LEGACY_MODE
         )
     )
-
-    # Now start the setup of the object managers
-    # ObjectPool keeps track of all the objects on the scene
-    # Starting up the collision handler, which manages all the objects collision events
-    # Adding the object pool and the map to the collision handler so they interact
 
     # Before we start the map objects constructor we load the level data that is being hold on a file
     # With all the information necessary to build the monsters from the template
