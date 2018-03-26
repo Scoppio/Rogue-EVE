@@ -137,13 +137,13 @@ def main():
     # ObjectPool keeps track of all the objects on the scene
     # Starting up the collision handler, which manages all the objects collision events
     # Adding the object pool and the map to the collision handler so they interact
-    game = GameContext(game_state=ObjectManager.GameState(EGameState.LOADING), real_time=REALTIME, menu=menu)
+    game_context = GameContext(game_state=ObjectManager.GameState(EGameState.LOADING), real_time=REALTIME, menu=menu)
 
-    game.set_object_pool(ObjectPool.ObjectPool())
+    game_context.set_object_pool(ObjectPool.ObjectPool())
 
     # A map constructor, that randomly create rooms with (not yet implemented) many different strategies
     # Legacy mode makes the map be drawn using chars instead of colored blocks
-    game.set_map(
+    game_context.set_map(
         MapConstructor(
             MAP_SIZE[0],
             MAP_SIZE[1]
@@ -159,28 +159,28 @@ def main():
     # Map objects constructor is a special factory that randomly populates the map with object templates
     # and does deal with weighted distributions, It makes everything in place, by reference
 
-    MapObjectsConstructor(game_instance=game).load_object_templates(LEVEL_DATA).populate_map()
+    MapObjectsConstructor(game_instance=game_context).load_object_templates(LEVEL_DATA).populate_map()
 
     # Creation of the player
     player = Character.load(
         yaml_file=PLAYER_DATA,
-        coord=game.map.get_rooms()[0].center(),
-        collision_handler=game.collision_handler,
+        coord=game_context.map.get_rooms()[0].center(),
+        collision_handler=game_context.collision_handler,
         inventory=list(),
-        game_state=game.game_state
+        game_state=game_context.game_state
     )
 
-    game.set_player(player)
+    game_context.set_player(player, inventory_width=INVENTORY_WIDTH)
 
     viewport = ObjectManager.ConsoleBuffer(
         root_view,
-        object_pool=game.object_pool,
-        map=game.map,
+        object_pool=game_context.object_pool,
+        map=game_context.map,
         width=MAP_SIZE[0],
         height=MAP_SIZE[1],
         origin=Vector2.zero(),
         target=Vector2.zero(),
-        mouse_controller=game.mouse_controller
+        mouse_controller=game_context.mouse_controller
     )
 
     lower_gui_renderer = ObjectManager.ConsoleBuffer(
@@ -189,7 +189,7 @@ def main():
         target=Vector2(0, 0),
         width=SCREEN_WIDTH,
         height=PANEL_HEIGHT,
-        mouse_controller=game.mouse_controller
+        mouse_controller=game_context.mouse_controller
     )
 
     lower_gui_renderer.add_message_console(MSG_WIDTH, MSG_HEIGHT, MSG_X, MSG_Y)
@@ -203,7 +203,7 @@ def main():
     # a warm welcoming message!
     Messenger.send_message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', Colors.red)
 
-    game.game_state.set_state(EGameState.PLAYING)
+    game_context.game_state.set_state(EGameState.PLAYING)
 
     while not tdl.event.is_window_closed():
 
@@ -214,14 +214,14 @@ def main():
 
         viewport.clear_all_objects()
 
-        game.handle_keys()
+        game_context.handle_keys()
 
-        viewport.set_fov_recompute_to(game.fov_recompute)
+        viewport.set_fov_recompute(game_context.fov_recompute)
 
-        if game.player_action == EAction.EXIT:
+        if game_context.player_action == EAction.EXIT:
             break
 
-        game.run_ai_turn()
+        game_context.run_ai_turn()
 
 
 if __name__ == '__main__':

@@ -80,7 +80,7 @@ class ObjectPool(object):
         if key in self.object_poll.keys():
             del self.object_poll[key]
         else:
-            print("Key not present in the object pool")
+            logger.error("Key not present in the object pool")
             # raise KeyError
 
     def find_by_id(self, key):

@@ -68,7 +68,7 @@ class TileMap(DrawableObject):
     def totals(self):
         total_tiles = list(itertools.chain(*self.tile_map))
         total_explored = sum([tile.explored for tile in total_tiles])
-        print("Total explored: {}".format(total_explored))
+        logger.debug("Total explored: {}".format(total_explored))
 
     def is_visible_tile(self, x, y):
         if x >= self.width or x < 0:
@@ -394,14 +394,12 @@ class MapObjectsConstructor(object):
             assert False, "List is empty"
 
     def populate_room(self, room):
-
         self._place_object(room, self.max_items_per_room, "item", 2)
         self._place_object(room, self.max_monsters_per_room, "monster", 1)
 
     def _place_object(self, room, max_objects, tag, z_index):
-
         num_objects = randint(0, max_objects)
-        print("Trying to put {} {} on room {}".format(num_objects, tag, room))
+        logger.info("Trying to put {} {} on room {}".format(num_objects, tag, room))
         for i in range(num_objects):
             # choose random spot for this object
             coord = Vector2(randint(room.x1+1, room.x2-1), randint(room.y1+1, room.y2-1))

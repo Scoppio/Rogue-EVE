@@ -146,7 +146,7 @@ class Vector2(object):
         if length > 0:
             return Vector2(int(self.X / length), int(self.Y / length))
         else:
-            print("Length 0, cannot normalize.")
+            logger.error("Length 0, cannot normalize.")
             return Vector2.zero()
 
     def as_tuple(self):
@@ -343,7 +343,7 @@ class DeathMethods(object):
     @staticmethod
     def player_death(player):
         """ the game ended!"""
-        print('You died!')
+        logger.info('You died!')
         player.game_state.set_state(EGameState.DEAD)
         # for added effect, transform the player into a corpse!
         player.char = '%'
@@ -354,7 +354,7 @@ class DeathMethods(object):
     def monster_death(monster):
         """ transform it into a nasty corpse! it doesn't block, can't be
         attacked and doesn't move"""
-        print(monster.name.capitalize() + ' is dead!')
+        logger.info(monster.name.capitalize() + ' is dead!')
         monster.char = '%'
         monster.color = Colors.dark_red
         monster.blocks = False

@@ -98,7 +98,7 @@ class ConsoleBuffer(object):
     def set_mouse_controller(self, mouse_controller):
         self.mouse_controller = mouse_controller
 
-    def set_fov_recompute_to(self, val: bool):
+    def set_fov_recompute(self, val: bool):
         self.fov_recompute = val
 
     def reset_fov_recompute(self):
@@ -108,7 +108,20 @@ class ConsoleBuffer(object):
         return self.fov_recompute
 
     def add_bar(self, x, y, total_width, name, value_name, maximum_value_name, obj, bar_color, back_color):
+        """
+        To add a bar you need to simply apply this template to the bar, filling the blanks
 
+        :param x: position relative in x to the console origin
+        :param y: position relative in y to the console origin
+        :param total_width: total width in chars of the bar
+        :param name: name of this bar to be printed
+        :param value_name: string name of the variable in the object you are passing
+        :param maximum_value_name: string name of the variable that holds the maximum value of the variable of interest
+        :param obj: object which holds the values of interest to be shown
+        :param bar_color: color of the filling of the bar
+        :param back_color: color of the background of the bar
+        :return:
+        """
         self.bars.append(
             {'x': x,
              'y': y,
