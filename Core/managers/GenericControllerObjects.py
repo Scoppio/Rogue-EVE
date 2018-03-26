@@ -8,7 +8,7 @@ logger = logging.getLogger('Rogue-EVE')
 
 
 class GameContext(object):
-    def __init__(self, object_pool = None, mouse_controller = None, map = None, game_state = None, real_time=False):
+    def __init__(self, object_pool = None, mouse_controller = None, map = None, game_state = None, real_time=False, menu=None):
         self.object_pool = object_pool
         self.mouse_controller = mouse_controller
         self.map = map
@@ -19,6 +19,7 @@ class GameContext(object):
         self.mouse_controller = None
         self.player_action = None
         self.real_time = real_time
+        self.menu = menu
 
         if self.collision_handler and self.object_pool:
             self._set_collision_handler()
@@ -36,9 +37,10 @@ class GameContext(object):
             self._set_collision_handler()
             self._set_mouse_controller()
 
-    def set_player(self, player):
+    def set_player(self, player, inventory_width=40):
         self.player = player
         self.object_pool.add_player(self.player)
+        self.inventory_width = inventory_width
 
     def _set_mouse_controller(self):
         self.mouse_controller = InputPeripherals.MouseController(map=self.map, object_pool=self.object_pool)
@@ -47,7 +49,6 @@ class GameContext(object):
         self.collision_handler = ObjectManager.CollisionHandler(map=self.map, object_pool=self.object_pool)
 
     def handle_keys(self):
-
         self.player_action = EAction.DIDNT_TAKE_TURN
         self.fov_recompute = False
         user_input = None
@@ -92,7 +93,6 @@ class GameContext(object):
             elif user_input.key == 'RIGHT':
                 self.fov_recompute = self.player.move_or_attack(Vector2(1, 0))
                 self.player_action = EAction.MOVE_RIGHT
-
             elif user_input.text == 'g':
                 # pick up an item
                 for obj in [item for item in self.object_pool.get_objects_as_list()
@@ -101,7 +101,22 @@ class GameContext(object):
                     obj.pick_up(self.player)
                     self.object_pool.delete_by_id(obj._id)
                     break
+            elif user_input.text == 'i':
+                # show the inventory
+                self.inventory_menu('Press the key next to an item to use it, or any other to cancel.\n')
         return
+
+    def inventory_menu(self, header):
+        if self.menu:
+            # show a menu with each item of the inventory as an option
+            if len(self.player.inventory) == 0:
+                options = ['Inventory is empty.']
+            else:
+                options = [item.name for item in self.player.inventory]
+
+            index = self.menu(header, options, self.inventory_width)
+        else:
+            logger.error("menu function is not being referenced inside the game context")
 
     def run_ai_turn(self):
         monster_action = True

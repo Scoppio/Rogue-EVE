@@ -38,7 +38,7 @@ args = parser.parse_args()
 
 SCREEN_WIDTH = int(args.screensize.split('x')[0])
 SCREEN_HEIGHT = int(args.screensize.split('x')[1])
-
+INVENTORY_WIDTH = 50
 # sizes and coordinates relevant for the GUI
 BAR_WIDTH = 20
 PANEL_HEIGHT = 7
@@ -85,6 +85,7 @@ ch.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(fh)
 logger.addHandler(ch)
+root_view = None
 
 
 def menu(header, options, width):
@@ -96,21 +97,47 @@ def menu(header, options, width):
         header_wrapped.extend(textwrap.wrap(header_line, width))
     header_height = len(header_wrapped)
     height = len(options) + header_height
+    # create an off-screen console that represents the menu's window
+    window = tdl.Console(width, height)
+
+    # print the header, with wrapped text
+    window.draw_rect(0, 0, width, height, None, fg=Colors.white, bg=None)
+    for i, line in enumerate(header_wrapped):
+        window.draw_str(0, 0 + i, header_wrapped[i])
+
+    y = header_height
+    letter_index = ord('a')
+    for option_text in options:
+        text = '(' + chr(letter_index) + ') ' + option_text
+        window.draw_str(0, y, text, bg=None)
+        y += 1
+        letter_index += 1
+    #blit the contents of "window" to the root console
+    x = SCREEN_WIDTH//2 - width//2
+    y = SCREEN_HEIGHT//2 - height//2
+    root_view.blit(window, x, y, width, height, 0, 0)
+    # present the root console to the player and wait for a key-press
+    tdl.flush()
+    key = tdl.event.key_wait()
+    key_char = key.char
+    if key_char == '':
+        key_char = ' '  # placeholder
 
 
 def main():
+    global root_view
     # setup to start the TDL and small consoles
     font = os.path.join("assets", "arial10x10.png")
     tdl.set_font(font, greyscale=True, altLayout=True)
     tdl.setFPS(LIMIT_FPS)
-    root = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
+    root_view = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
 
     # Start to setup the object which will handle most of the generally accessed stuff
     # GameContext will keep setup of the object managers
     # ObjectPool keeps track of all the objects on the scene
     # Starting up the collision handler, which manages all the objects collision events
     # Adding the object pool and the map to the collision handler so they interact
-    game = GameContext(game_state=ObjectManager.GameState(EGameState.LOADING), real_time=REALTIME)
+    game = GameContext(game_state=ObjectManager.GameState(EGameState.LOADING), real_time=REALTIME, menu=menu)
 
     game.set_object_pool(ObjectPool.ObjectPool())
 
@@ -146,7 +173,7 @@ def main():
     game.set_player(player)
 
     viewport = ObjectManager.ConsoleBuffer(
-        root,
+        root_view,
         object_pool=game.object_pool,
         map=game.map,
         width=MAP_SIZE[0],
@@ -157,7 +184,7 @@ def main():
     )
 
     lower_gui_renderer = ObjectManager.ConsoleBuffer(
-        root,
+        root_view,
         origin=Vector2(0, SCREEN_HEIGHT-PANEL_HEIGHT),
         target=Vector2(0, 0),
         width=SCREEN_WIDTH,
