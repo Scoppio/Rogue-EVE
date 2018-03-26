@@ -2,9 +2,10 @@ import os
 import tdl
 import logging
 import argparse
+from pathlib import Path
 from utils import Colors
 from managers import ObjectManager, ObjectPool, Messenger as ms
-from managers.GenericControllerObjects import GameController
+from managers.GenericControllerObjects import GameContext
 from models.GameObjects import Character, Vector2, Item
 from models.EnumStatus import EGameState, EAction
 from models.MapObjects import MapConstructor, MapObjectsConstructor
@@ -66,10 +67,24 @@ logging.basicConfig(
     level=LOGLEVEL[args.loglevel]
 )
 
-logger = logging.getLogger('Rogue-EVE')
-ch = logging.StreamHandler()
-logger.addHandler(ch)
 
+log_file = os.path.abspath(os.path.join(str(Path.home()), 'proto_out.log'))
+
+logger = logging.getLogger('Rogue-EVE')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler(log_file)
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# add the handlers to the logger
+logger.addHandler(fh)
+logger.addHandler(ch)
 
 def menu(header, options, width):
     pass
@@ -84,7 +99,7 @@ def main():
     root = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
 
     # Start to setup the object which will handle most of the generally accessed stuff
-    game = GameController()
+    game = GameContext()
     game.set_object_pool(ObjectPool.ObjectPool())
     # General tools for management of the game
     game.game_state = ObjectManager.GameState(EGameState.LOADING)

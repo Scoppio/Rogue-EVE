@@ -23,7 +23,7 @@ class MouseController(object):
 
     def set_mouse_coord(self, new_coord):
         self.mouse_coord = new_coord
-        logger.debug("mouse position", self.mouse_coord)
+        logger.debug("mouse position {}".format(self.mouse_coord))
 
     def get_names_under_mouse(self):
         # return a string with the names of all objects under the mouse

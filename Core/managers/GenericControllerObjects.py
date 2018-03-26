@@ -6,7 +6,8 @@ from managers import InputPeripherals, ObjectManager
 
 logger = logging.getLogger('Rogue-EVE')
 
-class GameController(object):
+
+class GameContext(object):
     def __init__(self, object_pool = None, mouse_controller = None, map = None, player = None, game_state = None, real_time=False):
         self.object_pool = object_pool
         self.mouse_controller = mouse_controller
