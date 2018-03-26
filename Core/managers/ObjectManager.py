@@ -1,11 +1,10 @@
 import tdl
-from models.GameObjects import Vector2
 from utils import Colors
 import logging
 import textwrap
 from models.EnumStatus import EGameState
+from models.GameObjects import Vector2
 from managers import Messenger
-from managers.MouseController import mouse_controller
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -69,14 +68,17 @@ class ConsoleBuffer(object):
                  origin: Vector2 = None,
                  target: Vector2 = None,
                  console: object = None,
+                 mouse_controller = None
                  ):
         self.object_pool = object_pool
         self.map = map
         self.root = root
+
         if console:
             self.console = console
         else:
             self.console = tdl.Console(width, height)
+
         self.origin = origin
         self.target = target
         self.height = height
@@ -91,6 +93,10 @@ class ConsoleBuffer(object):
         self.message_width = None
         self.message_origin_x = None
         self.message_origin_y = None
+        self.mouse_controller = mouse_controller
+
+    def set_mouse_controller(self, mouse_controller):
+        self.mouse_controller = mouse_controller
 
     def set_fov_recompute_to(self, val: bool):
         self.fov_recompute = val
@@ -145,7 +151,8 @@ class ConsoleBuffer(object):
             self.console.draw_str(self.message_origin_x, y, line, bg=None, fg=color)
             y += 1
 
-        self.console.draw_str(1, 0, mouse_controller.get_names_under_mouse(), bg=None, fg=Colors.light_gray)
+        if self.mouse_controller:
+            self.console.draw_str(1, 0, self.mouse_controller.get_names_under_mouse(), bg=None, fg=Colors.light_gray)
 
         # blit the contents of "panel" to the root console
         self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X,

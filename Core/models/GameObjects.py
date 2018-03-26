@@ -438,13 +438,16 @@ class Character(GameObject):
                  collision_handler=None,
                  torch=10,
                  tags=list(),
-                 game_state=None
+                 game_state=None,
+                 inventory=None
             ):
         super(Character, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags)
+
         self.torch = torch
         self.collision_handler = collision_handler
         self.game_state = game_state
         self.fighter = copy.copy(fighter)
+
         if self.fighter:
             # let the fighter component know who owns it
             self.fighter.owner = self
@@ -453,6 +456,8 @@ class Character(GameObject):
         if self.ai:
             # let the AI component know who owns it
             self.ai.owner = self
+
+        self.inventory = inventory
 
     def __str__(self):
         return repr(self)
@@ -468,6 +473,9 @@ class Character(GameObject):
                 return
 
         self.coord = self.coord + step
+
+    def get_inventory(self):
+        return self.inventory
 
     def move_or_attack(self, step):
         """
@@ -502,7 +510,7 @@ class Character(GameObject):
         self.move(Vector2(dx, dy))
 
     @staticmethod
-    def load(yaml_file=None, hard_values=None, coord=Vector2.zero(), collision_handler=None, game_state=None):
+    def load(yaml_file=None, hard_values=None, coord=Vector2.zero(), collision_handler=None, game_state=None, inventory=None):
         if yaml_file:
             with open(yaml_file) as stream:
                 values = yaml.safe_load(stream)
@@ -529,6 +537,9 @@ class Character(GameObject):
         if "torch" in values.keys():
             torch = values["torch"]
 
+        if inventory:
+            inventory = list()
+
         return Character(
             coord=coord,
             char=values["char"],
@@ -540,5 +551,59 @@ class Character(GameObject):
             collision_handler=collision_handler,
             torch=torch,
             tags=values["tags"],
-            game_state=game_state
+            game_state=game_state,
+            inventory=inventory
+        )
+
+
+class Item(GameObject):
+    def __init__(self,
+                 coord: Vector2=None,
+                 char: str="!",
+                 color: tuple=(255, 255, 255),
+                 name='unnamed item',
+                 blocks=False,
+                 _id: str=None,
+                 tags=list(),
+                 object_pool=None
+            ):
+        super(Item, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags)
+        self.object_pool=object_pool
+
+    def pick_up(self, player):
+        # add to the player's inventory and remove from the map
+        if player.get_inventory() is not None:
+            if len(player.get_inventory()) >= 26:
+                send_message('Your inventory is full, cannot pick up ' + self.name + '.', Colors.red)
+            else:
+                print(self)
+                player.get_inventory().append(self)
+                print("remember to remove this item from the object pool!")
+                send_message('You picked up a ' + self.name + '!', Colors.green)
+                return True
+        return False
+
+    @staticmethod
+    def load(yaml_file=None, hard_values=None, coord=Vector2.zero(), collision_handler=None):
+        if yaml_file:
+            with open(yaml_file) as stream:
+                values = yaml.safe_load(stream)
+
+            if not values:
+                raise RuntimeError("File could not be read")
+        else:
+            values = hard_values
+
+        if values["color"] in [a for a in dir(Colors) if "__" not in a]:
+            color = eval("Colors." + values["color"])
+        else:
+            color = Colors.white
+
+        return Item(
+            coord=coord,
+            char=values["char"],
+            color=color,
+            name=values["name"],
+            blocks=values["blocks"],
+            tags=values["tags"]
         )

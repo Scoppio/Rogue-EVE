@@ -250,6 +250,7 @@ class MapConstructor(object):
             my_map[x][y].blocked = False
             my_map[x][y].block_sight = False
 
+
 class Rect(object):
     # a rectangle on the map. used to characterize a room.
     def __init__(self, x, y, w, h):

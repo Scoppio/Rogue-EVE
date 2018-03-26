@@ -12,7 +12,7 @@ map-size:
   height: 70
   width: 80
 items:
-  - type: GameObject
+  - type: Item
     params:
         char: "!"
         color: violet
