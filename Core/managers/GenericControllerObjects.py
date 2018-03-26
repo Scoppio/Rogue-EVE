@@ -8,17 +8,21 @@ logger = logging.getLogger('Rogue-EVE')
 
 
 class GameContext(object):
-    def __init__(self, object_pool = None, mouse_controller = None, map = None, player = None, game_state = None, real_time=False):
+    def __init__(self, object_pool = None, mouse_controller = None, map = None, game_state = None, real_time=False):
         self.object_pool = object_pool
         self.mouse_controller = mouse_controller
         self.map = map
-        self.player = player
+        self.player = None
         self.game_state = game_state
         self.fov_recompute = False
         self.collision_handler = None
         self.mouse_controller = None
         self.player_action = None
         self.real_time = real_time
+
+        if self.collision_handler and self.object_pool:
+            self._set_collision_handler()
+            self._set_mouse_controller()
 
     def set_object_pool(self, object_pool):
         self.object_pool = object_pool
@@ -31,6 +35,10 @@ class GameContext(object):
         if self.object_pool:
             self._set_collision_handler()
             self._set_mouse_controller()
+
+    def set_player(self, player):
+        self.player = player
+        self.object_pool.add_player(self.player)
 
     def _set_mouse_controller(self):
         self.mouse_controller = InputPeripherals.MouseController(map=self.map, object_pool=self.object_pool)

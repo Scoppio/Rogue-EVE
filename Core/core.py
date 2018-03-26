@@ -5,9 +5,9 @@ import argparse
 import textwrap
 from pathlib import Path
 from utils import Colors
-from managers import ObjectManager, ObjectPool, Messenger as ms
+from managers import ObjectManager, ObjectPool, Messenger
 from managers.GenericControllerObjects import GameContext
-from models.GameObjects import Character, Vector2, Item
+from models.GameObjects import Character, Vector2
 from models.EnumStatus import EGameState, EAction
 from models.MapObjects import MapConstructor, MapObjectsConstructor
 
@@ -39,7 +39,7 @@ args = parser.parse_args()
 SCREEN_WIDTH = int(args.screensize.split('x')[0])
 SCREEN_HEIGHT = int(args.screensize.split('x')[1])
 
-#sizes and coordinates relevant for the GUI
+# sizes and coordinates relevant for the GUI
 BAR_WIDTH = 20
 PANEL_HEIGHT = 7
 PANEL_Y = SCREEN_HEIGHT - PANEL_HEIGHT
@@ -49,7 +49,7 @@ MSG_Y = 1
 MSG_WIDTH = SCREEN_WIDTH - BAR_WIDTH - 2
 MSG_HEIGHT = PANEL_HEIGHT - 1
 
-MAP_SIZE= (SCREEN_WIDTH ,SCREEN_HEIGHT-PANEL_HEIGHT)
+MAP_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT-PANEL_HEIGHT)
 LIMIT_FPS = args.fps
 REALTIME = args.realtime
 LEGACY_MODE = args.legacy
@@ -68,17 +68,16 @@ logging.basicConfig(
     level=LOGLEVEL[args.loglevel]
 )
 
-
 log_file = os.path.abspath(os.path.join(str(Path.home()), 'proto_out.log'))
 
 logger = logging.getLogger('Rogue-EVE')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(LOGLEVEL[args.loglevel])
 # create file handler which logs even debug messages
 fh = logging.FileHandler(log_file)
-fh.setLevel(logging.DEBUG)
+fh.setLevel(LOGLEVEL[args.loglevel])
 # create console handler with a higher log level
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(LOGLEVEL[args.loglevel])
 # create formatter and add it to the handlers
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
@@ -86,6 +85,7 @@ ch.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(fh)
 logger.addHandler(ch)
+
 
 def menu(header, options, width):
     if len(options) > 26:
@@ -99,8 +99,6 @@ def menu(header, options, width):
 
 
 def main():
-
-
     # setup to start the TDL and small consoles
     font = os.path.join("assets", "arial10x10.png")
     tdl.set_font(font, greyscale=True, altLayout=True)
@@ -112,7 +110,7 @@ def main():
     # ObjectPool keeps track of all the objects on the scene
     # Starting up the collision handler, which manages all the objects collision events
     # Adding the object pool and the map to the collision handler so they interact
-    game = GameContext(game_state=ObjectManager.GameState(EGameState.LOADING))
+    game = GameContext(game_state=ObjectManager.GameState(EGameState.LOADING), real_time=REALTIME)
 
     game.set_object_pool(ObjectPool.ObjectPool())
 
@@ -135,12 +133,17 @@ def main():
     # and does deal with weighted distributions, It makes everything in place, by reference
 
     MapObjectsConstructor(game_instance=game).load_object_templates(LEVEL_DATA).populate_map()
-    inventory = []
+
     # Creation of the player
-    player = Character.load(yaml_file=PLAYER_DATA, coord=game.map.get_rooms()[0].center(),
-                       collision_handler=game.collision_handler, inventory=inventory, game_state=game.game_state)
-    game.player = player
-    game.object_pool.add_player(player)
+    player = Character.load(
+        yaml_file=PLAYER_DATA,
+        coord=game.map.get_rooms()[0].center(),
+        collision_handler=game.collision_handler,
+        inventory=list(),
+        game_state=game.game_state
+    )
+
+    game.set_player(player)
 
     viewport = ObjectManager.ConsoleBuffer(
         root,
@@ -171,7 +174,7 @@ def main():
     )
 
     # a warm welcoming message!
-    ms.send_message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', Colors.red)
+    Messenger.send_message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', Colors.red)
 
     game.game_state.set_state(EGameState.PLAYING)
 

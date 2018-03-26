@@ -23,7 +23,6 @@ items:
             - small
             - potion
     weight: 1.0
-
 monsters:
   - type: Character
     params:
