@@ -103,7 +103,9 @@ class GameContext(object):
                     break
             elif user_input.text == 'i':
                 # show the inventory
-                self.inventory_menu('Press the key next to an item to use it, or any other to cancel.\n')
+                chosen_item = self.inventory_menu('Press the key next to an item to use it, or any other to cancel.\n')
+                if chosen_item is not None:
+                    chosen_item.use()
         return
 
     def inventory_menu(self, header):
@@ -115,6 +117,10 @@ class GameContext(object):
                 options = [item.name for item in self.player.inventory]
 
             index = self.menu(header, options, self.inventory_width)
+
+            # if an item was chosen, return it
+            if index is None or len(self.player.get_inventory()) == 0: return None
+            return self.player.get_inventory()[index]
         else:
             logger.error("menu function is not being referenced inside the game context")
 

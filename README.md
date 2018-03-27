@@ -13,3 +13,13 @@ I could add sneak properties and do a roguelike of the game card thief,
 could be a good change in the game pace.
 
 * *Many dungeon types* - Add system to create many types for dungeons.
+
+* *Random Parallel Learning*
+
+* *Hero or Zero*
+
+* *Diverse Tools & Making Do*
+
+* *Competing Objectives & Strategic Commitment*
+
+* *Variety not Random*

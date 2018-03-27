@@ -3,6 +3,7 @@ import math
 import logging
 import copy
 import yaml
+from random import randint
 from utils import Colors
 from models.EnumStatus import EGameState
 from managers.Messenger import send_message
@@ -339,6 +340,24 @@ class BasicMonsterAI(object):
         return closest_point_of_interest
 
 
+class ConfusedMonster(object):
+    # AI for a temporarily confused monster (reverts to previous AI after a while).
+    def __init__(self, old_ai, num_turns=5):
+        self.owner = None
+        self.old_ai = old_ai
+        self.num_turns = num_turns
+
+    def take_turn(self):
+        if self.num_turns > 0:  # still confused...
+            # move in a random direction, and decrease the number of turns confused
+            self.owner.move(randint(-1, 1), randint(-1, 1))
+            self.num_turns -= 1
+
+        else:  # restore the previous AI (this one will be deleted because it's not referenced anymore)
+            self.owner.ai = self.old_ai
+            send_message('The ' + self.owner.name + ' is no longer confused!', Colors.red)
+
+
 class DeathMethods(object):
     @staticmethod
     def player_death(player):
@@ -364,6 +383,18 @@ class DeathMethods(object):
         monster.z_index = 0
 
 
+class UseFunctions(object):
+    @staticmethod
+    def cast_heal(ref, heal_amount=5):
+        # heal the player
+        if ref.player.fighter.hp == ref.player.fighter.max_hp:
+            send_message('You are already at full health.', Colors.red)
+            return 'cancelled'
+
+        send_message('Your wounds start to feel better!', Colors.light_violet)
+        ref.player.fighter.heal(heal_amount)
+
+
 class Fighter(object):
     def __init__(self, hp, defense, power, death_function):
         self.owner = None
@@ -372,6 +403,12 @@ class Fighter(object):
         self.defense = defense
         self.power = power
         self.death_function = death_function
+
+    def heal(self, amount):
+        # heal by the given amount, without going over the maximum
+        self.hp += amount
+        if self.hp > self.max_hp:
+            self.hp = self.max_hp
 
     def take_damage(self, damage):
         # apply damage if possible
@@ -565,10 +602,19 @@ class Item(GameObject):
                  blocks=False,
                  _id: str=None,
                  tags=list(),
-                 object_pool=None
+                 use_function=UseFunctions.cast_heal
             ):
         super(Item, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags)
-        self.object_pool=object_pool
+        self.use_function = use_function
+        self.player = None
+
+    def use(self):
+        # just call the "use_function" if it is defined
+        if self.use_function is None:
+            send_message('The ' + self.name + ' cannot be used.', color=Colors.azure)
+        else:
+            if self.use_function(self) != 'cancelled' and self.player.get_inventory():
+                self.player.get_inventory().remove(self)  # destroy after use, unless it was cancelled for some reason
 
     def pick_up(self, player):
         # add to the player's inventory and remove from the map
@@ -576,7 +622,8 @@ class Item(GameObject):
             if len(player.get_inventory()) >= 26:
                 send_message('Your inventory is full, cannot pick up ' + self.name + '.', Colors.red)
             else:
-                player.get_inventory().append(self)
+                self.player = player
+                self.player.get_inventory().append(self)
                 send_message('You picked up a ' + self.name + '!', Colors.green)
                 return True
         return False

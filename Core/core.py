@@ -123,6 +123,12 @@ def menu(header, options, width):
     if key_char == '':
         key_char = ' '  # placeholder
 
+    #convert the ASCII code to an index; if it corresponds to an option, return it
+    index = ord(key_char) - ord('a')
+    if index >= 0 and index < len(options):
+        return index
+    return None
+
 
 def main():
     global root_view
@@ -195,9 +201,7 @@ def main():
     lower_gui_renderer.add_message_console(MSG_WIDTH, MSG_HEIGHT, MSG_X, MSG_Y)
 
     lower_gui_renderer.add_bar(
-        1, 1, BAR_WIDTH, 'HP', 'hp',
-        'max_hp', player.fighter,
-        Colors.light_red, Colors.darker_red
+        1, 1, BAR_WIDTH, 'HP', 'hp', 'max_hp', player.fighter, Colors.light_red, Colors.darker_red
     )
 
     # a warm welcoming message!
