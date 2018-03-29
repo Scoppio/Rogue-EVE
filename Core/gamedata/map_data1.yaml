@@ -22,7 +22,7 @@ items:
             - item
             - small
             - potion
-        use_function: cast_heal
+        use_function: cast_selfheal
         extra_params:
             heal_amount: 5
     weight: 1.0
@@ -30,7 +30,7 @@ items:
     params:
         char: "#"
         color: dark_yellow
-        name: lightnin scroll
+        name: lightning scroll
         blocks: False
         tags:
             - item
@@ -40,6 +40,7 @@ items:
         extra_params:
             range: 5
             damage: 15
+            target_mode: closest
             target_tag: monster
     weight: 1.0
   - type: Item
@@ -55,11 +56,11 @@ items:
         use_function: cast_fireball
         extra_params:
             range: 10
-            radius: 5
+            radius: 3
             damage: 15
             target_mode: area
             target_tag: mortal
-    weight: 5.0
+    weight: 1.0
 monsters:
   - type: Character
     params:

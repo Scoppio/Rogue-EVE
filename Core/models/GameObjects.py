@@ -7,7 +7,6 @@ from random import randint
 from utils import Colors
 from models.EnumStatus import EGameState
 from managers.Messenger import send_message
-from managers.ObjectPool import object_pool
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -360,6 +359,23 @@ class ConfusedMonsterAI(object):
             send_message('The ' + self.owner.name + ' is no longer confused!', Colors.red)
 
 
+class FrozenMonsterAI(object):
+    # AI for a temporarily freezes monster (reverts to previous AI after a while).
+    def __init__(self, old_ai, num_turns=5):
+        self.owner = None
+        self.old_ai = old_ai
+        self.num_turns = num_turns
+
+    def take_turn(self):
+        if self.num_turns > 0:  # still confused...
+            # move in a random direction, and decrease the number of turns confused
+            self.num_turns -= 1
+
+        else:  # restore the previous AI (this one will be deleted because it's not referenced anymore)
+            self.owner.ai = self.old_ai
+            send_message('The ' + self.owner.name + ' is no longer frozen!', Colors.red)
+
+
 class DeathMethods(object):
     @staticmethod
     def player_death(player):
@@ -387,74 +403,148 @@ class DeathMethods(object):
 
 class UseFunctions(object):
     @staticmethod
-    def invalid_function(ref):
+    def invalid_function(ref, **kwargs):
         send_message('The {} vanishes!'.format(ref.name))
 
     @staticmethod
-    def do_nothing(ref):
+    def do_nothing(ref, **kwargs):
         pass
 
     @staticmethod
-    def cast_heal(ref):
+    def cast_heal(ref, **kwargs):
+        # heal the targets
+        objs = ref.context.targeting(**kwargs)
+
+        if objs:
+            for obj in objs:
+                if obj.fighter.hp < obj.fighter.max_hp:
+                    send_message("The {}'s wounds start to feel better!", Colors.light_violet)
+                    obj.fighter.heal(kwargs["heal_amount"])
+                else:
+                    send_message("The {} is already at full health!", Colors.light_violet)
+        else:
+            send_message('No targets found!', Colors.red)
+            return 'cancelled'
+
+    @staticmethod
+    def cast_selfheal(ref, **kwargs):
         # heal the player
         if ref.context.player.fighter.hp == ref.context.player.fighter.max_hp:
             send_message('You are already at full health.', Colors.red)
             return 'cancelled'
 
         send_message('Your wounds start to feel better!', Colors.light_violet)
-        ref.context.player.fighter.heal(ref.extra_params["heal_amount"])
+        ref.context.player.fighter.heal(kwargs["heal_amount"])
 
     @staticmethod
-    def cast_lightning(ref):
+    def cast_lightning(ref, **kwargs):
         # find closest enemy (inside a maximum range) and damage it
-        monster = ref.context.closest_object(ref.extra_params["range"], ref.extra_params["target_tag"])
-        if monster is None:  # no enemy found within maximum range
-            send_message('No enemy is close enough to strike.', Colors.red)
-            return 'cancelled'
+        objs = ref.context.targeting(**kwargs)
 
-        # zap it!
-        send_message('A lighting bolt strikes the ' + monster.name + ' with a loud thunder! The damage is '
-                + str(ref.extra_params["damage"]) + ' hit points.', Colors.light_blue)
-        monster.fighter.take_damage(ref.extra_params["damage"])
+        if objs:
+            for obj in objs:
+                # zap it!
+                send_message('A lighting bolt strikes the ' + obj.name + ' with a loud thunder! The damage is '
+                        + str(ref.extra_params["damage"]) + ' hit points.', Colors.light_blue)
+                obj.fighter.take_damage(ref.extra_params["damage"])
+        else:
+            send_message('No targets found!')
+            return 'canceled'
 
     @staticmethod
-    def cast_fireball(ref):
+    def cast_fireball(ref, **kwargs):
         # ask the player for a target tile to throw a fireball at
-        send_message('Left-click a target tile for the fireball, or right-click to cancel.', Colors.light_cyan)
 
-        objs = ref.context.targeting(
-            ref.extra_params["target_mode"] if "target_tag" in ref.extra_params.keys() else "self",
-            ref.extra_params["target_tag"] if "target_tag" in ref.extra_params.keys() else None,
-            ref.extra_params["range"] if "range" in ref.extra_params.keys() else None,
-            ref.extra_params["radius"] if "radius" in ref.extra_params.keys() else 0,
-            ref.extra_params["visible_only"] if "visible_only" in ref.extra_params.keys() else False
-        )
-        print(objs)
+        send_message('Left-click a target tile for the {}, or right-click to cancel.'.format(ref.name), Colors.light_cyan)
+
+        objs = ref.context.targeting(**kwargs)
+
         if objs:
-            send_message('The fireball explodes, burning everything within ' + str(ref.extra_params["radius"]) + ' tiles!', Colors.orange)
+            send_message('The fireball explodes, burning everything within ' + str(kwargs["radius"]) + ' tiles!', Colors.orange)
             for obj in objs:
                 # damage every fighter in range, including the player
-                send_message('The ' + obj.name + ' gets burned for ' + str(ref.extra_params["damage"]) + ' hit points.', Colors.orange)
+                send_message('The ' + obj.name + ' gets burned for ' + str(kwargs["damage"]) + ' hit points.', Colors.orange)
                 if obj.fighter:
-                    obj.fighter.take_damage(ref.extra_params["damage"])
+                    obj.fighter.take_damage(kwargs["damage"])
         else:
             send_message('Canceled!', Colors.blue)
             return 'cancelled'
 
     @staticmethod
-    def cast_confuse(ref):
+    def cast_confuse(ref, **kwargs):
         # find closest enemy in-range and confuse it
-        monster = ref.context.closest_monster(ref.extra_params["range"])
-        if monster is None:  # no enemy found within maximum range
+        monsters = ref.context.targeting(**kwargs)
+        if monsters:  # no enemy found within maximum range
+            for monster in monsters:
+                # replace the monster's AI with a "confused" one; after some turns it will restore the old AI
+                StatusEffects.behavior_change(target=monster, behaviour="confused", **kwargs)
+                send_message('The eyes of the ' + monster.name + ' look vacant, as he starts to stumble around!',
+                             Colors.light_green)
+        else:
             send_message('No enemy is close enough to confuse.', Colors.red)
             return 'cancelled'
+
+    @staticmethod
+    def custom_magic(ref, **kwargs):
+        targets = ref.context.targeting(**kwargs)
+
+        if targets:  # no enemy found within maximum range
+            if "status_effect" in kwargs.keys():
+                status_effect = kwargs["status_effect"]
+            else:
+                status_effect = None
+
+            if "heal_amount" in kwargs.keys():
+                heal_amount = kwargs["heal_amount"]
+            else:
+                heal_amount = None
+            if "damage" in kwargs.keys():
+                damage = kwargs["damage"]
+            else:
+                damage = None
+
+            if "flavor_text" in kwargs.keys():
+                flavor_text = kwargs["flavor_text"]
+            else:
+                flavor_text = "Thee {target} was hit by {name}!"
+
+            for target in targets:
+                if status_effect:
+                    status_effect(target=target, **kwargs)
+
+                if target.fighter:
+                    if damage:
+                        target.fighter.take_damage(damage)
+                    if heal_amount:
+                        target.fighter.heal(heal_amount)
+
+                send_message(flavor_text.format(target=target, **kwargs),
+                             Colors.light_green)
         else:
-            # replace the monster's AI with a "confused" one; after some turns it will restore the old AI
-            old_ai = monster.ai
-            monster.ai = ConfusedMonsterAI(old_ai)
-            monster.ai.owner = monster  # tell the new component who owns it
-            send_message('The eyes of the ' + monster.name + ' look vacant, as he starts to stumble around!',
-                    Colors.light_green)
+            send_message('No target found!', Colors.red)
+            return 'cancelled'
+
+
+class StatusEffects(object):
+
+    @staticmethod
+    def behavior_change(**kwargs):
+        monster = kwargs["target"]
+        behaviour = kwargs["behaviour"]
+
+        if "number_of_turns" in kwargs.keys():
+            number_of_turns = kwargs["number_of_turns"]
+        else:
+            number_of_turns = 5
+
+        old_ai = monster.ai # monster.ai
+        if behaviour == "confused":
+            monster.ai = ConfusedMonsterAI(old_ai, number_of_turns)
+        elif behaviour == "frozen":
+            monster.ai = FrozenMonsterAI(old_ai, number_of_turns)
+
+        monster.ai.owner = monster  # tell the new component who owns it
+
 
 class Fighter(object):
     def __init__(self, hp, defense, power, death_function):
@@ -676,7 +766,7 @@ class Item(GameObject):
         if self.use_function is None:
             send_message('The ' + self.name + ' cannot be used. It vanishes!', color=Colors.azure)
         else:
-            if self.use_function(self) != 'cancelled' and self.context.player.get_inventory():
+            if self.use_function(self, **self.extra_params) != 'cancelled' and self.context.player.get_inventory():
                 self.context.player.get_inventory().remove(self)  # destroy after use, unless it was cancelled for some reason
                 self.context = None
 
@@ -712,6 +802,10 @@ class Item(GameObject):
         else:
             logger.error("Could not find use_function {}".format(values["use_function"]))
             use_function = UseFunctions.do_nothing
+
+        if "extra_params" in values.keys() and "status_effect" in values["extra_params"].keys():
+            if values["extra_params"]["status_effect"] in [a for a in dir(StatusEffects) if "__" not in a]:
+                values["extra_params"]["status_effect"] = eval("StatusEffects." +  values["extra_params"]["status_effect"])
 
         return Item(
             coord=coord,

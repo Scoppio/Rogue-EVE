@@ -158,6 +158,7 @@ class GameContext(object):
     def target_tile(self, max_range=None):
         # return the position of a tile left-clicked in player's FOV (optionally in
         # a range), or (None,None) if right-clicked.
+
         while True:
             tdl.flush()
             clicked = False
@@ -196,19 +197,31 @@ class GameContext(object):
                     if obj.coord == mouse_coord and obj != self.player:
                         return obj
 
-    def targeting(self, target_mode=None, target_tag=None, max_range=None, radius=0, visible_only=True):
+    def targeting(self, **kwargs):
+        target_mode, target_tag, range, visible_only, radius = None, None, None, True, 0
+        for k, v in kwargs.items():
+            if k == "target_mode":
+                target_mode = v
+            if k == "target_tag":
+                target_tag = v
+            if k == "range":
+                range = v
+            if k == "visible_only":
+                visible_only = v
+            if k == "radius":
+                radius = v
 
         if target_mode == "single":
-            return list(self.target_object(max_range, target_tag))
+            return list(self.target_object(range, target_tag))
 
         elif target_mode == "self":
             return list(self.player)
 
         elif target_mode == "closest":
-            return list(self.closest_object(max_range, target_tag))
+            return list(self.closest_object(range, target_tag))
 
         elif target_mode == "area":
-            x, y = self.target_tile(max_range)
+            x, y = self.target_tile(range)
             coord = Vector2(x, y)
 
         else:
