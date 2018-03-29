@@ -87,7 +87,6 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 root_view = None
 
-
 def menu(header, options, width):
     if len(options) > 26:
         raise ValueError('Cannot have a menu with more than 26 options.')
@@ -145,7 +144,7 @@ def main():
     # Adding the object pool and the map to the collision handler so they interact
     game_context = GameContext(game_state=ObjectManager.GameState(EGameState.LOADING), real_time=REALTIME, menu=menu)
 
-    game_context.set_object_pool(ObjectPool.ObjectPool())
+    game_context.set_object_pool(ObjectPool.object_pool)
 
     # A map constructor, that randomly create rooms with (not yet implemented) many different strategies
     # Legacy mode makes the map be drawn using chars instead of colored blocks

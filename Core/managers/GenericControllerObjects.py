@@ -39,6 +39,7 @@ class GameContext(object):
 
     def set_player(self, player, inventory_width=40):
         self.player = player
+        self.player.context = self
         self.object_pool.add_player(self.player)
         self.inventory_width = inventory_width
 
@@ -101,12 +102,12 @@ class GameContext(object):
                     obj.pick_up(self.player)
                     self.object_pool.delete_by_id(obj._id)
                     break
+
             elif user_input.text == 'i':
                 # show the inventory
                 chosen_item = self.inventory_menu('Press the key next to an item to use it, or any other to cancel.\n')
                 if chosen_item is not None:
                     chosen_item.use()
-        return
 
     def inventory_menu(self, header):
         if self.menu:
@@ -138,3 +139,17 @@ class GameContext(object):
             for obj in self.object_pool.find_by_tag('monster'):
                 if obj.ai:
                     obj.ai.take_turn()
+
+    def closest_object(self, max_range, tag_of_interest):
+        # find closest enemy, up to a maximum range, and in the player's FOV
+        closest_enemy = None
+        closest_dist = max_range + 1  # start with (slightly more than) maximum range
+
+        for monster in self.object_pool.find_by_tag(tag_of_interest):
+            if self.map.is_visible_tile(monster.coord.X, monster.coord.Y):
+                # calculate distance between this object and the player
+                dist = Vector2.distance(monster.coord, self.player.coord)
+                if dist < closest_dist:  # it's closer, so remember it
+                    closest_enemy = monster
+                    closest_dist = dist
+        return closest_enemy

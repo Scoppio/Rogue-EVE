@@ -22,6 +22,25 @@ items:
             - item
             - small
             - potion
+        use_function: cast_heal
+        extra_params:
+            heal_amount: 5
+    weight: 1.0
+  - type: Item
+    params:
+        char: "#"
+        color: dark yellow
+        name: lightnin scroll
+        blocks: False
+        tags:
+            - item
+            - small
+            - magic
+        use_function: cast_lightning
+        extra_params:
+            range: 5
+            damage: 15
+            target_tag: monster
     weight: 1.0
 monsters:
   - type: Character

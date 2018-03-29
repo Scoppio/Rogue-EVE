@@ -7,6 +7,7 @@ from random import randint
 from utils import Colors
 from models.EnumStatus import EGameState
 from managers.Messenger import send_message
+from managers.ObjectPool import object_pool
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -259,6 +260,7 @@ class GameObject(DrawableObject):
         self.object_pool = None
         self.tags = tags
         self.z_index = 1
+        self.context = None
 
     def __str__(self):
         return repr(self)
@@ -385,14 +387,35 @@ class DeathMethods(object):
 
 class UseFunctions(object):
     @staticmethod
-    def cast_heal(ref, heal_amount=5):
+    def invalid_function(ref):
+        send_message('The {} vanishes!'.format(ref.name))
+
+    @staticmethod
+    def do_nothing(ref):
+        pass
+
+    @staticmethod
+    def cast_heal(ref):
         # heal the player
-        if ref.player.fighter.hp == ref.player.fighter.max_hp:
+        if ref.context.player.fighter.hp == ref.context.player.fighter.max_hp:
             send_message('You are already at full health.', Colors.red)
             return 'cancelled'
 
         send_message('Your wounds start to feel better!', Colors.light_violet)
-        ref.player.fighter.heal(heal_amount)
+        ref.context.player.fighter.heal(ref.extra_params["heal_amount"])
+
+    @staticmethod
+    def cast_lightning(ref):
+        # find closest enemy (inside a maximum range) and damage it
+        monster = ref.context.closest_object(ref.extra_params["range"], ref.extra_params["target_tag"])
+        if monster is None:  # no enemy found within maximum range
+            send_message('No enemy is close enough to strike.', Colors.red)
+            return 'cancelled'
+
+        # zap it!
+        send_message('A lighting bolt strikes the ' + monster.name + ' with a loud thunder! The damage is '
+                + str(ref.extra_params["damage"]) + ' hit points.', Colors.light_blue)
+        monster.fighter.take_damage(ref.extra_params["damage"])
 
 
 class Fighter(object):
@@ -602,19 +625,22 @@ class Item(GameObject):
                  blocks=False,
                  _id: str=None,
                  tags=list(),
-                 use_function=UseFunctions.cast_heal
+                 use_function=None,
+                 extra_params=None
             ):
         super(Item, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags)
-        self.use_function = use_function
+        self.use_function=use_function
+        self.extra_params=extra_params
         self.player = None
 
     def use(self):
         # just call the "use_function" if it is defined
         if self.use_function is None:
-            send_message('The ' + self.name + ' cannot be used.', color=Colors.azure)
+            send_message('The ' + self.name + ' cannot be used. It vanishes!', color=Colors.azure)
         else:
-            if self.use_function(self) != 'cancelled' and self.player.get_inventory():
-                self.player.get_inventory().remove(self)  # destroy after use, unless it was cancelled for some reason
+            if self.use_function(self) != 'cancelled' and self.context.player.get_inventory():
+                self.context.player.get_inventory().remove(self)  # destroy after use, unless it was cancelled for some reason
+                self.context = None
 
     def pick_up(self, player):
         # add to the player's inventory and remove from the map
@@ -622,8 +648,8 @@ class Item(GameObject):
             if len(player.get_inventory()) >= 26:
                 send_message('Your inventory is full, cannot pick up ' + self.name + '.', Colors.red)
             else:
-                self.player = player
-                self.player.get_inventory().append(self)
+                self.context = player.context
+                player.get_inventory().append(self)
                 send_message('You picked up a ' + self.name + '!', Colors.green)
                 return True
         return False
@@ -639,10 +665,15 @@ class Item(GameObject):
         else:
             values = hard_values
 
+        color = Colors.white
         if values["color"] in [a for a in dir(Colors) if "__" not in a]:
             color = eval("Colors." + values["color"])
+
+        if values["use_function"] in [a for a in dir(UseFunctions) if "__" not in a]:
+            use_function = eval("UseFunctions." + values["use_function"])
         else:
-            color = Colors.white
+            logger.error("Could not find use_function {}".format(values["use_function"]))
+            use_function = UseFunctions.do_nothing
 
         return Item(
             coord=coord,
@@ -650,5 +681,7 @@ class Item(GameObject):
             color=color,
             name=values["name"],
             blocks=values["blocks"],
-            tags=values["tags"]
+            tags=values["tags"],
+            use_function=use_function,
+            extra_params=values["extra_params"]
         )
