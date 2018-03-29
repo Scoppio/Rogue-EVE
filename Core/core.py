@@ -207,7 +207,7 @@ def main():
     Messenger.send_message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', Colors.red)
 
     game_context.game_state.set_state(EGameState.PLAYING)
-
+    game_context.camera = viewport
     while not tdl.event.is_window_closed():
 
         viewport.render_all_objects()

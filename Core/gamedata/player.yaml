@@ -11,3 +11,4 @@ fighter:
 torch: 9
 tags:
   - player
+  - mortal

@@ -70,7 +70,7 @@ class TileMap(DrawableObject):
         total_explored = sum([tile.explored for tile in total_tiles])
         logger.debug("Total explored: {}".format(total_explored))
 
-    def is_visible_tile(self, x, y):
+    def is_visible_tile(self, x=None, y=None):
         if x >= self.width or x < 0:
             return False
         elif y >= self.height or y < 0:

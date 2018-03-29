@@ -8,7 +8,7 @@ logger = logging.getLogger('Rogue-EVE')
 
 
 class GameContext(object):
-    def __init__(self, object_pool = None, mouse_controller = None, map = None, game_state = None, real_time=False, menu=None):
+    def __init__(self, object_pool = None, mouse_controller = None, map = None, game_state = None, real_time=False, menu=None, camera=None):
         self.object_pool = object_pool
         self.mouse_controller = mouse_controller
         self.map = map
@@ -20,6 +20,7 @@ class GameContext(object):
         self.player_action = None
         self.real_time = real_time
         self.menu = menu
+        self.camera = camera
 
         if self.collision_handler and self.object_pool:
             self._set_collision_handler()
@@ -153,3 +154,76 @@ class GameContext(object):
                     closest_enemy = monster
                     closest_dist = dist
         return closest_enemy
+
+    def target_tile(self, max_range=None):
+        # return the position of a tile left-clicked in player's FOV (optionally in
+        # a range), or (None,None) if right-clicked.
+        while True:
+            tdl.flush()
+            clicked = False
+            for event in tdl.event.get():
+                if event.type == 'MOUSEMOTION':
+                    self.mouse_controller.mouse_coord = event.cell
+                if event.type == 'MOUSEDOWN' and event.button == 'LEFT':
+                    clicked = True
+                elif ((event.type == 'MOUSEDOWN' and event.button == 'RIGHT') or
+                      (event.type == 'KEYDOWN' and event.key == 'ESCAPE')):
+                    return (None, None)
+
+            self.camera.render_all_objects()
+
+            coord = Vector2(*self.mouse_controller.mouse_coord)
+
+            if (clicked and self.map.is_visible_tile(coord.X, coord.Y)
+                    and (max_range is None or Vector2.distance(coord, self.player.coord) <= max_range)):
+                return self.mouse_controller.mouse_coord
+
+    def target_object(self, max_range=None, target_tag=None):
+        # returns a clicked monster inside FOV up to a range, or None if right-clicked
+        while True:
+            (x, y) = self.target_tile(max_range)
+            if x is None:  # player cancelled
+                return None
+
+            mouse_coord = Vector2(x,y)
+            # return the first clicked monster, otherwise continue looping
+            if target_tag:
+                for obj in self.object_pool.find_by_tag(target_tag):
+                    if obj.coord == mouse_coord and obj != self.player:
+                        return obj
+            else:
+                for obj in self.object_pool.get_objects_as_list():
+                    if obj.coord == mouse_coord and obj != self.player:
+                        return obj
+
+    def targeting(self, target_mode=None, target_tag=None, max_range=None, radius=0, visible_only=True):
+
+        if target_mode == "single":
+            return list(self.target_object(max_range, target_tag))
+
+        elif target_mode == "self":
+            return list(self.player)
+
+        elif target_mode == "closest":
+            return list(self.closest_object(max_range, target_tag))
+
+        elif target_mode == "area":
+            x, y = self.target_tile(max_range)
+            coord = Vector2(x, y)
+
+        else:
+            logger.error("target_mode unknown {}".format(target_mode))
+            return []
+
+        ret = list()
+        if target_tag:
+            for obj in self.object_pool.find_by_tag(target_tag):
+                if not visible_only or self.map.is_visible_tile(obj.coord.X, obj.coord.Y):
+                    if Vector2.distance(obj.coord, coord) <= radius:
+                        ret.append(obj)
+        else:
+            for obj in self.object_pool.get_objects_as_list():
+                if not visible_only or self.map.is_visible_tile(obj.coord.X, obj.coord.Y):
+                    if Vector2.distance(obj.coord, coord) <= radius:
+                        ret.append(obj)
+        return ret

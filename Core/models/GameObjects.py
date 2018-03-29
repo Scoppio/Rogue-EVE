@@ -342,7 +342,7 @@ class BasicMonsterAI(object):
         return closest_point_of_interest
 
 
-class ConfusedMonster(object):
+class ConfusedMonsterAI(object):
     # AI for a temporarily confused monster (reverts to previous AI after a while).
     def __init__(self, old_ai, num_turns=5):
         self.owner = None
@@ -417,6 +417,44 @@ class UseFunctions(object):
                 + str(ref.extra_params["damage"]) + ' hit points.', Colors.light_blue)
         monster.fighter.take_damage(ref.extra_params["damage"])
 
+    @staticmethod
+    def cast_fireball(ref):
+        # ask the player for a target tile to throw a fireball at
+        send_message('Left-click a target tile for the fireball, or right-click to cancel.', Colors.light_cyan)
+
+        objs = ref.context.targeting(
+            ref.extra_params["target_mode"] if "target_tag" in ref.extra_params.keys() else "self",
+            ref.extra_params["target_tag"] if "target_tag" in ref.extra_params.keys() else None,
+            ref.extra_params["range"] if "range" in ref.extra_params.keys() else None,
+            ref.extra_params["radius"] if "radius" in ref.extra_params.keys() else 0,
+            ref.extra_params["visible_only"] if "visible_only" in ref.extra_params.keys() else False
+        )
+        print(objs)
+        if objs:
+            send_message('The fireball explodes, burning everything within ' + str(ref.extra_params["radius"]) + ' tiles!', Colors.orange)
+            for obj in objs:
+                # damage every fighter in range, including the player
+                send_message('The ' + obj.name + ' gets burned for ' + str(ref.extra_params["damage"]) + ' hit points.', Colors.orange)
+                if obj.fighter:
+                    obj.fighter.take_damage(ref.extra_params["damage"])
+        else:
+            send_message('Canceled!', Colors.blue)
+            return 'cancelled'
+
+    @staticmethod
+    def cast_confuse(ref):
+        # find closest enemy in-range and confuse it
+        monster = ref.context.closest_monster(ref.extra_params["range"])
+        if monster is None:  # no enemy found within maximum range
+            send_message('No enemy is close enough to confuse.', Colors.red)
+            return 'cancelled'
+        else:
+            # replace the monster's AI with a "confused" one; after some turns it will restore the old AI
+            old_ai = monster.ai
+            monster.ai = ConfusedMonsterAI(old_ai)
+            monster.ai.owner = monster  # tell the new component who owns it
+            send_message('The eyes of the ' + monster.name + ' look vacant, as he starts to stumble around!',
+                    Colors.light_green)
 
 class Fighter(object):
     def __init__(self, hp, defense, power, death_function):

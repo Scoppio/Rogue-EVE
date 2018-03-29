@@ -29,7 +29,7 @@ items:
   - type: Item
     params:
         char: "#"
-        color: dark yellow
+        color: dark_yellow
         name: lightnin scroll
         blocks: False
         tags:
@@ -42,6 +42,24 @@ items:
             damage: 15
             target_tag: monster
     weight: 1.0
+  - type: Item
+    params:
+        char: "#"
+        color: dark_red
+        name: fireball scroll
+        blocks: False
+        tags:
+            - item
+            - small
+            - magic
+        use_function: cast_fireball
+        extra_params:
+            range: 10
+            radius: 5
+            damage: 15
+            target_mode: area
+            target_tag: mortal
+    weight: 5.0
 monsters:
   - type: Character
     params:
@@ -60,6 +78,7 @@ monsters:
             - monster
             - orc
             - small
+            - mortal
     weight: 3.0
   - type: Character
     params:
@@ -78,4 +97,5 @@ monsters:
             - monster
             - troll
             - big
+            - mortal
     weight: 1.0
