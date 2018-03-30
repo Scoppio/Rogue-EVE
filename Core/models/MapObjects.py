@@ -353,26 +353,27 @@ class MapObjectsConstructor(object):
     def load_object_templates(self, yaml_file):
         """Load an yaml object with the template for the level"""
         with open(yaml_file) as stream:
-            map_data = yaml.safe_load(stream)
+            template = yaml.safe_load(stream)
 
-        if not map_data:
+        if not template:
             raise RuntimeError("File could not be read")
 
-        print(map_data)
+        if "map" in template.keys():
+            if template["map"]["max-room-items"]:
+                logger.info("max-room-items: {}".format(template["map"]["max-room-items"]))
+                self.max_items_per_room = template["map"]["max-room-items"]
 
-        if map_data["max-room-items"]:
-            print("max-room-items: {}".format(map_data["max-room-items"]))
-            self.max_items_per_room = map_data["max-room-items"]
+            if template["map"]["max-room-monsters"]:
+                logger.info("max-room-monsters: {} ".format(template["map"]["max-room-monsters"]))
+                self.max_monsters_per_room = template["map"]["max-room-monsters"]
 
-        if map_data["max-room-monsters"]:
-            print("max-room-monsters: {} ".format(map_data["max-room-monsters"]))
-            self.max_monsters_per_room = map_data["max-room-monsters"]
+        if "items" in template.keys():
+            for obj in template["items"]:
+                self._append_template(obj)
 
-        for obj in map_data["items"]:
-            self._append_template(obj)
-
-        for obj in map_data["monsters"]:
-            self._append_template(obj)
+        if "monsters" in template.keys():
+            for obj in template["monsters"]:
+                self._append_template(obj)
 
         return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
                                      self.object_templates, self.max_monsters_per_room, self.max_items_per_room)

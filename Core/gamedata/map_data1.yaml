@@ -5,12 +5,12 @@ metadata:
   revision: 1
   author: Lucas Coppio
   contact: "@DeveloperCoppio"
-max-rooms: 9
-max-room-items: 2
-max-room-monsters: 5
-map-size:
+map-data:
   height: 70
   width: 80
+  max-rooms: 9
+  max-room-items: 2
+  max-room-monsters: 5
 items:
   - type: Item
     params:
