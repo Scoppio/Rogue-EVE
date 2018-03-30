@@ -1,11 +1,9 @@
+from models.GameObjects import Vector2
 
-def foo(**kwargs):
-    print(kwargs["a"])
-    for k, v in kwargs.items():
-        print(type(k,), k, type(v), v)
+a = Vector2(0, 1)
+x, y = a
 
-bar = {"a": 0, "b": "alpha", "person": "Kassandra"}
+b = (2,3)
+c = Vector2(*b)
 
-foo(foobar=[1,2,3], **bar)
-
-print("Olá {person}".format(world="world", **bar))
+print(c)

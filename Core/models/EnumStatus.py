@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class EGameState(Enum):
     LOADING = 0
     PAUSED = 1
@@ -15,3 +16,11 @@ class EAction(Enum):
     MOVE_LEFT = 4
     MOVE_RIGHT = 5
     DEAD = 99
+
+
+class MapTypes(Enum):
+    RANDOM = 0
+    CONSTRAINT = 1
+    CONSTRUCTIVE1 = 2
+    CONSTRUCTIVE2 = 3
+    CONSTRUCTIVE3 = 4

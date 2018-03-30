@@ -2,6 +2,7 @@ from random import randint, uniform
 import itertools
 import yaml
 from models import GameObjects
+from models.EnumStatus import MapTypes
 from models.GameObjects import DrawableObject, Vector2
 import logging
 
@@ -10,9 +11,12 @@ logger = logging.getLogger('Rogue-EVE')
 
 class Tile(object):
     """a tile of the map and its properties"""
-    def __init__(self, blocked, block_sight=None):
+    def __init__(self, blocked, x, y, block_sight=None):
         self.blocked = blocked
         self.explored = False
+        self.x = x
+        self.y = y
+        self.id = (x, y)
 
         # by default, if a tile is blocked, it also blocks sight
         if block_sight is None:
@@ -34,8 +38,31 @@ class TileMap(DrawableObject):
         self.legacy_mode = legacy_mode
         self.visible_tiles = None
 
+    def get_tile_by_id(self, id):
+        x, y = id
+        return self.tile_map[x][y]
+
+    def get_tile_id(self, x, y):
+        return (x, y)
+
     def set_visible_tiles(self, visible_tiles):
         self.visible_tiles = visible_tiles
+
+    def in_bounds(self, id):
+        (x, y) = id
+        return 0 <= x < self.width and 0 <= y < self.height
+
+    def passable(self, id):
+        tile = self.get_tile_by_id(id)
+        return not tile.blocked
+
+    def neighbors(self, id):
+        (x, y) = id
+        results = [(x + 1, y), (x, y - 1), (x - 1, y), (x, y + 1)]
+        if (x + y) % 2 == 0: results.reverse()  # aesthetics
+        results = filter(self.in_bounds, results)
+        results = filter(self.passable, results)
+        return results
 
     def draw_with_color(self):
         self.legacy_mode = False
@@ -182,10 +209,17 @@ class MapConstructor(object):
         return Rect(x, y, w, h)
 
     def make_random_map(self, strategy: str="random", maximum_number_of_tries=100, legacy_mode=False):
-        if strategy is "random":
+        if strategy is MapTypes.RANDOM:
             return self._random_strategy(maximum_number_of_tries, legacy_mode)
-        elif strategy is "procedural":
+        elif strategy is MapTypes.CONSTRAINT:
             raise NotImplementedError("Only the default random method is implemented by now")
+        elif strategy is MapTypes.CONSTRUCTIVE1:
+            raise NotImplementedError("Only the default random method is implemented by now")
+        elif strategy is MapTypes.CONSTRUCTIVE2:
+            raise NotImplementedError("Only the default random method is implemented by now")
+        elif strategy is MapTypes.CONSTRUCTIVE3:
+            raise NotImplementedError("Only the default random method is implemented by now")
+
         else:
             # default value is random strategy
             return self._random_strategy(maximum_number_of_tries, legacy_mode)
@@ -207,7 +241,7 @@ class MapConstructor(object):
                 self.add_room(new_room)
 
         # fill map with "unblocked" tiles
-        my_map = [[Tile(True)
+        my_map = [[Tile(True, x, y)
                    for y in range(self.height)]
                   for x in range(self.width)]
 

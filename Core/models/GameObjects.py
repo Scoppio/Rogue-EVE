@@ -3,6 +3,7 @@ import math
 import logging
 import copy
 import yaml
+from utils import PathFinding
 from random import randint
 from utils import Colors
 from models.EnumStatus import EGameState
@@ -82,6 +83,9 @@ class Vector2(object):
     def __rfloordiv__(self, value):
         return self.__floordiv__(value)
 
+    def __abs__(self):
+        return Vector2(abs(self.X), abs(self.Y))
+
     def __eq__(self, other):
         """Check to see if two Vector2 objects are equal"""
         if isinstance(other, Vector2):
@@ -118,6 +122,9 @@ class Vector2(object):
 
     def __len__(self):
         return 2
+
+    def as_tuple(self):
+        return (self.X, self.Y)
 
     # Define our properties
     @staticmethod
@@ -319,10 +326,10 @@ class BasicMonsterAI(object):
 
         if (monster.coord.X, monster.coord.Y) in visible_tiles:
             closest_point_of_interest = self.get_closest_point_of_interest()
-            # print("closes point of interest for tag {} {}".format(self.interest_tag, closest_point_of_interest))
-
+            pos = closest_point_of_interest["coord"] - self.owner.coord
+            pos = (abs(pos.X) + abs(pos.Y))
             # move towards player if far away
-            if closest_point_of_interest['dist'] >= 2:
+            if pos > 1:
                 monster.move_towards(closest_point_of_interest['obj'].coord)
 
             # close enough, attack! (if the player is still alive.)
@@ -331,12 +338,14 @@ class BasicMonsterAI(object):
 
     def get_closest_point_of_interest(self):
         points_of_interest = self.owner.object_pool.find_by_tag(self.interest_tag)
-        closest_point_of_interest = {'obj': None, 'dist': 1000000}
+        closest_point_of_interest = {'obj': None, 'dist': 1000000, 'coord': Vector2.zero()}
+
         for poi in points_of_interest:
             dist = Vector2.distance(self.owner.coord, poi.coord)
             if dist < closest_point_of_interest['dist']:
                 closest_point_of_interest['dist'] = dist
                 closest_point_of_interest['obj'] = poi
+                closest_point_of_interest['coord'] = poi.coord
 
         return closest_point_of_interest
 
@@ -657,10 +666,12 @@ class Character(GameObject):
 
     def move(self, step: Vector2):
         if self.collision_handler:
-            if self.collision_handler.is_blocked((self.coord + step).X, (self.coord + step).Y):
+            direction = self.coord + step
+            print(direction)
+            if self.collision_handler.is_blocked(*direction):
                 return
 
-        self.coord = self.coord + step
+        self.coord = direction
 
     def get_inventory(self):
         return self.inventory
@@ -688,14 +699,11 @@ class Character(GameObject):
         return fov_recompute
 
     def move_towards(self, target: Vector2):
-        # vector from this object to the target, and distance
-        distance = Vector2.distance(self.coord, target)
+        result = PathFinding.breadth_first_search(self.collision_handler.map, self.coord.as_tuple(), target.as_tuple())
+        print(result)
+        coord = Vector2(*result[1])
 
-        # normalize it to length 1 (preserving direction), then round it and
-        # convert to integer so the movement is restricted to the map grid
-        dx = int(round((target - self.coord).X / distance))
-        dy = int(round((target - self.coord).Y / distance))
-        self.move(Vector2(dx, dy))
+        self.move(coord-self.coord)
 
     @staticmethod
     def load(yaml_file=None, hard_values=None, coord=Vector2.zero(), collision_handler=None, game_state=None, inventory=None):
