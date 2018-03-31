@@ -57,6 +57,7 @@ LOGLEVEL = {0: logging.DEBUG, 1:logging.INFO, 2: logging.WARNING, 3: logging.ERR
 
 # loading gamedata, level objects, player information, etc.
 gamedata_dir = os.path.join(os.path.dirname(__file__), "gamedata")
+assets_dir = os.path.join(os.path.dirname(__file__), "assets")
 
 LEVEL_DATA = os.path.join(gamedata_dir, args.level_file)
 PLAYER_DATA = os.path.join(gamedata_dir, args.player_file)
@@ -68,7 +69,7 @@ logging.basicConfig(
     level=LOGLEVEL[args.loglevel]
 )
 
-log_file = os.path.abspath(os.path.join(str(Path.home()), 'proto_out.log'))
+log_file = os.path.abspath(os.path.join(str(Path.home()), 'rogue_eve.log'))
 
 logger = logging.getLogger('Rogue-EVE')
 logger.setLevel(LOGLEVEL[args.loglevel])
@@ -132,7 +133,7 @@ def menu(header, options, width):
 def main():
     global root_view
     # setup to start the TDL and small consoles
-    font = os.path.join("assets", "arial10x10.png")
+    font = os.path.join(assets_dir, "arial10x10.png")
     tdl.set_font(font, greyscale=True, altLayout=True)
     tdl.setFPS(LIMIT_FPS)
     root_view = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)

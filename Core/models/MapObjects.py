@@ -269,7 +269,6 @@ class MapConstructor(object):
         return TileMap(my_map, self.rooms, self.color_dark_wall, self.color_light_wall,
                        self.color_dark_ground, self.color_light_ground, legacy_mode)
 
-
     @staticmethod
     def _create_h_tunnel(my_map, x1, x2, y):
         # build horzontal tunnels
@@ -321,6 +320,19 @@ class Rect(object):
         cond4 = self.y2 >= other.y1
 
         return cond1 and cond2 and cond3 and cond4
+
+
+class Room(Rect):
+    def __init__(self, x, y, w, h, doors: []):
+        super(Room, self).__init__(x=x, y=y, w=w, h=h)
+        self.doors = doors
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return "<Room x1={x1} y1={y1} x2={x2} y2={y2}>" \
+            .format(x1=self.x1, x2=self.x2, y1=self.y1, y2=self.y2)
 
 
 class MapObjectsConstructor(object):
