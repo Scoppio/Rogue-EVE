@@ -88,6 +88,7 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 root_view = None
 
+
 def menu(header, options, width):
     if len(options) > 26:
         raise ValueError('Cannot have a menu with more than 26 options.')

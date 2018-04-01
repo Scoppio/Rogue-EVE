@@ -24,3 +24,9 @@ class MapTypes(Enum):
     CONSTRUCTIVE1 = 2
     CONSTRUCTIVE2 = 3
     CONSTRUCTIVE3 = 4
+
+class Cardinals(Enum):
+    NORTH = 0
+    SOUTH = 1
+    EAST = 2
+    WEST = 3

@@ -24,6 +24,11 @@ class Tile(object):
 
         self.block_sight = block_sight
 
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return f"<Tile blocked={self.blocked} x={self.x} y={self.y}>"
 
 class TileMap(DrawableObject):
     def __init__(self, map, rooms, color_dark_wall, color_light_wall, color_dark_ground, color_light_ground, legacy_mode):

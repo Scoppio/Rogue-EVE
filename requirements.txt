@@ -2,3 +2,4 @@ cffi==1.11.2
 numpy==1.13.3
 tdl==4.1.1
 tracery==0.1.1
+python-slugify==1.2.5
