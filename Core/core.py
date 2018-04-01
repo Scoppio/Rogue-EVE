@@ -8,7 +8,7 @@ from utils import Colors
 from managers import ObjectManager, ObjectPool, Messenger
 from managers.GenericControllerObjects import GameContext
 from models.GameObjects import Character, Vector2
-from models.EnumStatus import EGameState, EAction
+from models.EnumStatus import EGameState, EAction, MapTypes
 from models.MapObjects import MapConstructor, MapObjectsConstructor
 
 # Based on the tutorial from RogueBasin for python3 with tdl
@@ -154,9 +154,17 @@ def main():
         MapConstructor(
             MAP_SIZE[0],
             MAP_SIZE[1]
-        ).make_random_map(
-            strategy="random",
-            maximum_number_of_tries=15,
+        )
+        #.add_tile_template(os.path.join(gamedata_dir, "maze-01.yaml"))
+        #.add_tile_template(os.path.join(gamedata_dir, "room-01.yaml"))
+        #.add_tile_template(os.path.join(gamedata_dir, "corner-01.yaml"))
+        #.add_tile_template(os.path.join(gamedata_dir, "corner-02.yaml"))
+        #.add_tile_template(os.path.join(gamedata_dir, "cross-01.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "t-section-01.yaml"))
+        #.add_tile_template(os.path.join(gamedata_dir, "corridor-01.yaml"))
+        .make_random_map(
+            strategy=MapTypes.CONSTRUCTIVE1,
+            maximum_number_of_tries=150,
             legacy_mode=LEGACY_MODE
         )
     )

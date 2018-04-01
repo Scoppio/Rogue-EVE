@@ -19,8 +19,8 @@ def load(absolute_file_path):
     with open(absolute_file_path) as stream:
         level_template = yaml.safe_load(stream)
 
-    w, h = load_tile_template(level_template["room_tiles"][0]["map"])
-    return w, h, level_template["room_tiles"][0]["name"]
+    w, h = load_tile_template(level_template["room_tiles"]["map"])
+    return w, h, level_template["room_tiles"]["name"]
 
 
 def get_cardinal(x, y):
@@ -257,7 +257,7 @@ def save():
 
     tdl_input()
 
-    data = {"room_tiles": [{"name": file_name, "map": _map_temp}]}
+    data = {"room_tiles": {"name": file_name, "map": _map_temp}}
 
     file_name = slugify(file_name)
     if ".yaml" not in file_name:
@@ -267,7 +267,7 @@ def save():
 
     with open(absolute_file_path, 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
-        print("Save done!")
+        print(f"{file_name} - Save!")
 
 
 def tdl_input():

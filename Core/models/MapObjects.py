@@ -1,8 +1,8 @@
-from random import randint, uniform
+from random import randint, uniform, choice
 import itertools
 import yaml
 from models import GameObjects
-from models.EnumStatus import MapTypes
+from models.EnumStatus import MapTypes, Cardinals
 from models.GameObjects import DrawableObject, Vector2
 import logging
 
@@ -173,6 +173,7 @@ class MapConstructor(object):
         self.room_max_size = 10
         self.room_min_size = 6
         self.max_rooms = 30
+        self.tile_set = []
 
     def set_width(self, width):
         self.width = width
@@ -219,15 +220,103 @@ class MapConstructor(object):
         elif strategy is MapTypes.CONSTRAINT:
             raise NotImplementedError("Only the default random method is implemented by now")
         elif strategy is MapTypes.CONSTRUCTIVE1:
-            raise NotImplementedError("Only the default random method is implemented by now")
+            return self._constructive_strategy(strategy, maximum_number_of_tries, legacy_mode)
         elif strategy is MapTypes.CONSTRUCTIVE2:
             raise NotImplementedError("Only the default random method is implemented by now")
         elif strategy is MapTypes.CONSTRUCTIVE3:
             raise NotImplementedError("Only the default random method is implemented by now")
-
         else:
             # default value is random strategy
             return self._random_strategy(maximum_number_of_tries, legacy_mode)
+
+    def add_tile_template(self, tile_template):
+        self.tile_set.append(tile_template)
+        return self
+
+    def _constructive_strategy(self, strategy, maximum_number_of_tries, legacy_mode):
+
+        def room_has_no_intersections(_room):
+            for r in self.rooms:
+                if _room.intersect(r):
+                    if _room.x2 >= self.width and _room.y2 >= self.height:
+                        return False
+            return True
+
+        def try_to_attach_room(placed_room, new_room_tile):
+            if placed_room.does_attach(new_room_tile):
+                for attachment in placed_room.get_attachments():
+                    for att in new_room_tile.attachments:
+                        if attachment.can_attach(att):
+                            x = attachment.x
+                            y = attachment.y
+                            if attachment.cardinal == Cardinals.SOUTH:
+                                y += 1
+                                x -= att.x
+                            if attachment.cardinal == Cardinals.NORTH:
+                                y -= att.y
+                                x -= att.x
+                            if attachment.cardinal == Cardinals.EAST:
+                                x += att.x
+                                y -= att.y
+                            if attachment.cardinal == Cardinals.WEST:
+                                x -= att.x+2
+                                y -= att.y+1
+                            if x >= 0 and y >= 0:
+                                new_room_tile.setting_new_position(x, y)
+                                if room_has_no_intersections(new_room_tile):
+                                    return True
+            return False
+
+        # if strategy == MapTypes.CONSTRUCTIVE1:
+        #     maximum_number_of_tries = 50
+        # if strategy == MapTypes.CONSTRUCTIVE2:
+        #     maximum_number_of_tries = 75
+        # if strategy == MapTypes.CONSTRUCTIVE3:
+        #     maximum_number_of_tries = 150
+
+        for n in range(maximum_number_of_tries):
+            if len(self.rooms) >= self.max_rooms:
+                break
+
+            new_room = Room.load(choice(self.tile_set))
+
+            logger.debug("Try {} of {}, total of {} rooms placed"
+                         .format(n+1, maximum_number_of_tries, len(self.rooms)))
+
+            if not self.rooms:
+                x = randint(0, self.width - new_room.get_width() - 1)
+                y = randint(0, self.height - new_room.get_height() - 1)
+                new_room.setting_new_position(x, y)
+                self.add_room(new_room)
+            else:
+                for room in self.rooms:
+                    if try_to_attach_room(room, new_room):
+                        self.add_room(new_room)
+                        break
+
+        # Here we can start to "paint" the map
+        my_map = [[Tile(False, x, y)
+                   for y in range(self.height)]
+                  for x in range(self.width)]
+
+        # build rooms
+        for idx, room in enumerate(self.rooms):
+            internals = room.get_internals()
+            print(f"original room size = x:{len(internals[0])} y:{len(internals)}")
+            print(f"actual room size = x:{len(range(room.x1, room.x2))} y:{len(range(room.y1, room.y2))}")
+            for n, x in enumerate(range(room.x1, room.x2)):
+                for m, y in enumerate(range(room.y1, room.y2)):
+                    if internals[m][n] == "#":
+                        my_map[x][y].blocked = True
+                        my_map[x][y].block_sight = True
+                    else:
+                        my_map[x][y].blocked = False
+                        my_map[x][y].block_sight = False
+
+        return TileMap(
+            my_map, self.rooms, self.color_dark_wall, self.color_light_wall,
+            self.color_dark_ground, self.color_light_ground, legacy_mode
+        )
 
     def _random_strategy(self, maximum_number_of_tries, legacy_mode):
         for _ in range(maximum_number_of_tries):
@@ -327,10 +416,84 @@ class Rect(object):
         return cond1 and cond2 and cond3 and cond4
 
 
+class Attachment(object):
+    def __init__(self, x, y, cardinal):
+        self.x = x
+        self.y = y
+        self.cardinal = cardinal
+        self.attached = None
+
+    def can_attach(self, other):
+        if other.cardinal == Cardinals.SOUTH and self.cardinal == Cardinals.NORTH:
+                return True
+        if other.cardinal == Cardinals.NORTH and self.cardinal == Cardinals.SOUTH:
+                return True
+        if other.cardinal == Cardinals.EAST and self.cardinal == Cardinals.WEST:
+                return True
+        if other.cardinal == Cardinals.WEST and self.cardinal == Cardinals.EAST:
+                return True
+        return False
+
+    def attach(self, other):
+        self.attached = other
+        other.attached = self
+
+    def detach(self):
+        self.attached = None
+
+
 class Room(Rect):
-    def __init__(self, x, y, w, h, doors: []):
+    def __init__(self, x, y, w, h, attachments, internals):
         super(Room, self).__init__(x=x, y=y, w=w, h=h)
-        self.doors = doors
+        self.attachments = attachments
+        self.internals = internals
+
+    def setting_new_position(self, x, y):
+        w = self.get_width()
+        h = self.get_height()
+        self.x1 = x
+        self.y1 = y
+        self.x2 = x + w
+        self.y2 = y + h
+
+    def _match_attachments(self, other):
+        test_cardinal = set()
+        for attachment in other.attachments:
+            if attachment.cardinal == Cardinals.EAST:
+                test_cardinal.add(Cardinals.WEST)
+            if attachment.cardinal == Cardinals.WEST:
+                test_cardinal.add(Cardinals.EAST)
+            if attachment.cardinal == Cardinals.NORTH:
+                test_cardinal.add(Cardinals.SOUTH)
+            if attachment.cardinal == Cardinals.SOUTH:
+                test_cardinal.add(Cardinals.NORTH)
+
+        return any(t in [att.cardinal for att in self.attachments] for t in test_cardinal)
+
+    def does_attach(self, other):
+        if type(other) == Room:
+            return self._match_attachments(other)
+        else:
+            return False
+
+    def get_attachments(self):
+        return [Attachment(att.x + self.x1+1, att.y + self.y1+1, att.cardinal) for att in self.attachments]
+
+    def attachment_choices(self, attachment):
+        ret = []
+        for att in self.attachments:
+            if att.cardinal == Cardinals.EAST and attachment.cardinal == Cardinals.WEST:
+                ret.append(att)
+            if att.cardinal == Cardinals.WEST and attachment.cardinal == Cardinals.EAST:
+                ret.append(att)
+            if att.cardinal == Cardinals.NORTH and attachment.cardinal == Cardinals.SOUTH:
+                ret.append(att)
+            if att.cardinal == Cardinals.SOUTH and attachment.cardinal == Cardinals.NORTH:
+                ret.append(att)
+        return ret
+
+    def get_internals(self):
+        return self.internals
 
     def __str__(self):
         return repr(self)
@@ -338,6 +501,53 @@ class Room(Rect):
     def __repr__(self):
         return "<Room x1={x1} y1={y1} x2={x2} y2={y2}>" \
             .format(x1=self.x1, x2=self.x2, y1=self.y1, y2=self.y2)
+
+    @staticmethod
+    def get_cardinal(x, y, w, h):
+        if x == 0:
+            return Cardinals.WEST
+        if x == w - 1:
+            return Cardinals.EAST
+        if y == 0:
+            return Cardinals.NORTH
+        if y == h - 1:
+            return Cardinals.SOUTH
+        raise ReferenceError('The attachment is not posed on a border!')
+
+    @staticmethod
+    def load(yaml_file=None, hard_values=None):
+        if yaml_file:
+            with open(yaml_file) as stream:
+                values = yaml.safe_load(stream)
+
+            if not values:
+                raise RuntimeError("File could not be read")
+        else:
+            values = hard_values
+
+        attachments = []
+
+        room = values["room_tiles"]
+        map = room["map"]
+        height = len(map)
+        width = len(map[0])
+        for y in range(height):
+            for x in range(width):
+                if map[y][x] == "A":
+                    attachments.append(Attachment(x, y, Room.get_cardinal(x, y, height, width)))
+
+        internals = map
+
+        logging.debug("Loading tile template {}".format(room["name"]))
+
+        return Room(
+                x=0,
+                y=0,
+                h=height,
+                w=width,
+                attachments=attachments,
+                internals=internals
+            )
 
 
 class MapObjectsConstructor(object):
