@@ -162,7 +162,7 @@ class TileMap(DrawableObject):
 
 
 class MapConstructor(object):
-    def __init__(self, width, height):
+    def __init__(self, width, height, max_number_of_rooms):
         self.width = width
         self.height = height
         self.color_dark_wall = (0, 0, 100)
@@ -172,7 +172,7 @@ class MapConstructor(object):
         self.rooms= []
         self.room_max_size = 10
         self.room_min_size = 6
-        self.max_rooms = 30
+        self.max_rooms = max_number_of_rooms
         self.tile_set = []
 
     def set_width(self, width):
@@ -237,36 +237,38 @@ class MapConstructor(object):
 
         def room_has_no_intersections(_room):
             for r in self.rooms:
-                if _room.intersect(r):
-                    if _room.x2 >= self.width and _room.y2 >= self.height:
+                if _room.intersect(r) or _room.x2 >= self.width and _room.y2 >= self.height:
                         return False
             return True
 
-        def try_to_attach_room(placed_room, new_room_tile):
-            if placed_room.does_attach(new_room_tile):
-                for attachment in placed_room.get_attachments():
-                    for att in new_room_tile.attachments:
-                        if attachment.can_attach(att):
-                            x = attachment.x
-                            y = attachment.y
-                            if attachment.cardinal == Cardinals.SOUTH:
-                                y += 1
-                                x -= att.x
-                            if attachment.cardinal == Cardinals.NORTH:
-                                y -= att.y
-                                x -= att.x
-                            if attachment.cardinal == Cardinals.EAST:
-                                x += att.x
-                                y -= att.y
-                            if attachment.cardinal == Cardinals.WEST:
-                                x -= att.x+2
-                                y -= att.y+1
-                            if x >= 0 and y >= 0:
-                                new_room_tile.setting_new_position(x, y)
-                                if room_has_no_intersections(new_room_tile):
-                                    return True
+        def try_to_attach_room(new_room_tile):
+            for attachment in [att for att in room_attachments if att.attached is None]:
+                for new_room_attachment in new_room_tile.attachments:
+                    if attachment.can_attach(new_room_attachment):
+                        x = attachment.x
+                        y = attachment.y
+                        if attachment.cardinal == Cardinals.SOUTH:
+                            x = x - new_room_attachment.x - 1
+                            y = y
+                        if attachment.cardinal == Cardinals.NORTH:
+                            y = y - new_room.get_height()-1
+                            x = x - new_room_attachment.x - 1
+                        if attachment.cardinal == Cardinals.EAST:
+                            y = y - new_room_attachment.y - 1
+                            x = x
+                        if attachment.cardinal == Cardinals.WEST:
+                            x = x - new_room.get_width() - 1
+                            y = y - new_room_attachment.y - 1
+                        h, w = y + new_room.get_height(), x + new_room.get_width()
+                        if x >= 0 and y >= 0 and h < self.height and w < self.width:
+                            new_room_tile.setting_new_position(x, y)
+                            if room_has_no_intersections(new_room_tile):
+                                attachment.attach(new_room_attachment)
+                                return True
             return False
 
+        room_attachments = []
+        failure = 0
         # if strategy == MapTypes.CONSTRUCTIVE1:
         #     maximum_number_of_tries = 50
         # if strategy == MapTypes.CONSTRUCTIVE2:
@@ -275,7 +277,9 @@ class MapConstructor(object):
         #     maximum_number_of_tries = 150
 
         for n in range(maximum_number_of_tries):
+            print("Try {} of {}".format(n+1, maximum_number_of_tries))
             if len(self.rooms) >= self.max_rooms:
+                print("Total de salas ultrapassa o maximo permitido")
                 break
 
             new_room = Room.load(choice(self.tile_set))
@@ -284,18 +288,28 @@ class MapConstructor(object):
                          .format(n+1, maximum_number_of_tries, len(self.rooms)))
 
             if not self.rooms:
-                x = randint(0, self.width - new_room.get_width() - 1)
-                y = randint(0, self.height - new_room.get_height() - 1)
+                x = randint(new_room.get_width() // 2, self.width - new_room.get_width() - 1)
+                y = randint(new_room.get_height() // 2, self.height - new_room.get_height() - 1)
                 new_room.setting_new_position(x, y)
-                self.add_room(new_room)
+                room_attachments = new_room.get_attachments()
+                self.rooms.append(new_room)
+                print("Added first room")
             else:
-                for room in self.rooms:
-                    if try_to_attach_room(room, new_room):
-                        self.add_room(new_room)
-                        break
+                print("Trying to attach room number", len(self.rooms)+1)
+                print("Total attachments", len(room_attachments))
+
+                if try_to_attach_room(new_room):
+                    self.rooms.append(new_room)
+                    new_attachments = new_room.get_attachments()
+                    room_attachments.extend(new_attachments)
+                    failure = 0
+                else:
+                    failure += 1
+            if failure > 100 and len(self.rooms) <= 3:
+                self.rooms = []
 
         # Here we can start to "paint" the map
-        my_map = [[Tile(False, x, y)
+        my_map = [[Tile(True, x, y)
                    for y in range(self.height)]
                   for x in range(self.width)]
 
@@ -306,12 +320,15 @@ class MapConstructor(object):
             print(f"actual room size = x:{len(range(room.x1, room.x2))} y:{len(range(room.y1, room.y2))}")
             for n, x in enumerate(range(room.x1, room.x2)):
                 for m, y in enumerate(range(room.y1, room.y2)):
-                    if internals[m][n] == "#":
-                        my_map[x][y].blocked = True
-                        my_map[x][y].block_sight = True
-                    else:
-                        my_map[x][y].blocked = False
-                        my_map[x][y].block_sight = False
+                    try:
+                        if internals[m][n] == "#":
+                            my_map[x][y].blocked = True
+                            my_map[x][y].block_sight = True
+                        else:
+                            my_map[x][y].blocked = False
+                            my_map[x][y].block_sight = False
+                    except IndexError as e:
+                        logger.error("Index error X={} Y={} M={} N={}".format(x,y,m,n))
 
         return TileMap(
             my_map, self.rooms, self.color_dark_wall, self.color_light_wall,
@@ -408,10 +425,10 @@ class Rect(object):
         # returns true if this rectangle intersects with another one
         # which happens only if all the following conditions are true
 
-        cond1 = self.x1 <= other.x2
-        cond2 = self.x2 >= other.x1
-        cond3 = self.y1 <= other.y2
-        cond4 = self.y2 >= other.y1
+        cond1 = self.x1 < other.x2
+        cond2 = self.x2 > other.x1
+        cond3 = self.y1 < other.y2
+        cond4 = self.y2 > other.y1
 
         return cond1 and cond2 and cond3 and cond4
 
@@ -477,7 +494,8 @@ class Room(Rect):
             return False
 
     def get_attachments(self):
-        return [Attachment(att.x + self.x1+1, att.y + self.y1+1, att.cardinal) for att in self.attachments]
+        attachments = [Attachment(att.x + self.x1+1, att.y + self.y1+1, att.cardinal) for att in self.attachments]
+        return attachments
 
     def attachment_choices(self, attachment):
         ret = []
@@ -512,7 +530,7 @@ class Room(Rect):
             return Cardinals.NORTH
         if y == h - 1:
             return Cardinals.SOUTH
-        raise ReferenceError('The attachment is not posed on a border!')
+        raise ReferenceError('The attachment is not posed on a border!', x, y, w, h)
 
     @staticmethod
     def load(yaml_file=None, hard_values=None):
@@ -534,7 +552,11 @@ class Room(Rect):
         for y in range(height):
             for x in range(width):
                 if map[y][x] == "A":
-                    attachments.append(Attachment(x, y, Room.get_cardinal(x, y, height, width)))
+                    try:
+                        attachments.append(Attachment(x, y, Room.get_cardinal(x, y, width, height)))
+                    except Exception as e:
+                        print(e)
+                        raise RuntimeError(room["name"] + " failed to load an attachment")
 
         internals = map
 

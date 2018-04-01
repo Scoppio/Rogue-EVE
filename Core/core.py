@@ -153,15 +153,18 @@ def main():
     game_context.set_map(
         MapConstructor(
             MAP_SIZE[0],
-            MAP_SIZE[1]
+            MAP_SIZE[1],
+            max_number_of_rooms=100
         )
-        #.add_tile_template(os.path.join(gamedata_dir, "maze-01.yaml"))
-        #.add_tile_template(os.path.join(gamedata_dir, "room-01.yaml"))
-        #.add_tile_template(os.path.join(gamedata_dir, "corner-01.yaml"))
-        #.add_tile_template(os.path.join(gamedata_dir, "corner-02.yaml"))
-        #.add_tile_template(os.path.join(gamedata_dir, "cross-01.yaml"))
-        .add_tile_template(os.path.join(gamedata_dir, "t-section-01.yaml"))
-        #.add_tile_template(os.path.join(gamedata_dir, "corridor-01.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "room-01.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "room-02.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "room-03.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "room-04.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "room-05.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "room-06.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "cross-01.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "cross-02.yaml"))
+        .add_tile_template(os.path.join(gamedata_dir, "corridor-02.yaml"))
         .make_random_map(
             strategy=MapTypes.CONSTRUCTIVE1,
             maximum_number_of_tries=150,

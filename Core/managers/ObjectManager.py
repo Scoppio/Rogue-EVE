@@ -172,15 +172,20 @@ class ConsoleBuffer(object):
                        self.target.Y)
 
     def render_all_objects(self):
+        def allTrue(x=0, y=0):
+            return True
+
         player = self.object_pool.get_player()
 
         if self.fov_must_recompute():
             # recompute FOV if needed (the player moved or something)
             self.reset_fov_recompute()
             self.visible_tiles = tdl.map.quickFOV(player.coord.X, player.coord.Y,
-                                                  self.map.is_visible_tile,
+                                                  allTrue,
+                                                  #self.map.is_visible_tile,
                                                   fov=self.fov_algorithm,
-                                                  radius=player.torch,
+                                                  #radius=player.torch,
+                                                  radius=100,
                                                   lightWalls=self.fov_light_walls)
 
             self.map.set_visible_tiles(self.visible_tiles)
