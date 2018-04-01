@@ -1,6 +1,7 @@
 from random import randint, uniform, choice
 import itertools
 import yaml
+import os
 from models import GameObjects
 from models.EnumStatus import MapTypes, Cardinals
 from models.GameObjects import DrawableObject, Vector2
@@ -42,6 +43,7 @@ class TileMap(DrawableObject):
         self.color_light_ground = color_light_ground
         self.legacy_mode = legacy_mode
         self.visible_tiles = None
+        logger.info("Tilemap created with {} rooms".format(len(self.rooms)))
 
     def get_tile_by_id(self, id):
         x, y = id
@@ -174,6 +176,7 @@ class MapConstructor(object):
         self.room_min_size = 6
         self.max_rooms = max_number_of_rooms
         self.tile_set = []
+        self.starting_tile = None
 
     def set_width(self, width):
         self.width = width
@@ -229,6 +232,15 @@ class MapConstructor(object):
             # default value is random strategy
             return self._random_strategy(maximum_number_of_tries, legacy_mode)
 
+    def add_starting_tile_template(self, starting_tile):
+        self.starting_tile = starting_tile
+        return self
+
+    def add_tile_template_folder(self, folder):
+        for file in os.listdir(folder):
+            self.tile_set.append(os.path.join(folder, file))
+        return self
+
     def add_tile_template(self, tile_template):
         self.tile_set.append(tile_template)
         return self
@@ -277,26 +289,18 @@ class MapConstructor(object):
         #     maximum_number_of_tries = 150
 
         for n in range(maximum_number_of_tries):
-            print("Try {} of {}".format(n+1, maximum_number_of_tries))
             if len(self.rooms) >= self.max_rooms:
-                print("Total de salas ultrapassa o maximo permitido")
                 break
 
-            new_room = Room.load(choice(self.tile_set))
-
-            logger.debug("Try {} of {}, total of {} rooms placed"
-                         .format(n+1, maximum_number_of_tries, len(self.rooms)))
-
             if not self.rooms:
-                x = randint(new_room.get_width() // 2, self.width - new_room.get_width() - 1)
-                y = randint(new_room.get_height() // 2, self.height - new_room.get_height() - 1)
+                new_room = Room.load(self.starting_tile)
+                x = randint(0, self.width - new_room.get_width() - 1)
+                y = randint(0, self.height - new_room.get_height() - 1)
                 new_room.setting_new_position(x, y)
                 room_attachments = new_room.get_attachments()
                 self.rooms.append(new_room)
-                print("Added first room")
             else:
-                print("Trying to attach room number", len(self.rooms)+1)
-                print("Total attachments", len(room_attachments))
+                new_room = Room.load(choice(self.tile_set))
 
                 if try_to_attach_room(new_room):
                     self.rooms.append(new_room)
@@ -316,8 +320,6 @@ class MapConstructor(object):
         # build rooms
         for idx, room in enumerate(self.rooms):
             internals = room.get_internals()
-            print(f"original room size = x:{len(internals[0])} y:{len(internals)}")
-            print(f"actual room size = x:{len(range(room.x1, room.x2))} y:{len(range(room.y1, room.y2))}")
             for n, x in enumerate(range(room.x1, room.x2)):
                 for m, y in enumerate(range(room.y1, room.y2)):
                     try:
@@ -578,6 +580,7 @@ class MapObjectsConstructor(object):
     objects to the map, collision handler and object pool
     """
     def __init__(self, tile_map=None, object_pool=None, collision_handler=None, object_templates=list(), max_monster_per_room: int=0, max_items_per_room: int=0, game_instance=None):
+        print("starting object constructor")
         if game_instance:
             self.tile_map = game_instance.map
             self.object_pool = game_instance.object_pool
@@ -601,20 +604,23 @@ class MapObjectsConstructor(object):
 
     def load_object_templates(self, yaml_file):
         """Load an yaml object with the template for the level"""
+        print("Loading objects template")
+        logger.info("Loading objects template")
+
         with open(yaml_file) as stream:
             template = yaml.safe_load(stream)
 
         if not template:
             raise RuntimeError("File could not be read")
 
-        if "map" in template.keys():
-            if template["map"]["max-room-items"]:
-                logger.info("max-room-items: {}".format(template["map"]["max-room-items"]))
-                self.max_items_per_room = template["map"]["max-room-items"]
+        if "map-data" in template.keys():
+            if template["map-data"]["max-room-items"]:
+                logger.info("max-room-items: {}".format(template["map-data"]["max-room-items"]))
+                self.max_items_per_room = template["map-data"]["max-room-items"]
 
-            if template["map"]["max-room-monsters"]:
-                logger.info("max-room-monsters: {} ".format(template["map"]["max-room-monsters"]))
-                self.max_monsters_per_room = template["map"]["max-room-monsters"]
+            if template["map-data"]["max-room-monsters"]:
+                logger.info("max-room-monsters: {} ".format(template["map-data"]["max-room-monsters"]))
+                self.max_monsters_per_room = template["map-data"]["max-room-monsters"]
 
         if "items" in template.keys():
             for obj in template["items"]:
@@ -683,19 +689,42 @@ class MapObjectsConstructor(object):
 
     def _place_object(self, room, max_objects, tag, z_index):
         num_objects = randint(0, max_objects)
-        logger.info("Trying to put {} {} on room {}".format(num_objects, tag, room))
+        print("Trying to put {} from {} max {} on room {}".format(num_objects, max_objects, tag, room))
         for i in range(num_objects):
             # choose random spot for this object
-            coord = Vector2(randint(room.x1+1, room.x2-1), randint(room.y1+1, room.y2-1))
+            if type(room) == Room:
+                print("It is a proper room")
+                internals = room.internals
+                positions = []
+                for y in range(len(internals)):
+                    for x in range(len(internals[0])):
+                        if internals[y][x] != "#":
+                            positions.append(Vector2(x + room.x1,y + room.y1))
+                tries = 3
+                coord = choice(positions)
+                while(tries):
+                    if not self.collision_handler.is_blocked(coord.X, coord.Y):
+                        coord = choice(positions)
+                        tries -= 1
+                        print("could not add monster to map", room, coord, tries)
+                    else:
+                        print("monster placed", room, coord, tries)
+                        tries = 0
+
+            else:
+                print("It is just a rect!")
+                coord = Vector2(randint(room.x1+1, room.x2-1), randint(room.y1+1, room.y2-1))
 
             if not self.collision_handler.is_blocked(coord.X, coord.Y):
+                print("Adding monster to map")
                 prototype = self.get_random_object_template(tag)
                 prototype.coord = coord
                 prototype.collision_handler = self.collision_handler
                 self.object_pool.append(prototype)
+            else:
+                print("could not add monster to map", room, coord)
 
     def populate_map(self):
         for idx, room in enumerate(self.tile_map.get_rooms()):
             if idx:
-                # choose random number of monsters
                 self.populate_room(room)

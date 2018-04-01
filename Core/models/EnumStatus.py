@@ -6,6 +6,7 @@ class EGameState(Enum):
     PAUSED = 1
     MENU = 2
     PLAYING = 3
+    DEAD = 99
 
 
 class EAction(Enum):

@@ -263,7 +263,7 @@ def save():
     if ".yaml" not in file_name:
         file_name += ".yaml"
 
-    absolute_file_path = os.path.join(gamedata_dir, file_name)
+    absolute_file_path = os.path.join(tiles_dir, file_name)
 
     with open(absolute_file_path, 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
@@ -347,6 +347,7 @@ color_dark_ground = (50, 50, 150)
 color_light_ground = (200, 180, 50)
 
 gamedata_dir = os.path.join(os.path.dirname(__file__), "gamedata")
+tiles_dir = os.path.join(gamedata_dir, "tiles")
 assets_dir= os.path.join(os.path.dirname(__file__), "assets")
 font = os.path.join(assets_dir, "arial10x10.png")
 

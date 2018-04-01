@@ -29,8 +29,8 @@ items:
   - type: Item
     params:
         char: "#"
-        color: dark_yellow
-        name: lightning scroll
+        color: dark_sepia
+        name: Lightning Scroll
         blocks: False
         tags:
             - item
@@ -41,6 +41,23 @@ items:
             range: 5
             damage: 15
             target_mode: closest
+            target_tag: monster
+    weight: 1.0
+  - type: Item
+    params:
+        char: "#"
+        color: light_fuchsia
+        name: Mass Counfusion Scroll
+        blocks: False
+        tags:
+            - item
+            - small
+            - magic
+        use_function: cast_confuse
+        extra_params:
+            range: 10
+            radius: 3
+            target_mode: area
             target_tag: monster
     weight: 1.0
   - type: Item
@@ -61,6 +78,25 @@ items:
             target_mode: area
             target_tag: mortal
     weight: 1.0
+  - type: Item
+    params:
+        char: "#"
+        color: light_blue
+        name: Magic Missile Scroll
+        blocks: False
+        tags:
+            - item
+            - small
+            - magic
+        use_function: custom_magic
+        extra_params:
+            range: 10
+            radius: 3
+            damage: 5
+            flavor_text: "The {target} scream in pain as the magic missile sears its skin!"
+            target_mode: ranged
+            target_tag: mortal
+    weight: 6.0
 monsters:
   - type: Character
     params:

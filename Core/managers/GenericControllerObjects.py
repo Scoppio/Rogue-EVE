@@ -211,14 +211,14 @@ class GameContext(object):
             if k == "radius":
                 radius = v
 
-        if target_mode == "single":
-            return list(self.target_object(range, target_tag))
+        if target_mode == "ranged":
+            return [self.target_object(range, target_tag)]
 
         elif target_mode == "self":
-            return list(self.player)
+            return [self.player]
 
         elif target_mode == "closest":
-            return list(self.closest_object(range, target_tag))
+            return [self.closest_object(range, target_tag)]
 
         elif target_mode == "area":
             x, y = self.target_tile(range)

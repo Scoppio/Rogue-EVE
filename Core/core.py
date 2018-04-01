@@ -16,7 +16,7 @@ from models.MapObjects import MapConstructor, MapObjectsConstructor
 # http://www.roguebasin.com/index.php?title=Roguelike_Tutorial,_using_python3%2Btdl,_part_7
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-l", "--loglevel", type=int, default=2,
+parser.add_argument("-l", "--loglevel", type=int, default=0,
                     help="increase output verbosity")
 parser.add_argument("-s", "--screensize", type=str, default='80x50',
                     help="sets the size of the screen in tiles using the pattern WxH. Ex.: 80x50, 100x75")
@@ -25,6 +25,8 @@ parser.add_argument("--fps", type=int, default=7,
 parser.add_argument("--realtime", help="run the game in realtime as oposed to turn based",
                     action="store_true")
 parser.add_argument("--legacy", help="Prints the tiles as characters",
+                    action="store_true")
+parser.add_argument("--darkness", help="Does not keep memory of what was already visited",
                     action="store_true")
 parser.add_argument("-L", "--level_file", type=str, default='map_data1.yaml',
                     help="Selects a different level file to use")
@@ -57,6 +59,7 @@ LOGLEVEL = {0: logging.DEBUG, 1:logging.INFO, 2: logging.WARNING, 3: logging.ERR
 
 # loading gamedata, level objects, player information, etc.
 gamedata_dir = os.path.join(os.path.dirname(__file__), "gamedata")
+tiles_dir = os.path.join(gamedata_dir, "tiles")
 assets_dir = os.path.join(os.path.dirname(__file__), "assets")
 
 LEVEL_DATA = os.path.join(gamedata_dir, args.level_file)
@@ -156,15 +159,8 @@ def main():
             MAP_SIZE[1],
             max_number_of_rooms=100
         )
-        .add_tile_template(os.path.join(gamedata_dir, "room-01.yaml"))
-        .add_tile_template(os.path.join(gamedata_dir, "room-02.yaml"))
-        .add_tile_template(os.path.join(gamedata_dir, "room-03.yaml"))
-        .add_tile_template(os.path.join(gamedata_dir, "room-04.yaml"))
-        .add_tile_template(os.path.join(gamedata_dir, "room-05.yaml"))
-        .add_tile_template(os.path.join(gamedata_dir, "room-06.yaml"))
-        .add_tile_template(os.path.join(gamedata_dir, "cross-01.yaml"))
-        .add_tile_template(os.path.join(gamedata_dir, "cross-02.yaml"))
-        .add_tile_template(os.path.join(gamedata_dir, "corridor-02.yaml"))
+        .add_starting_tile_template(os.path.join(tiles_dir, "room-02.yaml"))
+        .add_tile_template_folder(tiles_dir)
         .make_random_map(
             strategy=MapTypes.CONSTRUCTIVE1,
             maximum_number_of_tries=150,
@@ -177,7 +173,11 @@ def main():
     # Map objects constructor is a special factory that randomly populates the map with object templates
     # and does deal with weighted distributions, It makes everything in place, by reference
 
-    MapObjectsConstructor(game_instance=game_context).load_object_templates(LEVEL_DATA).populate_map()
+    MapObjectsConstructor(
+        game_instance=game_context
+    ).load_object_templates(
+        LEVEL_DATA
+    ).populate_map()
 
     # Creation of the player
     player = Character.load(

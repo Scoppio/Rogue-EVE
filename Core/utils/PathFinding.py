@@ -34,7 +34,10 @@ def breadth_first_search(graph, start, goal):
     path = []
     while current != start:
         path.append(current)
-        current = came_from[current]
+        try:
+            current = came_from[current]
+        except KeyError:
+            break
     path.append(start)
     path.reverse()
 

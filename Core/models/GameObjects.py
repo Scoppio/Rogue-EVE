@@ -360,7 +360,7 @@ class ConfusedMonsterAI(object):
     def take_turn(self):
         if self.num_turns > 0:  # still confused...
             # move in a random direction, and decrease the number of turns confused
-            self.owner.move(randint(-1, 1), randint(-1, 1))
+            self.owner.move(Vector2(randint(-1, 1), randint(-1, 1)))
             self.num_turns -= 1
 
         else:  # restore the previous AI (this one will be deleted because it's not referenced anymore)
@@ -515,7 +515,7 @@ class UseFunctions(object):
             if "flavor_text" in kwargs.keys():
                 flavor_text = kwargs["flavor_text"]
             else:
-                flavor_text = "Thee {target} was hit by {name}!"
+                flavor_text = "The {target} was hit by {name}!"
 
             for target in targets:
                 if status_effect:
@@ -527,7 +527,7 @@ class UseFunctions(object):
                     if heal_amount:
                         target.fighter.heal(heal_amount)
 
-                send_message(flavor_text.format(target=target, **kwargs),
+                send_message(flavor_text.format(target=target.name,name=ref.name, **kwargs),
                              Colors.light_green)
         else:
             send_message('No target found!', Colors.red)
