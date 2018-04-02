@@ -110,6 +110,13 @@ class GameContext(object):
                 if chosen_item is not None:
                     chosen_item.use()
 
+            elif user_input.text == 'd':
+                # show the inventory; if an item is selected, drop it
+                chosen_item = self.inventory_menu('Press the key next to an item to' +
+                                             'drop it, or any other to cancel.\n')
+                if chosen_item is not None:
+                    chosen_item.drop()
+
     def inventory_menu(self, header):
         if self.menu:
             # show a menu with each item of the inventory as an option

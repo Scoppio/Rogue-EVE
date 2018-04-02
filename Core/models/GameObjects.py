@@ -408,6 +408,7 @@ class DeathMethods(object):
         monster.ai = None
         monster.name = 'remains of ' + monster.name
         monster.z_index = 0
+        monster.tags = ["corpse"]
 
 
 class UseFunctions(object):
@@ -789,6 +790,13 @@ class Item(GameObject):
                 send_message('You picked up a ' + self.name + '!', Colors.green)
                 return True
         return False
+
+    def drop(self):
+        self.coord = self.context.player.coord
+        self.context.object_pool.append(self)
+        self.context.player.get_inventory().remove(self)
+        self.context = None
+        send_message('You droped ' + self.name + '!', Colors.yellow)
 
     @staticmethod
     def load(yaml_file=None, hard_values=None, coord=Vector2.zero(), collision_handler=None):
