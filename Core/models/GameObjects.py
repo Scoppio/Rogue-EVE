@@ -268,6 +268,9 @@ class GameObject(DrawableObject):
         self.z_index = 1
         self.context = None
 
+    def get_id(self):
+        return self._id
+
     def __str__(self):
         return repr(self)
 

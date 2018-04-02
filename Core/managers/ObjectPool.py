@@ -24,12 +24,13 @@ class ObjectPool(object):
 
     def add_player(self, player):
         """Add the player"""
-        player._id = self._identify_object()
+        if not player.get_id():
+            player._id = self._identify_object()
         self.player = player
         self.append(player)
 
     def remove_player(self):
-        self.delete_by_id(self.player._id)
+        self.delete_by_id(self.player.get_id())
         self.player = None
 
     def append(self, obj):

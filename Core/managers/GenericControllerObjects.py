@@ -8,7 +8,7 @@ logger = logging.getLogger('Rogue-EVE')
 
 
 class GameContext(object):
-    def __init__(self, object_pool = None, mouse_controller = None, map = None, game_state = None, real_time=False,
+    def __init__(self, object_pool = None, mouse_controller = None, map = None, game_state=None, real_time=False,
                  menu=None, camera=None, lower_gui_renderer=None):
         self.object_pool = object_pool
         self.mouse_controller = mouse_controller
@@ -17,7 +17,6 @@ class GameContext(object):
         self.game_state = game_state
         self.fov_recompute = False
         self.collision_handler = None
-        self.mouse_controller = None
         self.player_action = None
         self.real_time = real_time
         self.menu = menu
@@ -47,6 +46,7 @@ class GameContext(object):
         self.inventory_width = inventory_width
 
     def _set_mouse_controller(self):
+        logger.info("Mouse is set up")
         self.mouse_controller = InputPeripherals.MouseController(map=self.map, object_pool=self.object_pool)
 
     def _set_collision_handler(self):
@@ -78,7 +78,7 @@ class GameContext(object):
 
         elif user_input.key == 'ESCAPE':
             self.player_action = EAction.EXIT
-            # exit game
+
             return
 
         if self.game_state.state == EGameState.PLAYING:
@@ -241,6 +241,7 @@ class GameContext(object):
         if target_tag:
             for obj in self.object_pool.find_by_tag(target_tag):
                 if not visible_only or self.map.is_visible_tile(obj.coord.X, obj.coord.Y):
+                    print(obj, obj.coord, coord)
                     if Vector2.distance(obj.coord, coord) <= radius:
                         ret.append(obj)
         else:

@@ -4,6 +4,7 @@ from tcod import image_load
 import logging
 import argparse
 import textwrap
+import shelve
 from pathlib import Path
 from utils import Colors
 from managers import ObjectManager, ObjectPool, Messenger
@@ -102,23 +103,26 @@ def main_menu():
     offset_x = (SCREEN_WIDTH - 80) // 2
     offset_y = (SCREEN_HEIGHT - 50) // 2
 
-    img.blit_2x(root_view, offset_x, offset_y)
-
-    # show the game's title, and some credits!
-    title = 'ROGUELIKE'
-    center = (SCREEN_WIDTH - len(title)) // 2
-    root_view.draw_str(center, 2, title, bg=None, fg=Colors.light_yellow)
-
-    title = 'By Scoppio'
-    center = (SCREEN_WIDTH - len(title)) // 2
-    root_view.draw_str(center, SCREEN_HEIGHT - 2, title, bg=None, fg=Colors.light_yellow)
-
     while not tdl.event.is_window_closed():
+        img.blit_2x(root_view, offset_x, offset_y)
+
+        # show the game's title, and some credits!
+        title = 'ROGUELIKE'
+        center = (SCREEN_WIDTH - len(title)) // 2
+        root_view.draw_str(center, 2, title, bg=None, fg=Colors.light_yellow)
+
+        title = 'By Scoppio'
+        center = (SCREEN_WIDTH - len(title)) // 2
+        root_view.draw_str(center, SCREEN_HEIGHT - 2, title, bg=None, fg=Colors.light_yellow)
+
         # show options and wait for the player's choice
         choice = menu('', ['Play a new game', 'Continue last game', 'Quit'], 24)
 
         if choice == 0:  # new game
             new_game()
+            play_game()
+        elif choice == 1:
+            load()
             play_game()
         elif choice == 2:  # quit
             break
@@ -160,6 +164,9 @@ def menu(header, options, width):
     if key_char == '':
         key_char = ' '  # placeholder
 
+    if key.key == 'ENTER' and key.alt:  # (special case) Alt+Enter: toggle fullscreen
+        tdl.set_fullscreen(not tdl.get_fullscreen())
+
     #convert the ASCII code to an index; if it corresponds to an option, return it
     index = ord(key_char) - ord('a')
     if index >= 0 and index < len(options):
@@ -187,9 +194,9 @@ def new_game():
             MAP_SIZE[1],
             max_number_of_rooms=100
         )
-            .add_starting_tile_template(os.path.join(tiles_dir, "room-02.yaml"))
-            .add_tile_template_folder(tiles_dir)
-            .make_random_map(
+        .add_starting_tile_template(os.path.join(tiles_dir, "room-02.yaml"))
+        .add_tile_template_folder(tiles_dir)
+        .make_random_map(
             strategy=MapTypes.CONSTRUCTIVE1,
             maximum_number_of_tries=150,
             legacy_mode=LEGACY_MODE
@@ -269,9 +276,97 @@ def play_game():
         game_context.camera.set_fov_recompute(game_context.fov_recompute)
 
         if game_context.player_action == EAction.EXIT:
+            save()
             break
 
         game_context.run_ai_turn()
+
+
+def save():
+    with shelve.open('savegame', 'n') as savefile:
+        savefile['game_context'] = game_context
+        savefile['player-id'] = game_context.player.get_id()
+        savefile['object_pool'] = game_context.object_pool.get_objects_as_dict()
+        savefile['map'] = game_context.map
+        savefile['game_msgs'] = game_context.lower_gui_renderer.game_msg
+        savefile['game_state'] = game_context.game_state
+        savefile['ais'] = {k: monster.ai
+                                for k, monster in game_context.object_pool.get_objects_as_dict().items()
+                                if type(monster) == Character
+                            }
+        savefile['fighters'] = {k: monster.fighter
+                                for k, monster in game_context.object_pool.get_objects_as_dict().items()
+                                if type(monster) == Character
+                            }
+        savefile.close()
+
+
+def load():
+    global game_context
+    with shelve.open('savegame', 'r') as savefile:
+        map = savefile['map']
+        objects = savefile['object_pool']
+        player_id = savefile['player-id']
+        game_msgs = savefile['game_msgs']
+        game_state = savefile['game_state']
+        ais = savefile['ais']
+        fighters = savefile['fighters']
+
+    game_context = GameContext(game_state=ObjectManager.GameState(game_state), real_time=REALTIME, menu=menu)
+    game_context.set_object_pool(ObjectPool.object_pool)
+    game_context.set_map(map)
+
+    for k, v in objects.items():
+        v.collision_handler = game_context.collision_handler
+        if k in fighters.keys():
+            v.fighter = fighters[k]
+            if v.fighter:
+                v.fighter.owner = v
+        if k in ais.keys():
+            v.ai = ais[k]
+            if v.ai:
+                v.ai.owner = v
+                v.ai.visible_tiles_ref = map.visible_tiles
+        if k == player_id:
+            v.game_state = game_context.game_state
+            game_context.set_player(v, inventory_width=INVENTORY_WIDTH)
+        else:
+            game_context.object_pool.append(v)
+
+    inventory = game_context.player.get_inventory()
+    for i in inventory:
+        i.context = game_context
+
+    viewport = ObjectManager.ConsoleBuffer(
+        root_view,
+        object_pool=game_context.object_pool,
+        map=game_context.map,
+        width=MAP_SIZE[0],
+        height=MAP_SIZE[1],
+        origin=Vector2.zero(),
+        target=Vector2.zero(),
+        mouse_controller=game_context.mouse_controller
+    )
+
+    lower_gui_renderer = ObjectManager.ConsoleBuffer(
+        root_view,
+        origin=Vector2(0, SCREEN_HEIGHT - PANEL_HEIGHT),
+        target=Vector2(0, 0),
+        width=SCREEN_WIDTH,
+        height=PANEL_HEIGHT,
+        mouse_controller=game_context.mouse_controller
+    )
+
+    lower_gui_renderer.add_message_console(MSG_WIDTH, MSG_HEIGHT, MSG_X, MSG_Y)
+    lower_gui_renderer.game_msg = game_msgs
+
+    lower_gui_renderer.add_bar(
+        1, 1, BAR_WIDTH, 'HP', 'hp', 'max_hp', game_context.player.fighter, Colors.light_red, Colors.darker_red
+    )
+
+    game_context.game_state.set_state(EGameState.PLAYING)
+    game_context.camera = viewport
+    game_context.lower_gui_renderer = lower_gui_renderer
 
 
 def main():

@@ -4,7 +4,7 @@ color: white
 name: player
 blocks: True
 fighter:
-  hp: 160
+  hp: 60
   defense: 3
   power: 5
   death_function: player_death
