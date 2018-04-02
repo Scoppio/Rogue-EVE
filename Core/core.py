@@ -1,5 +1,6 @@
 import os
 import tdl
+from tcod import image_load
 import logging
 import argparse
 import textwrap
@@ -89,7 +90,38 @@ ch.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(fh)
 logger.addHandler(ch)
+
 root_view = None
+game_context = None
+
+
+def main_menu():
+    img = image_load(os.path.join(assets_dir, 'menu_background.png'))
+    # show the background image, at twice the regular console resolution
+
+    offset_x = (SCREEN_WIDTH - 80) // 2
+    offset_y = (SCREEN_HEIGHT - 50) // 2
+
+    img.blit_2x(root_view, offset_x, offset_y)
+
+    # show the game's title, and some credits!
+    title = 'ROGUELIKE'
+    center = (SCREEN_WIDTH - len(title)) // 2
+    root_view.draw_str(center, 2, title, bg=None, fg=Colors.light_yellow)
+
+    title = 'By Scoppio'
+    center = (SCREEN_WIDTH - len(title)) // 2
+    root_view.draw_str(center, SCREEN_HEIGHT - 2, title, bg=None, fg=Colors.light_yellow)
+
+    while not tdl.event.is_window_closed():
+        # show options and wait for the player's choice
+        choice = menu('', ['Play a new game', 'Continue last game', 'Quit'], 24)
+
+        if choice == 0:  # new game
+            new_game()
+            play_game()
+        elif choice == 2:  # quit
+            break
 
 
 def menu(header, options, width):
@@ -116,6 +148,7 @@ def menu(header, options, width):
         window.draw_str(0, y, text, bg=None)
         y += 1
         letter_index += 1
+
     #blit the contents of "window" to the root console
     x = SCREEN_WIDTH//2 - width//2
     y = SCREEN_HEIGHT//2 - height//2
@@ -134,13 +167,8 @@ def menu(header, options, width):
     return None
 
 
-def main():
-    global root_view
-    # setup to start the TDL and small consoles
-    font = os.path.join(assets_dir, "arial10x10.png")
-    tdl.set_font(font, greyscale=True, altLayout=True)
-    tdl.setFPS(LIMIT_FPS)
-    root_view = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
+def new_game():
+    global game_context
 
     # Start to setup the object which will handle most of the generally accessed stuff
     # GameContext will keep setup of the object managers
@@ -159,9 +187,9 @@ def main():
             MAP_SIZE[1],
             max_number_of_rooms=100
         )
-        .add_starting_tile_template(os.path.join(tiles_dir, "room-02.yaml"))
-        .add_tile_template_folder(tiles_dir)
-        .make_random_map(
+            .add_starting_tile_template(os.path.join(tiles_dir, "room-02.yaml"))
+            .add_tile_template_folder(tiles_dir)
+            .make_random_map(
             strategy=MapTypes.CONSTRUCTIVE1,
             maximum_number_of_tries=150,
             legacy_mode=LEGACY_MODE
@@ -203,7 +231,7 @@ def main():
 
     lower_gui_renderer = ObjectManager.ConsoleBuffer(
         root_view,
-        origin=Vector2(0, SCREEN_HEIGHT-PANEL_HEIGHT),
+        origin=Vector2(0, SCREEN_HEIGHT - PANEL_HEIGHT),
         target=Vector2(0, 0),
         width=SCREEN_WIDTH,
         height=PANEL_HEIGHT,
@@ -221,23 +249,40 @@ def main():
 
     game_context.game_state.set_state(EGameState.PLAYING)
     game_context.camera = viewport
+    game_context.lower_gui_renderer = lower_gui_renderer
+
+    return game_context
+
+
+def play_game():
     while not tdl.event.is_window_closed():
 
-        viewport.render_all_objects()
-        lower_gui_renderer.render_gui()
+        game_context.camera.render_all_objects()
+        game_context.lower_gui_renderer.render_gui()
 
         tdl.flush()
 
-        viewport.clear_all_objects()
+        game_context.camera.clear_all_objects()
 
         game_context.handle_keys()
 
-        viewport.set_fov_recompute(game_context.fov_recompute)
+        game_context.camera.set_fov_recompute(game_context.fov_recompute)
 
         if game_context.player_action == EAction.EXIT:
             break
 
         game_context.run_ai_turn()
+
+
+def main():
+    global root_view
+    # setup to start the TDL and small consoles
+    font = os.path.join(assets_dir, "arial10x10.png")
+    tdl.set_font(font, greyscale=True, altLayout=True)
+    tdl.setFPS(LIMIT_FPS)
+    root_view = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
+
+    main_menu()
 
 
 if __name__ == '__main__':

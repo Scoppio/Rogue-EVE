@@ -172,9 +172,6 @@ class ConsoleBuffer(object):
                        self.target.Y)
 
     def render_all_objects(self):
-        def allTrue(x=0, y=0):
-            return True
-
         player = self.object_pool.get_player()
 
         if self.fov_must_recompute():

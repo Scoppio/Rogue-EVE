@@ -109,7 +109,7 @@ monsters:
         fighter:
             hp: 10
             defense: 0
-            power: 2
+            power: 5
             death_function: monster_death
         tags:
             - monster
