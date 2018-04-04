@@ -93,6 +93,3 @@ class ObjectPool(object):
 
     def find_by_tag(self, tag):
         return [obj for obj in self.get_objects_as_list() if tag in obj.tags]
-
-
-object_pool = ObjectPool()

@@ -136,3 +136,13 @@ monsters:
             - big
             - mortal
     weight: 1.0
+mandatory:
+  - type: GameObject
+    params:
+        char: "<"
+        color: white
+        name: stairs
+        blocks: False
+        tags:
+            - stairs
+    weight: 1.0

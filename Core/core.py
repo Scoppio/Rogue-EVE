@@ -146,7 +146,7 @@ def menu(header, options, width):
         window.draw_str(0, 0 + i, header_wrapped[i])
 
     y = header_height
-    letter_index = ord('a')
+    letter_index = ord('1')
     for option_text in options:
         text = '(' + chr(letter_index) + ') ' + option_text
         window.draw_str(0, y, text, bg=None)
@@ -168,10 +168,62 @@ def menu(header, options, width):
         tdl.set_fullscreen(not tdl.get_fullscreen())
 
     #convert the ASCII code to an index; if it corresponds to an option, return it
-    index = ord(key_char) - ord('a')
+    index = ord(key_char) - ord('1')
     if index >= 0 and index < len(options):
         return index
     return None
+
+
+def next_level():
+    global game_context
+    # advance to the next level
+    Messenger.send_message('You take a moment to rest, and recover your strength.', Colors.light_violet)
+    player = game_context.player
+    player.fighter.heal_percent(0.5)  # heal the player by 50%
+
+    game_context.object_pool.clear_object_pool(keep_player=True)
+    game_context.set_map(
+        make_map()
+    )
+
+    MapObjectsConstructor(
+        game_instance=game_context
+    ).load_object_templates(
+        LEVEL_DATA
+    ).populate_map()
+
+    player.coord = game_context.map.get_rooms()[0].center()
+
+    Messenger.send_message('After a rare moment of peace, you descend deeper into the heart of the dungeon...', Colors.red)
+
+    viewport = ObjectManager.ConsoleBuffer(
+        root_view,
+        object_pool=game_context.object_pool,
+        map=game_context.map,
+        width=MAP_SIZE[0],
+        height=MAP_SIZE[1],
+        origin=Vector2.zero(),
+        target=Vector2.zero(),
+        mouse_controller=game_context.mouse_controller
+    )
+
+    lower_gui_renderer = ObjectManager.ConsoleBuffer(
+        root_view,
+        origin=Vector2(0, SCREEN_HEIGHT - PANEL_HEIGHT),
+        target=Vector2(0, 0),
+        width=SCREEN_WIDTH,
+        height=PANEL_HEIGHT,
+        mouse_controller=game_context.mouse_controller
+    )
+
+    lower_gui_renderer.add_message_console(MSG_WIDTH, MSG_HEIGHT, MSG_X, MSG_Y)
+
+    lower_gui_renderer.add_bar(
+        1, 1, BAR_WIDTH, 'HP', 'hp', 'max_hp', player.fighter, Colors.light_red, Colors.darker_red
+    )
+
+    game_context.camera = viewport
+    game_context.lower_gui_renderer = lower_gui_renderer
 
 
 def new_game():
@@ -182,25 +234,14 @@ def new_game():
     # ObjectPool keeps track of all the objects on the scene
     # Starting up the collision handler, which manages all the objects collision events
     # Adding the object pool and the map to the collision handler so they interact
-    game_context = GameContext(game_state=ObjectManager.GameState(EGameState.LOADING), real_time=REALTIME, menu=menu)
+    game_context = GameContext(next_level=next_level, game_state=ObjectManager.GameState(EGameState.LOADING), real_time=REALTIME, menu=menu)
 
-    game_context.set_object_pool(ObjectPool.object_pool)
+    game_context.set_object_pool(ObjectPool.ObjectPool())
 
     # A map constructor, that randomly create rooms with (not yet implemented) many different strategies
     # Legacy mode makes the map be drawn using chars instead of colored blocks
     game_context.set_map(
-        MapConstructor(
-            MAP_SIZE[0],
-            MAP_SIZE[1],
-            max_number_of_rooms=100
-        )
-        .add_starting_tile_template(os.path.join(tiles_dir, "room-02.yaml"))
-        .add_tile_template_folder(tiles_dir)
-        .make_random_map(
-            strategy=MapTypes.CONSTRUCTIVE1,
-            maximum_number_of_tries=150,
-            legacy_mode=LEGACY_MODE
-        )
+        make_map()
     )
 
     # Before we start the map objects constructor we load the level data that is being hold on a file
@@ -261,6 +302,22 @@ def new_game():
     return game_context
 
 
+def make_map(starting_room="room-02.yaml", max_rooms=3):
+    return MapConstructor(
+        MAP_SIZE[0],
+        MAP_SIZE[1],
+        max_number_of_rooms=max_rooms
+    ).add_starting_tile_template(
+        os.path.join(tiles_dir, starting_room)
+    ).add_tile_template_folder(
+        tiles_dir
+    ).make_random_map(
+        strategy=MapTypes.CONSTRUCTIVE1,
+        maximum_number_of_tries=150,
+        legacy_mode=LEGACY_MODE
+    )
+
+
 def play_game():
     while not tdl.event.is_window_closed():
 
@@ -312,8 +369,8 @@ def load():
         ais = savefile['ais']
         fighters = savefile['fighters']
 
-    game_context = GameContext(game_state=ObjectManager.GameState(game_state), real_time=REALTIME, menu=menu)
-    game_context.set_object_pool(ObjectPool.object_pool)
+    game_context = GameContext(next_level=next_level, game_state=ObjectManager.GameState(game_state), real_time=REALTIME, menu=menu)
+    game_context.set_object_pool(ObjectPool.ObjectPool())
     game_context.set_map(map)
 
     for k, v in objects.items():

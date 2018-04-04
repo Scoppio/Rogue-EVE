@@ -8,7 +8,7 @@ logger = logging.getLogger('Rogue-EVE')
 
 
 class GameContext(object):
-    def __init__(self, object_pool = None, mouse_controller = None, map = None, game_state=None, real_time=False,
+    def __init__(self, next_level, object_pool = None, mouse_controller = None, map = None, game_state=None, real_time=False,
                  menu=None, camera=None, lower_gui_renderer=None):
         self.object_pool = object_pool
         self.mouse_controller = mouse_controller
@@ -22,6 +22,7 @@ class GameContext(object):
         self.menu = menu
         self.camera = camera
         self.lower_gui_renderer = lower_gui_renderer
+        self.next_level = next_level
 
         if self.collision_handler and self.object_pool:
             self._set_collision_handler()
@@ -30,6 +31,7 @@ class GameContext(object):
     def set_object_pool(self, object_pool):
         self.object_pool = object_pool
         if self.map:
+            self.object_pool.map = self.map
             self._set_collision_handler()
             self._set_mouse_controller()
 
@@ -38,19 +40,23 @@ class GameContext(object):
         if self.object_pool:
             self._set_collision_handler()
             self._set_mouse_controller()
+            self.object_pool.map=self.map
 
-    def set_player(self, player, inventory_width=40):
+    def set_player(self, player, inventory_width=8):
         self.player = player
         self.player.context = self
         self.object_pool.add_player(self.player)
         self.inventory_width = inventory_width
 
     def _set_mouse_controller(self):
-        logger.info("Mouse is set up")
         self.mouse_controller = InputPeripherals.MouseController(map=self.map, object_pool=self.object_pool)
+        logger.info("Mouse is set up")
 
     def _set_collision_handler(self):
-        self.collision_handler = ObjectManager.CollisionHandler(map=self.map, object_pool=self.object_pool)
+        if self.collision_handler:
+            self.collision_handler.set_map(self.map)
+        else:
+            self.collision_handler = ObjectManager.CollisionHandler(map=self.map, object_pool=self.object_pool)
 
     def handle_keys(self):
         self.player_action = EAction.DIDNT_TAKE_TURN
@@ -104,6 +110,14 @@ class GameContext(object):
                                and item.coord == self.player.coord]:
                     obj.pick_up(self.player)
                     self.object_pool.delete_by_id(obj._id)
+                    break
+
+            elif user_input.text == '<':
+                # pick up an item
+                for obj in [stair for stair in self.object_pool.find_by_tag("stairs")
+                            if stair.coord == self.player.coord]:
+                    self.next_level()
+                    self.fov_recompute = True
                     break
 
             elif user_input.text == 'i':
@@ -232,16 +246,17 @@ class GameContext(object):
         elif target_mode == "area":
             x, y = self.target_tile(range)
             coord = Vector2(x, y)
+            if not x and not y:
+                return []
 
         else:
             logger.error("target_mode unknown {}".format(target_mode))
             return []
 
-        ret = list()
+        ret = []
         if target_tag:
             for obj in self.object_pool.find_by_tag(target_tag):
                 if not visible_only or self.map.is_visible_tile(obj.coord.X, obj.coord.Y):
-                    print(obj, obj.coord, coord)
                     if Vector2.distance(obj.coord, coord) <= radius:
                         ret.append(obj)
         else:

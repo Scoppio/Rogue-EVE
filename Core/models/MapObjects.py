@@ -579,17 +579,12 @@ class MapObjectsConstructor(object):
     and automatically populates the map necessary objects with the proper references for those newly added
     objects to the map, collision handler and object pool
     """
-    def __init__(self, tile_map=None, object_pool=None, collision_handler=None, object_templates=list(), max_monster_per_room: int=0, max_items_per_room: int=0, game_instance=None):
+    def __init__(self, object_templates=list(), max_monster_per_room: int=0, max_items_per_room: int=0, game_instance=None):
         print("starting object constructor")
-        if game_instance:
-            self.tile_map = game_instance.map
-            self.object_pool = game_instance.object_pool
-            self.collision_handler = game_instance.collision_handler
-        else:
-            self.tile_map = tile_map
-            self.object_pool = object_pool
-            self.collision_handler = collision_handler
-
+        self.game_instance = game_instance
+        self.tile_map = game_instance.map
+        self.object_pool = game_instance.object_pool
+        self.collision_handler = game_instance.collision_handler
         self.object_templates = object_templates
         self.max_monsters_per_room = max_monster_per_room
         self.max_items_per_room=max_items_per_room
@@ -604,7 +599,6 @@ class MapObjectsConstructor(object):
 
     def load_object_templates(self, yaml_file):
         """Load an yaml object with the template for the level"""
-        print("Loading objects template")
         logger.info("Loading objects template")
 
         with open(yaml_file) as stream:
@@ -622,55 +616,33 @@ class MapObjectsConstructor(object):
                 logger.info("max-room-monsters: {} ".format(template["map-data"]["max-room-monsters"]))
                 self.max_monsters_per_room = template["map-data"]["max-room-monsters"]
 
-        if "items" in template.keys():
-            for obj in template["items"]:
-                self._append_template(obj)
+        self._append_object_template(template, "items")
+        self._append_object_template(template, "monsters")
+        self._append_object_template(template, "mandatory")
 
-        if "monsters" in template.keys():
-            for obj in template["monsters"]:
-                self._append_template(obj)
-
-        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
-                                     self.object_templates, self.max_monsters_per_room, self.max_items_per_room)
+        return MapObjectsConstructor(object_templates=self.object_templates, max_items_per_room=self.max_items_per_room,
+                                     max_monster_per_room=self.max_monsters_per_room, game_instance=self.game_instance)
 
     def _append_object_template(self, level_template, key):
         if key in level_template.keys():
             for obj in level_template[key]:
                 if obj["type"] in [a for a in dir(GameObjects) if "__" not in a]:
                     obj_template = eval("GameObjects." + obj["type"])
-
                     self.object_templates.append((obj_template, obj["params"], obj["weight"]))
                 else:
                     logger.warning("Object {} is not recognizable as a GameObject", obj["type"])
 
-    def load_level_template(self, yaml_file):
-
-        with open(yaml_file) as stream:
-            level_template = yaml.safe_load(stream)
-
-        if not level_template:
-            raise RuntimeError("File could not be read")
-
-        self._append_object_template(level_template, "items")
-        self._append_object_template(level_template, "monsters")
-
-        self.max_monsters_per_room = level_template["max-room-monsters"]
-        self.max_items_per_room =  level_template["max-room-items"]
-
-        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
-                                     self.object_templates, self.max_monsters_per_room, self.max_items_per_room)
-
     def set_max_objects_per_room(self, value):
         self.max_monsters_per_room = value
-        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
-                                     self.object_templates, self.max_monsters_per_room, self.max_items_per_room)
+        return MapObjectsConstructor(object_templates=self.object_templates, max_items_per_room=self.max_items_per_room,
+                                     max_monster_per_room=self.max_monsters_per_room, game_instance=self.game_instance)
 
     def set_max_items_per_room(self, value):
         self.max_items_per_room = value
-        return MapObjectsConstructor(self.tile_map, self.object_pool, self.collision_handler,
-                                     self.object_templates, self.max_monsters_per_room, self.max_items_per_room)
+        return MapObjectsConstructor(object_templates=self.object_templates, max_items_per_room=self.max_items_per_room,
+                                     max_monster_per_room=self.max_monsters_per_room, game_instance=self.game_instance)
 
-    def get_random_object_template(self, tag):
+    def _get_random_object_template(self, tag):
         filtered_template_list = [template for template in self.object_templates if tag in template[1]["tags"]]
 
         total = sum(w for _, _, w in filtered_template_list)
@@ -683,12 +655,19 @@ class MapObjectsConstructor(object):
         else:
             assert False, "List is empty"
 
-    def populate_room(self, room):
+    def _populate_room(self, room):
         self._place_object(room, self.max_items_per_room, "item", 2)
         self._place_object(room, self.max_monsters_per_room, "monster", 1)
 
-    def _place_object(self, room, max_objects, tag, z_index):
-        num_objects = randint(0, max_objects)
+    def _populate_last_room(self, room):
+        self._place_object(room, 1, "stairs", 1, mandatory=True)
+        self._place_object(room, self.max_items_per_room, "item", 1)
+        self._place_object(room, self.max_monsters_per_room, "monster", 2)
+
+    def _place_object(self, room, max_objects, tag, z_index, mandatory=False):
+
+        num_objects = max(1, randint(0, max_objects)) if mandatory else randint(0, max_objects)
+
         print("Trying to put {} from {} max {} on room {}".format(num_objects, max_objects, tag, room))
         for i in range(num_objects):
             # choose random spot for this object
@@ -702,14 +681,15 @@ class MapObjectsConstructor(object):
                             positions.append(Vector2(x + room.x1,y + room.y1))
                 tries = 3
                 coord = choice(positions)
-                while(tries):
+                while(tries or mandatory):
                     if not self.collision_handler.is_blocked(coord.X, coord.Y):
+                        print("monster placed", room, coord, tries)
+                        break
+                    else:
                         coord = choice(positions)
                         tries -= 1
                         print("could not add monster to map", room, coord, tries)
-                    else:
-                        print("monster placed", room, coord, tries)
-                        tries = 0
+
 
             else:
                 print("It is just a rect!")
@@ -717,8 +697,9 @@ class MapObjectsConstructor(object):
 
             if not self.collision_handler.is_blocked(coord.X, coord.Y):
                 print("Adding monster to map")
-                prototype = self.get_random_object_template(tag)
+                prototype = self._get_random_object_template(tag)
                 prototype.coord = coord
+                prototype.z_index=z_index
                 prototype.collision_handler = self.collision_handler
                 self.object_pool.append(prototype)
             else:
@@ -726,5 +707,7 @@ class MapObjectsConstructor(object):
 
     def populate_map(self):
         for idx, room in enumerate(self.tile_map.get_rooms()):
-            if idx:
-                self.populate_room(room)
+            if idx and idx < len(self.tile_map.get_rooms()) - 1:
+                self._populate_room(room)
+            elif idx:
+                self._populate_last_room(room)

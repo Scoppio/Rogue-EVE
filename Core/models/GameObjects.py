@@ -255,7 +255,8 @@ class GameObject(DrawableObject):
                  name: str='unnamed',
                  blocks: bool=False,
                  _id: str=None,
-                 tags=list()
+                 tags=list(),
+                 z_index=1
                  ):
         self._id = _id
         self.coord = coord
@@ -265,7 +266,7 @@ class GameObject(DrawableObject):
         self.name = name
         self.object_pool = None
         self.tags = tags
-        self.z_index = 1
+        self.z_index = z_index
         self.context = None
 
     def get_id(self):
@@ -574,6 +575,13 @@ class Fighter(object):
         if self.hp > self.max_hp:
             self.hp = self.max_hp
 
+    def heal_percent(self, amount_percent):
+        """Heal the character in a percent from 0 to 1"""
+        amount = self.max_hp * amount_percent
+        self.hp += amount
+        if self.hp > self.max_hp:
+            self.hp = self.max_hp
+
     def take_damage(self, damage):
         # apply damage if possible
         if damage > 0:
@@ -640,9 +648,10 @@ class Character(GameObject):
                  torch=10,
                  tags=list(),
                  game_state=None,
-                 inventory=None
+                 inventory=None,
+                 z_index=1
             ):
-        super(Character, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags)
+        super(Character, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags, z_index=z_index)
 
         self.torch = torch
         self.collision_handler = collision_handler
@@ -766,9 +775,10 @@ class Item(GameObject):
                  _id: str=None,
                  tags=list(),
                  use_function=None,
-                 extra_params=None
+                 extra_params=None,
+                 z_index=2
             ):
-        super(Item, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags)
+        super(Item, self).__init__(coord=coord, char=char, color=color, name=name, blocks=blocks, _id=_id, tags=tags, z_index=z_index)
         self.use_function=use_function
         self.extra_params=extra_params
         self.player = None
