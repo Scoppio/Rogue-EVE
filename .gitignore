@@ -91,6 +91,7 @@ ENV/
 # idea
 .idea/*
 .idea/workspace.xml
-Core/savegame.bak
-Core/savegame.dat
-Core/savegame.dir
+
+savegame.bak
+savegame.dat
+savegame.dir
