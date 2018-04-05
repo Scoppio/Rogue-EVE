@@ -450,7 +450,7 @@ def load():
 
 def main():
     global root_view
-    
+
     # setup to start the TDL and small consoles
     font = os.path.join(assets_dir, "arial10x10.png")
     tdl.set_font(font, greyscale=True, altLayout=True)
