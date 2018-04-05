@@ -94,6 +94,7 @@ class ConsoleBuffer(object):
         self.message_origin_x = None
         self.message_origin_y = None
         self.mouse_controller = mouse_controller
+        self.extras = []
 
     def set_mouse_controller(self, mouse_controller):
         self.mouse_controller = mouse_controller
@@ -106,6 +107,30 @@ class ConsoleBuffer(object):
 
     def fov_must_recompute(self):
         return self.fov_recompute
+
+    def add_extra(self, x, y, name, obj, char_color, back_color):
+        """
+         To add an extra you need to simply apply this template to the extra, filling the blanks
+        :param x:
+        :param y:
+        :param total_width:
+        :param name:
+        :param value_name:
+        :param obj:
+        :param char_color:
+        :param back_color:
+        :return:
+        """
+        self.extras.append(
+            {
+                'x': x,
+                'y': y,
+                'name': name,
+                'obj': obj,
+                'char_color': char_color,
+                'back_color': back_color
+            }
+        )
 
     def add_bar(self, x, y, total_width, name, value_name, maximum_value_name, obj, bar_color, back_color):
         """
@@ -123,15 +148,16 @@ class ConsoleBuffer(object):
         :return:
         """
         self.bars.append(
-            {'x': x,
-             'y': y,
-             'value_name': value_name,
-             'maximum_value_name': maximum_value_name,
-             'total_width': total_width,
-             'name': name,
-             'obj': obj,
-             'bar_color': bar_color,
-             'back_color': back_color
+            {
+                'x': x,
+                 'y': y,
+                 'value_name': value_name,
+                 'maximum_value_name': maximum_value_name,
+                 'total_width': total_width,
+                 'name': name,
+                 'obj': obj,
+                 'bar_color': bar_color,
+                 'back_color': back_color
              }
         )
 
@@ -158,6 +184,13 @@ class ConsoleBuffer(object):
             text = args['name'] + ': ' + str(value) + '/' + str(maximum)
             x_centered = args['x'] + (args['total_width'] - len(text)) // 2
             self.console.draw_str(x_centered, args['y'], text, fg=Colors.white, bg=None)
+
+        for args in self.extras:
+            # render a bar (HP, experience, etc). first calculate the width of the bar
+            value = args['obj']
+
+            text = "{}: {}".format(args['name'], value)
+            self.console.draw_str(args['x'], args['y'], text, fg=args["char_color"], bg=args['back_color'])
 
         y = self.message_origin_y
         for (line, color) in self.game_msg:

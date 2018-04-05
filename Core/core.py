@@ -176,12 +176,14 @@ def menu(header, options, width):
 
 def next_level():
     global game_context
+
     # advance to the next level
     Messenger.send_message('You take a moment to rest, and recover your strength.', Colors.light_violet)
     player = game_context.player
     player.fighter.heal_percent(0.5)  # heal the player by 50%
 
     game_context.object_pool.clear_object_pool(keep_player=True)
+
     game_context.set_map(
         make_map()
     )
@@ -220,6 +222,10 @@ def next_level():
 
     lower_gui_renderer.add_bar(
         1, 1, BAR_WIDTH, 'HP', 'hp', 'max_hp', player.fighter, Colors.light_red, Colors.darker_red
+    )
+
+    lower_gui_renderer.add_extra(
+        1, 6, 'DUNGEON LEVEL', game_context.get_extra("dungeon_level"), Colors.yellow, None
     )
 
     game_context.camera = viewport
@@ -265,6 +271,7 @@ def new_game():
     )
 
     game_context.set_player(player, inventory_width=INVENTORY_WIDTH)
+    game_context.add_extra("dungeon_level", 1)
 
     viewport = ObjectManager.ConsoleBuffer(
         root_view,
@@ -290,6 +297,10 @@ def new_game():
 
     lower_gui_renderer.add_bar(
         1, 1, BAR_WIDTH, 'HP', 'hp', 'max_hp', player.fighter, Colors.light_red, Colors.darker_red
+    )
+
+    lower_gui_renderer.add_extra(
+        1, 6, 'DUNGEON LEVEL', game_context.get_extra("dungeon_level"), Colors.yellow, None
     )
 
     # a warm welcoming message!
@@ -355,11 +366,14 @@ def save():
                                 for k, monster in game_context.object_pool.get_objects_as_dict().items()
                                 if type(monster) == Character
                             }
+        savefile['dungeon_level'] = game_context.get_extra("dungeon_level")
+        savefile['extras'] = game_context.extras
         savefile.close()
 
 
 def load():
     global game_context
+
     with shelve.open('savegame', 'r') as savefile:
         map = savefile['map']
         objects = savefile['object_pool']
@@ -368,8 +382,16 @@ def load():
         game_state = savefile['game_state']
         ais = savefile['ais']
         fighters = savefile['fighters']
+        extras = savefile['extras']
 
-    game_context = GameContext(next_level=next_level, game_state=ObjectManager.GameState(game_state), real_time=REALTIME, menu=menu)
+    game_context = GameContext(
+        next_level=next_level,
+        game_state=ObjectManager.GameState(game_state),
+        real_time=REALTIME,
+        menu=menu
+    )
+
+    game_context.extras = extras
     game_context.set_object_pool(ObjectPool.ObjectPool())
     game_context.set_map(map)
 
@@ -428,12 +450,12 @@ def load():
 
 def main():
     global root_view
+    
     # setup to start the TDL and small consoles
     font = os.path.join(assets_dir, "arial10x10.png")
     tdl.set_font(font, greyscale=True, altLayout=True)
     tdl.setFPS(LIMIT_FPS)
     root_view = tdl.init(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title="Roguelike", fullscreen=False)
-
     main_menu()
 
 

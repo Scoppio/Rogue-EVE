@@ -23,10 +23,21 @@ class GameContext(object):
         self.camera = camera
         self.lower_gui_renderer = lower_gui_renderer
         self.next_level = next_level
+        self.extras = {}
 
         if self.collision_handler and self.object_pool:
             self._set_collision_handler()
             self._set_mouse_controller()
+
+    def add_extra(self, key, value):
+        self.extras[key] = value
+
+    def get_extra(self, key):
+        if key in self.extras.keys():
+            return self.extras[key]
+        else:
+            logger.error("Key {} is not present in extras".format(key))
+        return None
 
     def set_object_pool(self, object_pool):
         self.object_pool = object_pool
@@ -116,6 +127,7 @@ class GameContext(object):
                 # pick up an item
                 for obj in [stair for stair in self.object_pool.find_by_tag("stairs")
                             if stair.coord == self.player.coord]:
+                    self.extras["dungeon_level"] += 1
                     self.next_level()
                     self.fov_recompute = True
                     break
