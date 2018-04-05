@@ -1,4 +1,8 @@
 import os
-from core import tiles_dir
+from models.EnumStatus import EMessage
 
-print(os.listdir(tiles_dir))
+a = {}
+a[EMessage.GAIN_XP] = 100
+
+if EMessage.GAIN_XP in a.keys():
+    print("gain xp", a[EMessage.GAIN_XP])

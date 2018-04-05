@@ -7,6 +7,7 @@ fighter:
   hp: 60
   defense: 3
   power: 5
+  xp: 0
   death_function: player_death
 torch: 9
 tags:

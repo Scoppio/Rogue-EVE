@@ -1,3 +1,4 @@
+import random
 import numbers
 import math
 import logging
@@ -6,8 +7,8 @@ import yaml
 from utils import PathFinding
 from random import randint
 from utils import Colors
-from models.EnumStatus import EGameState
-from managers.Messenger import send_message
+from models.EnumStatus import EGameState, EMessage, EEquipmentSlot
+from managers.Messenger import send_message, broadcast_message
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -297,6 +298,9 @@ class GameObject(DrawableObject):
         else:
             color = Colors.dark_crimson
 
+        if "blocks" not in values.keys():
+            values["blocks"] = False
+
         return GameObject(
             coord=Vector2.zero(),
             char=values["char"],
@@ -405,6 +409,7 @@ class DeathMethods(object):
         """ transform it into a nasty corpse! it doesn't block, can't be
         attacked and doesn't move"""
         logger.info(monster.name.capitalize() + ' is dead!')
+        broadcast_message("player", {EMessage.GAIN_XP: monster.fighter.xp})
         monster.char = '%'
         monster.color = Colors.dark_red
         monster.blocks = False
@@ -561,13 +566,72 @@ class StatusEffects(object):
 
 
 class Fighter(object):
-    def __init__(self, hp, defense, power, death_function):
+    def __init__(self, hp, defense, power, xp, death_function, level=1, level_up_base=200, level_up_factor=150):
         self.owner = None
-        self.max_hp = hp
         self.hp = hp
-        self.defense = defense
-        self.power = power
+        self.base_max_hp = hp
+        self.starting_max_hp = hp
+        self.base_defense = defense
+        self.starting_defense = defense
+        self.base_power = power
+        self.starting_power = power
+        self.xp = xp
+        self._level_up_base = level_up_base
+        self._level_up_factor = level_up_factor
+        self.level_up_xp = self._level_up_base + level * self._level_up_factor
+        self.level = level
         self.death_function = death_function
+
+    @property
+    def defense(self):
+        bonus = sum(equipment.defense_bonus for equipment in self.get_all_equipped_items())
+        return self.base_defense + bonus
+
+    @property
+    def power(self):
+        bonus = sum(equipment.power_bonus for equipment in self.get_all_equipped_items())
+        return self.base_power + bonus
+
+    @property
+    def max_hp(self):
+        bonus = sum(equipment.max_hp_bonus for equipment in self.get_all_equipped_items())
+        return self.base_max_hp + bonus
+
+    def get_all_equipped_items(self):
+        if self.owner and "player" in self.owner.tags:
+            return [item for item in self.owner.get_inventory() if type(item) == Equipment and item.is_equipped]
+        else:
+            return []  # other objects have no equipment
+
+    def gain_xp(self, amount):
+        send_message("{name} gained {amount} xp".format(name=self.owner.name, amount=amount), color=Colors.cyan)
+        self.xp += amount
+        self.check_level_up()
+
+    def check_level_up(self):
+        # see if the player's experience is enough to level-up
+        while self.xp >= self.level_up_xp:
+            self.level += 1
+            self.xp -= self.level_up_xp
+            send_message('Your battle skills grow stronger! You reached level ' + str(self.level) + '!', color=Colors.yellow)
+            self.level_up_xp = self._level_up_base + self.level * self._level_up_factor
+            broadcast_message("game-controller", {EMessage.LEVEL_UP: self.owner})
+
+    def _automatic_level_up_power(self):
+        self.base_power = int(self.starting_power + 1 * self.level)
+
+    def _automatic_level_up_defense(self):
+        self.base_defense = int(self.starting_defense * 1 * self.level)
+
+    def _automatic_level_up_hp(self):
+        self.base_max_hp = int(self.starting_max_hp * 20 * self.level)
+
+    def automatic_level_up(self):
+        choices = [self._automatic_level_up_defense,
+                   self._automatic_level_up_power,
+                   self._automatic_level_up_hp]
+        random_attribute = random.choice(choices)
+        random_attribute()
 
     def heal(self, amount):
         # heal by the given amount, without going over the maximum
@@ -598,16 +662,16 @@ class Fighter(object):
         damage = self.power - target.fighter.defense
 
         if damage > 0:
-            # make the target take some damage
-            send_message(self.owner.name.capitalize() +
-                         ' attacks ' + target.name + ' for ' + str(damage) + ' hit points.',
-                         Colors.light_blue)
-            # print(self.owner.name.capitalize() + ' attacks ' + target.name + ' for ' + str(damage) + ' hit points.')
+            send_message(
+                self.owner.name.capitalize() + ' attacks ' + target.name + ' for ' + str(damage) + ' hit points.',
+                Colors.light_blue
+            )
             target.fighter.take_damage(damage)
         else:
-            send_message(self.owner.name.capitalize() + ' attacks ' + target.name + ' but it has no effect!',
-                         Colors.light_blue)
-            # print(self.owner.name.capitalize() + ' attacks ' + target.name + ' but it has no effect!')
+            send_message(
+                self.owner.name.capitalize() + ' attacks ' + target.name + ' but it has no effect!',
+                Colors.light_blue
+            )
 
     @staticmethod
     def load(yaml_file=None, hard_values=None):
@@ -627,10 +691,11 @@ class Fighter(object):
                 death_function = eval("DeathMethods." + values["death_function"])
 
         return Fighter(
-            values["hp"],
-            values["defense"],
-            values["power"],
-            death_function
+            hp=values["hp"],
+            defense=values["defense"],
+            power=values["power"],
+            xp=values["xp"],
+            death_function=death_function
         )
 
 
@@ -677,14 +742,21 @@ class Character(GameObject):
             name=self.name, _id=self._id, coord=self.coord, char=self.char, color=self.color
         )
 
+    def receive_message(self, tag, body):
+        if EMessage.GAIN_XP in body.keys():
+            if self.fighter:
+                self.fighter.gain_xp(body[EMessage.GAIN_XP])
+        elif EMessage.TAKE_DAMAGE in body.keys():
+            if self.fighter:
+                self.fighter.take_damage(body[EMessage.TAKE_DAMAGE])
+
     def move(self, step: Vector2):
         if self.collision_handler:
             direction = self.coord + step
-            print(direction)
             if self.collision_handler.is_blocked(*direction):
                 return
 
-        self.coord = direction
+            self.coord = direction
 
     def get_inventory(self):
         return self.inventory
@@ -745,6 +817,9 @@ class Character(GameObject):
         torch = 0
         if "torch" in values.keys():
             torch = values["torch"]
+
+        if "blocks" not in values.keys():
+            values["blocks"] = True
 
         if inventory:
             inventory = list()
@@ -832,6 +907,9 @@ class Item(GameObject):
             logger.error("Could not find use_function {}".format(values["use_function"]))
             use_function = UseFunctions.do_nothing
 
+        if "blocks" not in values.keys():
+            values["blocks"] = False
+
         if "extra_params" in values.keys() and "status_effect" in values["extra_params"].keys():
             if values["extra_params"]["status_effect"] in [a for a in dir(StatusEffects) if "__" not in a]:
                 values["extra_params"]["status_effect"] = eval("StatusEffects." +  values["extra_params"]["status_effect"])
@@ -844,5 +922,103 @@ class Item(GameObject):
             blocks=values["blocks"],
             tags=values["tags"],
             use_function=use_function,
+            extra_params=values["extra_params"]
+        )
+
+
+class Equipment(Item):
+    def __init__(self,
+                 coord: Vector2=None,
+                 char: str=")",
+                 color: tuple=(255, 255, 255),
+                 name='unnamed equipment',
+                 blocks=False,
+                 _id: str=None,
+                 tags=list(),
+                 power_bonus=0,
+                 defense_bonus=0,
+                 max_hp_bonus=0,
+                 slot=None,
+                 use_function=None,
+                 charges=0,
+                 extra_params=None,
+                 z_index=2
+            ):
+        super(Equipment, self).__init__(
+            coord=coord,
+            char=char,
+            color=color,
+            name=name,
+            blocks=blocks,
+            _id=_id,
+            tags=tags,
+            extra_params=extra_params,
+            use_function=use_function,
+            z_index=z_index
+        )
+        self.player = None
+        self.extra_params = extra_params
+        self.power_bonus = power_bonus
+        self.defense_bonus = defense_bonus
+        self.max_hp_bonus = max_hp_bonus
+        self.is_equipped = False
+        self.charges = charges
+        self.slot = slot
+
+    def use(self):
+        # just call the "use_function" if it is defined
+        if self.use_function is None or self.charges <= 0:
+            send_message('There are no special properties on ' + self.name, color=Colors.azure)
+        else:
+            if self.use_function(self, **self.extra_params) != 'cancelled' and self.context.player.get_inventory():
+                if self.charges != "infinite":
+                    if self.charges > 0:
+                        self.charges -= 1
+                        send_message("There are {} charges left on {}!".format(self.charges, self.name), color=Colors.azure)
+
+    @staticmethod
+    def load(yaml_file=None, hard_values=None, coord=Vector2.zero(), collision_handler=None):
+        if yaml_file:
+            with open(yaml_file) as stream:
+                values = yaml.safe_load(stream)
+
+            if not values:
+                raise RuntimeError("File could not be read")
+        else:
+            values = hard_values
+
+        color = Colors.white
+        if "color" in values.keys()and values["color"] in [a for a in dir(Colors) if "__" not in a]:
+            color = eval("Colors." + values["color"])
+
+        if "use_function" not in values.keys():
+            use_function = None
+        else:
+            if values["use_function"] in [a for a in dir(UseFunctions) if "__" not in a]:
+                use_function = eval("UseFunctions." + values["use_function"])
+            else:
+                logger.error("Could not find use_function {}".format(values["use_function"]))
+                use_function = UseFunctions.do_nothing
+
+        if "blocks" not in values.keys():
+            values["blocks"] = False
+
+        if "charges" not in values.keys():
+            values["charges"] = 0
+
+        if "extra_params" in values.keys() and "status_effect" in values["extra_params"].keys():
+            if values["extra_params"]["status_effect"] in [a for a in dir(StatusEffects) if "__" not in a]:
+                values["extra_params"]["status_effect"] = eval("StatusEffects." +  values["extra_params"]["status_effect"])
+
+        return Equipment(
+            coord=coord,
+            char=values["char"],
+            color=color,
+            name=values["name"],
+            blocks=values["blocks"],
+            tags=values["tags"],
+            use_function=use_function,
+            slot=EEquipmentSlot(values["slot"]),
+            charges=values["charges"],
             extra_params=values["extra_params"]
         )

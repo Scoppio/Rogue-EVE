@@ -1,8 +1,9 @@
 import tdl
 import logging
-from models.EnumStatus import EGameState, EAction
+from models.EnumStatus import EGameState, EAction, EMessage
 from models.GameObjects import Vector2, Item
-from managers import InputPeripherals, ObjectManager
+from managers import InputPeripherals, ObjectManager, Messenger
+from utils import Colors
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -24,10 +25,50 @@ class GameContext(object):
         self.lower_gui_renderer = lower_gui_renderer
         self.next_level = next_level
         self.extras = {}
-
+        self.setup_broadcast_message()
         if self.collision_handler and self.object_pool:
             self._set_collision_handler()
             self._set_mouse_controller()
+
+    def setup_broadcast_message(self):
+        Messenger.broadcast_handler = self
+
+    def broadcast_message(self, tag, body):
+        if tag == "game-controller":
+            if EMessage.LEVEL_UP in body.keys():
+                self._player_level_up(body[EMessage.LEVEL_UP])
+                self._monsters_level_up()
+                Messenger.send_message(
+                    "You hear a thundering roar echoing! The monsters also became stronger!",
+                    color=Colors.crimson
+                )
+            elif EMessage.MONSTERS_LEVEL_UP in body.keys():
+                self._monsters_level_up()
+
+        for obj in self.object_pool.find_by_tag(tag):
+            obj.receive_message(tag, body)
+
+    def _player_level_up(self, player):
+        choice = None
+        while choice is None:  # keep asking until a choice is made
+            choice = self.menu('Level up! Choose a stat to raise:\n',
+                          ['Constitution (+20 HP, from ' + str(player.fighter.max_hp) + ')',
+                           'Strength (+1 attack, from ' + str(player.fighter.power) + ')',
+                           'Agility (+1 defense, from ' + str(player.fighter.defense) + ')'], 40)
+        if choice == 0:
+            player.fighter.base_max_hp += 20
+            player.fighter.hp += 20
+        elif choice == 1:
+            player.fighter.base_power += 1
+        elif choice == 2:
+            player.fighter.base_defense += 1
+        player.fighter.heal_percent(1)
+
+    def _monsters_level_up(self):
+        for monster in self.object_pool.find_by_tag("monster"):
+            if monster.fighter:
+                monster.level = self.player.fighter.level
+                monster.fighter.automatic_level_up()
 
     def add_extra(self, key, value):
         self.extras[key] = value
@@ -69,6 +110,9 @@ class GameContext(object):
         else:
             self.collision_handler = ObjectManager.CollisionHandler(map=self.map, object_pool=self.object_pool)
 
+    def message_box(self, message, width=40):
+        self.menu(message, [], width)
+
     def handle_keys(self):
         self.player_action = EAction.DIDNT_TAKE_TURN
         self.fov_recompute = False
@@ -100,20 +144,35 @@ class GameContext(object):
 
         if self.game_state.state == EGameState.PLAYING:
             self.fov_recompute = False
-
             # movement keys
-            if user_input.key == 'UP':
+            if user_input.key == "UP" or user_input.key == "KP8":
                 self.fov_recompute = self.player.move_or_attack(Vector2(0, -1))
                 self.player_action = EAction.MOVE_UP
-            elif user_input.key == 'DOWN':
+            elif user_input.key == "DOWN" or user_input.key == "KP2":
                 self.fov_recompute = self.player.move_or_attack(Vector2(0, 1))
                 self.player_action = EAction.MOVE_DOWN
-            elif user_input.key == 'LEFT':
+            elif user_input.key == "LEFT" or user_input.key == "KP4":
                 self.fov_recompute = self.player.move_or_attack(Vector2(-1, 0))
                 self.player_action = EAction.MOVE_LEFT
-            elif user_input.key == 'RIGHT':
+            elif user_input.key == "RIGHT" or user_input.key == "KP6":
                 self.fov_recompute = self.player.move_or_attack(Vector2(1, 0))
                 self.player_action = EAction.MOVE_RIGHT
+            elif user_input.key == "HOME" or user_input.key == "KP7":
+                self.fov_recompute = self.player.move_or_attack(Vector2(-1, -1))
+                self.player_action = EAction.MOVE_DIAGONAL_UL
+            elif user_input.key == "PAGEUP" or user_input.key == "KP9":
+                self.fov_recompute = self.player.move_or_attack(Vector2(1, -1))
+                self.player_action = EAction.MOVE_DIAGONAL_UR
+            elif user_input.key == "END" or user_input.key == "KP1":
+                self.fov_recompute = self.player.move_or_attack(Vector2(-1, 1))
+                self.player_action = EAction.MOVE_DIAGONAL_DL
+            elif user_input.key == "PAGEDOWN" or user_input.key == "KP3":
+                self.fov_recompute = self.player.move_or_attack(Vector2(1, 1))
+                self.player_action = EAction.MOVE_DIAGONAL_DR
+            elif user_input.key == "KP5":
+                self.player_action = EAction.WAITING
+                # do nothing ie wait for the monster to come to you
+
             elif user_input.text == 'g':
                 # pick up an item
                 for obj in [item for item in self.object_pool.get_objects_as_list()
@@ -123,7 +182,7 @@ class GameContext(object):
                     self.object_pool.delete_by_id(obj._id)
                     break
 
-            elif user_input.text == '<':
+            elif user_input.text == '<' or user_input.text == '/' :
                 # pick up an item
                 for obj in [stair for stair in self.object_pool.find_by_tag("stairs")
                             if stair.coord == self.player.coord]:
@@ -144,6 +203,13 @@ class GameContext(object):
                                              'drop it, or any other to cancel.\n')
                 if chosen_item is not None:
                     chosen_item.drop()
+
+            elif user_input.text == 'c':
+                # show character information
+                self.message_box(
+                    'Character Information\n\nLevel: ' + str(self.player.fighter.level) + '\nExperience: ' + str(self.player.fighter.xp) +
+                    '\nExperience to level up: ' + str(self.player.fighter.level_up_xp) + '\n\nMaximum HP: ' + str(self.player.fighter.max_hp) +
+                    '\nAttack: ' + str(self.player.fighter.power) + '\nDefense: ' + str(self.player.fighter.defense))
 
     def inventory_menu(self, header):
         if self.menu:

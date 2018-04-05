@@ -689,8 +689,6 @@ class MapObjectsConstructor(object):
                         coord = choice(positions)
                         tries -= 1
                         print("could not add monster to map", room, coord, tries)
-
-
             else:
                 print("It is just a rect!")
                 coord = Vector2(randint(room.x1+1, room.x2-1), randint(room.y1+1, room.y2-1))

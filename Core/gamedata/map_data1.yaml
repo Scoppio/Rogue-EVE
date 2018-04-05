@@ -17,7 +17,6 @@ items:
         char: "!"
         color: violet
         name: healing potion
-        blocks: False
         tags:
             - item
             - small
@@ -31,7 +30,6 @@ items:
         char: "#"
         color: dark_sepia
         name: Lightning Scroll
-        blocks: False
         tags:
             - item
             - small
@@ -48,7 +46,6 @@ items:
         char: "#"
         color: light_fuchsia
         name: Mass Counfusion Scroll
-        blocks: False
         tags:
             - item
             - small
@@ -65,7 +62,6 @@ items:
         char: "#"
         color: dark_red
         name: fireball scroll
-        blocks: False
         tags:
             - item
             - small
@@ -83,7 +79,6 @@ items:
         char: "#"
         color: light_blue
         name: Magic Missile Scroll
-        blocks: False
         tags:
             - item
             - small
@@ -103,13 +98,13 @@ monsters:
         char: o
         color: dark_fuchsia
         name: orc
-        blocks: True
         ai:
             interest_tag: player
         fighter:
             hp: 10
             defense: 0
             power: 5
+            xp: 1000
             death_function: monster_death
         tags:
             - monster
@@ -122,13 +117,13 @@ monsters:
         char: T
         color: dark_blue
         name: Troll
-        blocks: True
         ai:
            interest_tag: player
         fighter:
             hp: 20
             defense: 1
             power: 5
+            xp: 1000
             death_function: monster_death
         tags:
             - monster
@@ -142,7 +137,6 @@ mandatory:
         char: "<"
         color: white
         name: stairs
-        blocks: False
         tags:
             - stairs
     weight: 1.0

@@ -10,12 +10,8 @@ from utils import Colors
 from managers import ObjectManager, ObjectPool, Messenger
 from managers.GenericControllerObjects import GameContext
 from models.GameObjects import Character, Vector2
-from models.EnumStatus import EGameState, EAction, MapTypes
+from models.EnumStatus import EGameState, EAction, MapTypes, EMessage
 from models.MapObjects import MapConstructor, MapObjectsConstructor
-
-# Based on the tutorial from RogueBasin for python3 with tdl
-# Adapted to use more objects and be more loosely tied, without many global variables and constants
-# http://www.roguebasin.com/index.php?title=Roguelike_Tutorial,_using_python3%2Btdl,_part_7
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-l", "--loglevel", type=int, default=0,
@@ -146,7 +142,7 @@ def menu(header, options, width):
         window.draw_str(0, 0 + i, header_wrapped[i])
 
     y = header_height
-    letter_index = ord('1')
+    letter_index = ord('a')
     for option_text in options:
         text = '(' + chr(letter_index) + ') ' + option_text
         window.draw_str(0, y, text, bg=None)
@@ -168,7 +164,7 @@ def menu(header, options, width):
         tdl.set_fullscreen(not tdl.get_fullscreen())
 
     #convert the ASCII code to an index; if it corresponds to an option, return it
-    index = ord(key_char) - ord('1')
+    index = ord(key_char) - ord('a')
     if index >= 0 and index < len(options):
         return index
     return None
@@ -223,13 +219,16 @@ def next_level():
     lower_gui_renderer.add_bar(
         1, 1, BAR_WIDTH, 'HP', 'hp', 'max_hp', player.fighter, Colors.light_red, Colors.darker_red
     )
-
+    lower_gui_renderer.add_bar(
+        1, 3, BAR_WIDTH, 'XP', 'xp', 'level_up_xp', game_context.player.fighter, Colors.light_blue, Colors.darker_blue
+    )
     lower_gui_renderer.add_extra(
         1, 6, 'DUNGEON LEVEL', game_context.get_extra("dungeon_level"), Colors.yellow, None
     )
 
     game_context.camera = viewport
     game_context.lower_gui_renderer = lower_gui_renderer
+    Messenger.broadcast_message("game-controller", {EMessage.MONSTERS_LEVEL_UP: None})
 
 
 def new_game():
@@ -298,7 +297,9 @@ def new_game():
     lower_gui_renderer.add_bar(
         1, 1, BAR_WIDTH, 'HP', 'hp', 'max_hp', player.fighter, Colors.light_red, Colors.darker_red
     )
-
+    lower_gui_renderer.add_bar(
+        1, 3, BAR_WIDTH, 'XP', 'xp', 'level_up_xp', game_context.player.fighter, Colors.light_blue, Colors.darker_blue
+    )
     lower_gui_renderer.add_extra(
         1, 6, 'DUNGEON LEVEL', game_context.get_extra("dungeon_level"), Colors.yellow, None
     )
@@ -309,7 +310,7 @@ def new_game():
     game_context.game_state.set_state(EGameState.PLAYING)
     game_context.camera = viewport
     game_context.lower_gui_renderer = lower_gui_renderer
-
+    Messenger.broadcast_message("game-controller", {EMessage.MONSTERS_LEVEL_UP: None})
     return game_context
 
 
@@ -442,10 +443,13 @@ def load():
     lower_gui_renderer.add_bar(
         1, 1, BAR_WIDTH, 'HP', 'hp', 'max_hp', game_context.player.fighter, Colors.light_red, Colors.darker_red
     )
-
+    lower_gui_renderer.add_bar(
+        1, 3, BAR_WIDTH, 'XP', 'xp', 'level_up_xp', game_context.player.fighter, Colors.light_blue, Colors.darker_blue
+    )
     game_context.game_state.set_state(EGameState.PLAYING)
     game_context.camera = viewport
     game_context.lower_gui_renderer = lower_gui_renderer
+    Messenger.broadcast_message("game-controller", {EMessage.MONSTERS_LEVEL_UP: None})
 
 
 def main():

@@ -181,7 +181,7 @@ class ConsoleBuffer(object):
                 self.console.draw_rect(args['x'], args['y'], bar_width, 1, None, bg=args['bar_color'])
 
             # finally, some centered text with the values
-            text = args['name'] + ': ' + str(value) + '/' + str(maximum)
+            text = "{}: {}/{}".format(args['name'], int(value), int(maximum))
             x_centered = args['x'] + (args['total_width'] - len(text)) // 2
             self.console.draw_str(x_centered, args['y'], text, fg=Colors.white, bg=None)
 
