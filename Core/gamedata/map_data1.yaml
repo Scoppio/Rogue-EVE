@@ -2,14 +2,11 @@
 metadata:
   name: test level 1
   created-at: 2018-03-24
-  revision: 1
+  revision: 2
   author: Lucas Coppio
   contact: "@DeveloperCoppio"
 map-data:
-  height: 70
-  width: 80
-  max-rooms: 9
-  max-room-items: 2
+  max-room-items: 3
   max-room-monsters: 5
 items:
   - type: Item
@@ -24,7 +21,7 @@ items:
         use_function: cast_selfheal
         extra_params:
             heal_amount: 15
-    weight: 1.0
+    weight: 15.0
   - type: Item
     params:
         char: "#"
@@ -40,7 +37,7 @@ items:
             damage: 15
             target_mode: closest
             target_tag: monster
-    weight: 1.0
+    weight: 3.0
   - type: Item
     params:
         char: "#"
@@ -56,7 +53,7 @@ items:
             radius: 3
             target_mode: area
             target_tag: monster
-    weight: 1.0
+    weight: 2.0
   - type: Item
     params:
         char: "#"
@@ -104,14 +101,14 @@ monsters:
             hp: 10
             defense: 0
             power: 5
-            xp: 1000
+            xp: 25
             death_function: monster_death
         tags:
             - monster
             - orc
             - small
             - mortal
-    weight: 3.0
+    weight: 5.0
   - type: Character
     params:
         char: T
@@ -120,10 +117,10 @@ monsters:
         ai:
            interest_tag: player
         fighter:
-            hp: 20
+            hp: 25
             defense: 1
             power: 5
-            xp: 1000
+            xp: 75
             death_function: monster_death
         tags:
             - monster

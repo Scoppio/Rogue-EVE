@@ -12,6 +12,11 @@ and develop.
 I could add sneak properties and do a roguelike of the game card thief, 
 could be a good change in the game pace.
 
+* *Composition not inheritance* - Soo... seens that maybe composition 
+is a good idea after all, since it allows for things to be created
+during runtime. One good example is the spell system created for
+magic items.
+
 * *Many dungeon types* - Add system to create many types for dungeons.
 
 * *Random Parallel Learning*
