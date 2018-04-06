@@ -30,6 +30,8 @@ parser.add_argument("-L", "--level_file", type=str, default='map_data1.yaml',
                     help="Selects a different level file to use")
 parser.add_argument("-P", "--player_file", type=str, default='player.yaml',
                     help="Selects a different player file to use")
+parser.add_argument("-r", "--minimum_number_of_rooms", type=int, default=7,
+                    help="Selects a minimum number of rooms")
 
 args = parser.parse_args()
 #########################################
@@ -38,6 +40,8 @@ args = parser.parse_args()
 
 SCREEN_WIDTH = int(args.screensize.split('x')[0])
 SCREEN_HEIGHT = int(args.screensize.split('x')[1])
+MIN_NUMBER_OF_ROOMS = int(args.minimum_number_of_rooms)
+
 INVENTORY_WIDTH = 50
 # sizes and coordinates relevant for the GUI
 BAR_WIDTH = 20
@@ -182,7 +186,7 @@ def next_level():
     game_context.object_pool.clear_object_pool(keep_player=True)
 
     game_context.set_map(
-        make_map()
+        make_map(max_rooms=game_context.get_extra("dungeon_level", default=1))
     )
 
     MapObjectsConstructor(
@@ -251,7 +255,7 @@ def new_game():
     # A map constructor, that randomly create rooms with (not yet implemented) many different strategies
     # Legacy mode makes the map be drawn using chars instead of colored blocks
     game_context.set_map(
-        make_map()
+        make_map(max_rooms=1)
     )
 
     # Before we start the map objects constructor we load the level data that is being hold on a file
@@ -323,7 +327,10 @@ def new_game():
     return game_context
 
 
-def make_map(starting_room="room-02.yaml", max_rooms=3):
+def make_map(max_rooms, starting_room="room-02.yaml"):
+
+    max_rooms = max(MIN_NUMBER_OF_ROOMS, int(max_rooms * 1.25))
+
     return MapConstructor(
         MAP_SIZE[0],
         MAP_SIZE[1],

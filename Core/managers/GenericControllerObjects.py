@@ -73,12 +73,12 @@ class GameContext(object):
     def add_extra(self, key, value):
         self.extras[key] = value
 
-    def get_extra(self, key):
+    def get_extra(self, key, default=None):
         if key in self.extras.keys():
             return self.extras[key]
         else:
             logger.error("Key {} is not present in extras".format(key))
-        return None
+        return default
 
     def set_object_pool(self, object_pool):
         self.object_pool = object_pool
