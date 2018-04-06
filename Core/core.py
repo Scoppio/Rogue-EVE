@@ -49,7 +49,8 @@ MSG_Y = 1
 MSG_WIDTH = SCREEN_WIDTH - BAR_WIDTH - 2
 MSG_HEIGHT = PANEL_HEIGHT - 1
 
-MAP_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT-PANEL_HEIGHT)
+#MAP_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT-PANEL_HEIGHT)
+MAP_SIZE = (200, 200)
 LIMIT_FPS = args.fps
 REALTIME = args.realtime
 LEGACY_MODE = args.legacy
@@ -163,9 +164,9 @@ def menu(header, options, width):
     if key.key == 'ENTER' and key.alt:  # (special case) Alt+Enter: toggle fullscreen
         tdl.set_fullscreen(not tdl.get_fullscreen())
 
-    #convert the ASCII code to an index; if it corresponds to an option, return it
+    # convert the ASCII code to an index; if it corresponds to an option, return it
     index = ord(key_char) - ord('a')
-    if index >= 0 and index < len(options):
+    if len(options) > index >= 0:
         return index
     return None
 
@@ -198,10 +199,14 @@ def next_level():
         root_view,
         object_pool=game_context.object_pool,
         map=game_context.map,
-        width=MAP_SIZE[0],
-        height=MAP_SIZE[1],
+        width=SCREEN_WIDTH,
+        height=SCREEN_HEIGHT - PANEL_HEIGHT,
         origin=Vector2.zero(),
         target=Vector2.zero(),
+        camera_height=SCREEN_HEIGHT - PANEL_HEIGHT,
+        camera_width=SCREEN_WIDTH,
+        map_height=MAP_SIZE[0],
+        map_width=MAP_SIZE[1],
         mouse_controller=game_context.mouse_controller
     )
 
@@ -276,10 +281,14 @@ def new_game():
         root_view,
         object_pool=game_context.object_pool,
         map=game_context.map,
-        width=MAP_SIZE[0],
-        height=MAP_SIZE[1],
+        width=SCREEN_WIDTH,
+        height=SCREEN_HEIGHT-PANEL_HEIGHT,
         origin=Vector2.zero(),
         target=Vector2.zero(),
+        camera_height=SCREEN_HEIGHT-PANEL_HEIGHT,
+        camera_width=SCREEN_WIDTH,
+        map_height=MAP_SIZE[0],
+        map_width=MAP_SIZE[1],
         mouse_controller=game_context.mouse_controller
     )
 
@@ -421,10 +430,14 @@ def load():
         root_view,
         object_pool=game_context.object_pool,
         map=game_context.map,
-        width=MAP_SIZE[0],
-        height=MAP_SIZE[1],
+        width=SCREEN_WIDTH,
+        height=SCREEN_HEIGHT - PANEL_HEIGHT,
         origin=Vector2.zero(),
         target=Vector2.zero(),
+        camera_height=SCREEN_HEIGHT - PANEL_HEIGHT,
+        camera_width=SCREEN_WIDTH,
+        map_height=MAP_SIZE[0],
+        map_width=MAP_SIZE[1],
         mouse_controller=game_context.mouse_controller
     )
 

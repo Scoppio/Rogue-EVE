@@ -116,15 +116,18 @@ class TileMap(DrawableObject):
         else:
             return True
 
-    def draw(self, console):
-        for x in range(self.width):
-            for y in range(self.height):
-                visible = (x, y) in self.visible_tiles
-                wall = self.tile_map[x][y].block_sight
-                explored = self.tile_map[x][y].explored
+    def draw(self, console, camera):
+        for x in range(camera.camera_width):
+            for y in range(camera.camera_height):
+                map_x, map_y = x + camera.camera_coord.X, y + camera.camera_coord.Y
+
+                visible = (map_x, map_y) in self.visible_tiles
+
+                wall = self.tile_map[map_x][map_y].block_sight
+                explored = self.tile_map[map_x][map_y].explored
 
                 if visible:
-                    self.tile_map[x][y].explored = True
+                    self.tile_map[map_x][map_y].explored = True
 
                 bg_color = None
                 fg_color = None
@@ -294,8 +297,8 @@ class MapConstructor(object):
 
             if not self.rooms:
                 new_room = Room.load(self.starting_tile)
-                x = randint(0, self.width - new_room.get_width() - 1)
-                y = randint(0, self.height - new_room.get_height() - 1)
+                x = randint(self.width // 2, self.width - new_room.get_width() - 1)
+                y = randint(self.height // 2, self.height - new_room.get_height() - 1)
                 new_room.setting_new_position(x, y)
                 room_attachments = new_room.get_attachments()
                 self.rooms.append(new_room)

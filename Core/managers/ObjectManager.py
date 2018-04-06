@@ -68,7 +68,11 @@ class ConsoleBuffer(object):
                  origin: Vector2 = None,
                  target: Vector2 = None,
                  console: object = None,
-                 mouse_controller = None
+                 mouse_controller = None,
+                 map_width = None,
+                 map_height = None,
+                 camera_width = None,
+                 camera_height = None
                  ):
         self.object_pool = object_pool
         self.map = map
@@ -93,6 +97,11 @@ class ConsoleBuffer(object):
         self.message_width = None
         self.message_origin_x = None
         self.message_origin_y = None
+        self.map_width = map_width
+        self.map_height = map_height
+        self.camera_height = camera_height
+        self.camera_width = camera_width
+        self.camera_coord = Vector2(0,0)
         self.mouse_controller = mouse_controller
         self.extras = []
 
@@ -198,17 +207,47 @@ class ConsoleBuffer(object):
             y += 1
 
         if self.mouse_controller:
-            self.console.draw_str(1, 0, self.mouse_controller.get_names_under_mouse(), bg=None, fg=Colors.light_gray)
+            self.console.draw_str(1, 0, self.mouse_controller.get_names_under_mouse(self.camera_coord), bg=None, fg=Colors.light_gray)
 
         # blit the contents of "panel" to the root console
         self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X,
                        self.target.Y)
 
+    def set_camera(self, camera_width, camera_height, map_width, map_height):
+        self.map_width = map_width
+        self.map_height = map_height
+        self.camera_height = camera_height
+        self.camera_width = camera_width
+
+    def move_camera(self, target_coord):
+
+        # new camera coordinates (top-left corner of the screen relative to the map)
+        x = target_coord.X - self.camera_width // 2  # coordinates so that the target is at the center of the screen
+        y = target_coord.Y - self.camera_height // 2
+
+        # make sure the camera doesn't see outside the map
+        x = 0 if x < 0 else y
+        y = 0 if y < 0 else y
+
+        if x >= self.map_width - self.camera_width - 1:
+            x = self.map_width - self.camera_width - 1
+        if y >= self.map_height - self.camera_height - 1:
+            y = self.map_height - self.camera_height - 1
+
+        if Vector2(x, y) != self.camera_coord:
+            self.fov_recompute = True
+
+        self.camera_coord = Vector2(x, y)
+
     def render_all_objects(self):
         player = self.object_pool.get_player()
 
+        self.move_camera(player.coord)
+
         if self.fov_must_recompute():
             # recompute FOV if needed (the player moved or something)
+            self.console.clear(fg=Colors.white, bg=Colors.black)
+
             self.reset_fov_recompute()
             self.visible_tiles = tdl.map.quickFOV(
                 player.coord.X,
@@ -221,26 +260,35 @@ class ConsoleBuffer(object):
 
             self.map.set_visible_tiles(self.visible_tiles)
             if self.map:
-                self.map.draw(self.console)
+                self.map.draw(self.console, self)
 
         if self.object_pool and self.object_pool.get_objects_as_list():
             sorted_objects_list = sorted(self.object_pool.get_objects_as_list(), key=lambda x: x.z_index, reverse=False)
 
             for obj in sorted_objects_list:
                 if (obj.coord.X, obj.coord.Y) in self.visible_tiles:
-                    obj.draw(self.console)
+                    obj.draw(self.console, self.camera_offset)
 
             if self.object_pool.get_player():
                 player = self.object_pool.get_player()
-                player.draw(self.console)
+                player.draw(self.console, self.camera_offset)
 
         self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X,
                        self.target.Y)
 
+    def camera_offset(self, obj_coord):
+        # convert coordinates on the map to coordinates on the screen
+        coord = obj_coord - self.camera_coord
+
+        if 0 < coord.X < self.camera_width or 0 < coord.Y < self.camera_width:
+            return coord
+
+        return None
+
     def clear_all_objects(self):
         if self.object_pool:
             for obj in self.object_pool.get_objects_as_list():
-                obj.clear(self.console)
+                obj.clear(self.console, self.camera_offset)
 
     def add_message_console(self, message_width, message_height, message_origin_x, message_origin_y):
         Messenger.message_handler = self

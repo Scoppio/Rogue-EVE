@@ -274,7 +274,7 @@ class GameContext(object):
 
             self.camera.render_all_objects()
 
-            coord = Vector2(*self.mouse_controller.mouse_coord)
+            coord = Vector2(*self.mouse_controller.mouse_coord) + self.camera.camera_pos
 
             if (clicked and self.map.is_visible_tile(coord.X, coord.Y)
                     and (max_range is None or Vector2.distance(coord, self.player.coord) <= max_range)):

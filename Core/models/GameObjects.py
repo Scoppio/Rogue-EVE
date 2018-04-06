@@ -241,10 +241,10 @@ class Vector2(object):
 
 
 class DrawableObject(object):
-    def draw(self, console):
+    def draw(self, console, camera_offset):
         pass
 
-    def clear(self, console):
+    def clear(self, console, camera_offset):
         pass
 
 
@@ -313,11 +313,15 @@ class GameObject(DrawableObject):
     def set_z_index(self, value):
         self.z_index = value
 
-    def draw(self, console):
-        console.draw_char(self.coord.X, self.coord.Y, self.char, bg=None, fg=self.color)
+    def draw(self, console, camera_offset):
+        draw_coord = camera_offset(self.coord)
+        if draw_coord:
+            console.draw_char(draw_coord.X, draw_coord.Y, self.char, bg=None, fg=self.color)
 
-    def clear(self, console):
-        console.draw_char(self.coord.X, self.coord.Y, ' ', bg=None, fg=self.color)
+    def clear(self, console, camera_offset):
+        draw_coord = camera_offset(self.coord)
+        if draw_coord:
+            console.draw_char(draw_coord.X, draw_coord.Y, ' ', bg=None, fg=self.color)
 
 
 class BasicMonsterAI(object):
