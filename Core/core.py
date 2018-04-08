@@ -263,12 +263,6 @@ def new_game():
     # Map objects constructor is a special factory that randomly populates the map with object templates
     # and does deal with weighted distributions, It makes everything in place, by reference
 
-    MapObjectsConstructor(
-        game_instance=game_context
-    ).load_object_templates(
-        LEVEL_DATA
-    ).populate_map()
-
     # Creation of the player
     player = Character.load(
         yaml_file=PLAYER_DATA,
@@ -280,6 +274,14 @@ def new_game():
 
     game_context.set_player(player, inventory_width=INVENTORY_WIDTH)
     game_context.add_extra("dungeon_level", 1)
+
+    MapObjectsConstructor(
+        game_instance=game_context
+    ).load_object_templates(
+        LEVEL_DATA
+    ).give_item_for_player(
+        "ICFBS01"
+    ).populate_map()
 
     viewport = ObjectManager.ConsoleBuffer(
         root_view,

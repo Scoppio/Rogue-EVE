@@ -1,7 +1,7 @@
 import tdl
 import logging
 from models.EnumStatus import EGameState, EAction, EMessage
-from models.GameObjects import Vector2, Item
+from models.GameObjects import Vector2, Item, Equipment
 from managers import InputPeripherals, ObjectManager, Messenger
 from utils import Colors
 
@@ -176,7 +176,7 @@ class GameContext(object):
             elif user_input.text == 'g':
                 # pick up an item
                 for obj in [item for item in self.object_pool.get_objects_as_list()
-                            if type(item) == Item
+                            if (type(item) == Item or type(item) == Equipment)
                                and item.coord == self.player.coord]:
                     obj.pick_up(self.player)
                     self.object_pool.delete_by_id(obj._id)
@@ -217,12 +217,13 @@ class GameContext(object):
             if len(self.player.inventory) == 0:
                 options = ['Inventory is empty.']
             else:
-                options = [item.name for item in self.player.inventory]
+                options = [item.get_name() for item in self.player.inventory]
 
             index = self.menu(header, options, self.inventory_width)
 
             # if an item was chosen, return it
-            if index is None or len(self.player.get_inventory()) == 0: return None
+            if index is None or len(self.player.get_inventory()) == 0:
+                return None
             return self.player.get_inventory()[index]
         else:
             logger.error("menu function is not being referenced inside the game context")
@@ -274,10 +275,11 @@ class GameContext(object):
 
             self.camera.render_all_objects()
 
-            coord = Vector2(*self.mouse_controller.mouse_coord) + self.camera.camera_pos
+            coord = Vector2(*self.mouse_controller.mouse_coord) + self.camera.camera_coord
 
             if (clicked and self.map.is_visible_tile(coord.X, coord.Y)
                     and (max_range is None or Vector2.distance(coord, self.player.coord) <= max_range)):
+                self.mouse_controller.set_mouse_coord(coord)
                 return self.mouse_controller.mouse_coord
 
     def target_object(self, max_range=None, target_tag=None):

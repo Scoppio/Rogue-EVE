@@ -63,16 +63,16 @@ class ConsoleBuffer(object):
                  root,
                  object_pool=None,
                  map=None,
-                 width: int = 0,
-                 height: int = 0,
-                 origin: Vector2 = None,
-                 target: Vector2 = None,
-                 console: object = None,
-                 mouse_controller = None,
-                 map_width = None,
-                 map_height = None,
-                 camera_width = None,
-                 camera_height = None
+                 width: int=0,
+                 height: int=0,
+                 origin: Vector2=None,
+                 target: Vector2=None,
+                 console: object=None,
+                 mouse_controller=None,
+                 map_width=None,
+                 map_height=None,
+                 camera_width=None,
+                 camera_height=None,
                  ):
         self.object_pool = object_pool
         self.map = map
@@ -241,8 +241,11 @@ class ConsoleBuffer(object):
 
     def render_all_objects(self):
         player = self.object_pool.get_player()
-
+        debug = True
         self.move_camera(player.coord)
+
+        if debug:
+            self.console.draw_str(0, 0, "{}/{}".format(self.camera_coord, player.coord))
 
         if self.fov_must_recompute():
             # recompute FOV if needed (the player moved or something)

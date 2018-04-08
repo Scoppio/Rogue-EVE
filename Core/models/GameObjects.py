@@ -158,9 +158,6 @@ class Vector2(object):
             logger.error("Length 0, cannot normalize.")
             return Vector2.zero()
 
-    def as_tuple(self):
-        return (self.X, self.Y)
-
     def normalize_copy(self):
         """Create a copy of this Vector, normalize it, and return it."""
         vec = self.copy()
@@ -588,22 +585,25 @@ class Fighter(object):
 
     @property
     def defense(self):
-        bonus = sum(equipment.defense_bonus for equipment in self.get_all_equipped_items())
+        bonus = sum(equipment.defense_bonus for equipment in self.get_equipped_items())
         return self.base_defense + bonus
 
     @property
     def power(self):
-        bonus = sum(equipment.power_bonus for equipment in self.get_all_equipped_items())
+        bonus = sum(equipment.power_bonus for equipment in self.get_equipped_items())
         return self.base_power + bonus
 
     @property
     def max_hp(self):
-        bonus = sum(equipment.max_hp_bonus for equipment in self.get_all_equipped_items())
+        bonus = sum(equipment.max_hp_bonus for equipment in self.get_equipped_items())
         return self.base_max_hp + bonus
 
-    def get_all_equipped_items(self):
+    def get_equipped_items(self, slot=None):
         if self.owner and "player" in self.owner.tags:
-            return [item for item in self.owner.get_inventory() if type(item) == Equipment and item.is_equipped]
+            items = [item for item in self.owner.get_inventory() if type(item) == Equipment and item.is_equipped]
+            if slot:
+                items = [item for item in items if item.slot == slot]
+            return items
         else:
             return []  # other objects have no equipment
 
@@ -875,11 +875,17 @@ class Item(GameObject):
         # add to the player's inventory and remove from the map
         if player.get_inventory() is not None:
             if len(player.get_inventory()) >= 26:
-                send_message('Your inventory is full, cannot pick up ' + self.name + '.', Colors.red)
+                try:
+                    send_message('Your inventory is full, cannot pick up ' + self.name + '.', Colors.red)
+                except Exception as e:
+                    logger.error("send_message() is not initialized yet", e)
             else:
                 self.context = player.context
                 player.get_inventory().append(self)
-                send_message('You picked up a ' + self.name + '!', Colors.green)
+                try:
+                    send_message('You picked up a ' + self.name + '!', Colors.green)
+                except Exception as e:
+                    logger.error("send_message() is not initialized yet", e)
                 return True
         return False
 
@@ -888,7 +894,11 @@ class Item(GameObject):
         self.context.object_pool.append(self)
         self.context.player.get_inventory().remove(self)
         self.context = None
+        self.player = None
         send_message('You droped ' + self.name + '!', Colors.yellow)
+
+    def get_name(self):
+        return self.name
 
     @staticmethod
     def load(yaml_file=None, hard_values=None, coord=Vector2.zero(), collision_handler=None):
@@ -969,16 +979,65 @@ class Equipment(Item):
         self.charges = charges
         self.slot = slot
 
-    def use(self):
-        # just call the "use_function" if it is defined
-        if self.use_function is None or self.charges <= 0:
-            send_message('There are no special properties on ' + self.name, color=Colors.azure)
+    def toggle_equip(self):
+        if self.is_equipped:
+            self.dequip()
         else:
-            if self.use_function(self, **self.extra_params) != 'cancelled' and self.context.player.get_inventory():
-                if self.charges != "infinite":
-                    if self.charges > 0:
-                        self.charges -= 1
-                        send_message("There are {} charges left on {}!".format(self.charges, self.name), color=Colors.azure)
+            self.equip()
+
+    def equip(self):
+        equipment = self.player.fighter.get_equipped_items(self.slot)
+        if equipment:
+            equipment[0].dequip()
+        self.is_equipped = True
+        send_message('Equipped ' + self.name + ' on ' + self.slot.value + '.', color=Colors.light_green)
+
+    def dequip(self):
+        if self.is_equipped:
+            self.is_equipped = False
+            send_message('Dequipped ' + self.name + ' from ' + self.slot.name + '.', color=Colors.light_yellow)
+
+    def pick_up(self, player):
+        if player.get_inventory() is not None:
+            if len(player.get_inventory()) >= 26:
+                send_message('Your inventory is full, cannot pick up ' + self.name + '.', Colors.red)
+            else:
+                self.context = player.context
+                player.get_inventory().append(self)
+                self.player = player
+                send_message('You picked up a ' + self.name + '!', Colors.green)
+                if not self.player.fighter.get_equipped_items(self.slot):
+                    self.equip()
+                return True
+        return False
+
+    def drop(self):
+        super(Equipment, self).drop()
+        self.dequip()
+
+    def get_name(self):
+        full_name = "{}".format(self.name)
+        if self.charges:
+            full_name = full_name + " - {} magic charges remaining".format(self.charges)
+        if self.is_equipped:
+            full_name = "[x] " + full_name
+        else:
+            full_name = "[] " + full_name
+        return full_name
+
+    def use(self):
+        if not self.is_equipped:
+            self.equip()
+        else:
+            # just call the "use_function" if it is defined
+            if self.use_function is None or self.charges <= 0:
+                send_message('There are no special properties on ' + self.name, color=Colors.azure)
+            else:
+                if self.use_function(self, **self.extra_params) != 'cancelled' and self.context.player.get_inventory():
+                    if self.charges != "infinite":
+                        if self.charges > 0:
+                            self.charges -= 1
+                            send_message("There are {} charges left on {}!".format(self.charges, self.name), color=Colors.azure)
 
     @staticmethod
     def load(yaml_file=None, hard_values=None, coord=Vector2.zero(), collision_handler=None):
@@ -1004,25 +1063,35 @@ class Equipment(Item):
                 logger.error("Could not find use_function {}".format(values["use_function"]))
                 use_function = UseFunctions.do_nothing
 
-        if "blocks" not in values.keys():
-            values["blocks"] = False
+        blocks = values["blocks"] if "blocks" in values.keys() else False
 
-        if "charges" not in values.keys():
-            values["charges"] = 0
+        charges = values["charges"] if "charges" in values.keys() else 0
 
-        if "extra_params" in values.keys() and "status_effect" in values["extra_params"].keys():
-            if values["extra_params"]["status_effect"] in [a for a in dir(StatusEffects) if "__" not in a]:
-                values["extra_params"]["status_effect"] = eval("StatusEffects." +  values["extra_params"]["status_effect"])
+        slot = [slot for slot in EEquipmentSlot if slot.value == values["slot"]]
+
+        power = values["power"] if "power" in values.keys() else 0
+        defense = values["defense"] if "defense" in values.keys() else 0
+        max_hp = values["max_hp"] if "max_hp" in values.keys() else 0
+
+        if "extra_params" in values.keys():
+            if "status_effect" in values["extra_params"].keys():
+                if values["extra_params"]["status_effect"] in [a for a in dir(StatusEffects) if "__" not in a]:
+                    values["extra_params"]["status_effect"] = eval("StatusEffects." + values["extra_params"]["status_effect"])
+        else:
+            values["extra_params"] = None
 
         return Equipment(
             coord=coord,
             char=values["char"],
             color=color,
             name=values["name"],
-            blocks=values["blocks"],
+            blocks=blocks,
             tags=values["tags"],
             use_function=use_function,
-            slot=EEquipmentSlot(values["slot"]),
-            charges=values["charges"],
-            extra_params=values["extra_params"]
+            slot=slot[0],
+            charges=charges,
+            extra_params=values["extra_params"],
+            power_bonus=power,
+            defense_bonus=defense,
+            max_hp_bonus=max_hp
         )

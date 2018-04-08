@@ -8,15 +8,20 @@ class EMessage(Enum):
     MONSTERS_LEVEL_UP = 4
 
 
-class EEquipmentSlot(Enum):
-    ARMOR = 0
-    HELMET = 1
-    LEFT_HAND = 2
-    RIGHT_HAND = 3
-    LEGS = 4
-    BOOTS = 5
-    AMULET = 6
-    RING = 7
+class NoValue(Enum):
+    def __repr__(self):
+        return '<%s.%s>' % (self.__class__.__name__, self.name)
+
+
+class EEquipmentSlot(NoValue):
+    ARMOR = "armor"
+    HELMET = "helmet"
+    LEFT_HAND = "left hand"
+    RIGHT_HAND = "right hand"
+    BOOTS = "boots"
+    AMULET = "amulet"
+    RING = "ring"
+
 
 class EGameState(Enum):
     LOADING = 0

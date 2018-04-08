@@ -13,11 +13,12 @@ items:
     params:
         char: "!"
         color: violet
-        name: healing potion
+        name: Healing Potion
         tags:
             - item
             - small
             - potion
+            - 0001
         use_function: cast_selfheal
         extra_params:
             heal_amount: 15
@@ -31,6 +32,7 @@ items:
             - item
             - small
             - magic
+            - 0002
         use_function: cast_lightning
         extra_params:
             range: 5
@@ -47,6 +49,7 @@ items:
             - item
             - small
             - magic
+            - 0003
         use_function: cast_confuse
         extra_params:
             range: 10
@@ -58,11 +61,12 @@ items:
     params:
         char: "#"
         color: dark_red
-        name: fireball scroll
+        name: Fireball Scroll
         tags:
             - item
             - small
             - magic
+            - ICFBS01
         use_function: cast_fireball
         extra_params:
             range: 10
@@ -80,6 +84,7 @@ items:
             - item
             - small
             - magic
+            - 0005
         use_function: custom_magic
         extra_params:
             range: 10
@@ -89,6 +94,84 @@ items:
             target_mode: ranged
             target_tag: mortal
     weight: 3.0
+  - type: Equipment
+    params:
+        char: ")"
+        color: light_blue
+        name: Short Sword
+        power: 2
+        max_hp: 0
+        defense: 0
+        slot: right hand
+        tags:
+            - item
+            - small
+            - sword
+            - 0007
+        use_function: do_nothing
+        extra_params:
+            target_tag: mortal
+    weight: 1.0
+  - type: Equipment
+    params:
+        char: "["
+        color: light_blue
+        name: Buckle
+        power: 0
+        max_hp: 0
+        defense: 5
+        slot: left hand
+        tags:
+            - item
+            - small
+            - shield
+            - 0008
+        use_function: do_nothing
+        extra_params:
+            target_tag: mortal
+    weight: 1.0
+  - type: Equipment
+    params:
+        char: "&"
+        color: light_blue
+        name: Gibbon
+        power: 0
+        max_hp: 10
+        defense: 3
+        slot: armor
+        tags:
+            - item
+            - small
+            - armor
+            - 0009
+        use_function: do_nothing
+        extra_params:
+            target_tag: mortal
+    weight: 1.0
+  - type: Equipment
+    params:
+        char: "I"
+        color: light_blue
+        name: Magic Staff
+        power: 3
+        max_hp: 5
+        defense: 1
+        charges: 10
+        slot: right hand
+        tags:
+            - item
+            - small
+            - staff
+            - magic
+            - 0010
+        use_function: custom_magic
+        extra_params:
+            range: 10
+            damage: 5
+            flavor_text: "The {target} scream in pain as the magic light sears its skin!"
+            target_mode: closest
+            target_tag: monster
+    weight: 1.0
 monsters:
   - type: Character
     params:

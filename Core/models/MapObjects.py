@@ -659,13 +659,28 @@ class MapObjectsConstructor(object):
             assert False, "List is empty"
 
     def _populate_room(self, room):
-        self._place_object(room, self.max_items_per_room, "item", 2)
-        self._place_object(room, self.max_monsters_per_room, "monster", 1)
+        self._place_object(room, self.max_items_per_room, "item", 1)
+        self._place_object(room, self.max_monsters_per_room, "monster", 2)
 
     def _populate_last_room(self, room):
         self._place_object(room, 1, "stairs", 1, mandatory=True)
         self._place_object(room, self.max_items_per_room, "item", 1)
         self._place_object(room, self.max_monsters_per_room, "monster", 2)
+
+    def give_item_for_player(self, item_tag):
+        try:
+            prototype = self._get_random_object_template(item_tag)
+            prototype.coord = Vector2.zero()
+            prototype.z_index = 1
+            prototype.collision_handler = self.collision_handler
+            self.object_pool.append(prototype)
+            player = self.object_pool.player
+            prototype.pick_up(player)
+        except Exception as e:
+            logger.warning("Could not find any item with tag " + item_tag)
+
+        return MapObjectsConstructor(object_templates=self.object_templates, max_items_per_room=self.max_items_per_room,
+                                 max_monster_per_room=self.max_monsters_per_room, game_instance=self.game_instance)
 
     def _place_object(self, room, max_objects, tag, z_index, mandatory=False):
 
@@ -684,7 +699,7 @@ class MapObjectsConstructor(object):
                             positions.append(Vector2(x + room.x1,y + room.y1))
                 tries = 3
                 coord = choice(positions)
-                while(tries or mandatory):
+                while tries or mandatory:
                     if not self.collision_handler.is_blocked(coord.X, coord.Y):
                         print("monster placed", room, coord, tries)
                         break
