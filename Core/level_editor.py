@@ -4,7 +4,8 @@ import tdl
 import random
 import argparse
 from models.MapObjects import Tile
-from models.GameObjects import GameObject, Vector2
+from models.GameObjects import GameObject
+from models.GenericObjects import Vector2
 from models.EnumStatus import Cardinals
 from utils import Colors
 from slugify import slugify

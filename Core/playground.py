@@ -1,8 +1,7 @@
 import os
-from models.EnumStatus import EMessage
+from utils import Colors
+colors = [color for color in dir(Colors) if "__" not in color]
 
-a = {}
-a[EMessage.GAIN_XP] = 100
-
-if EMessage.GAIN_XP in a.keys():
-    print("gain xp", a[EMessage.GAIN_XP])
+print(
+    colors
+)

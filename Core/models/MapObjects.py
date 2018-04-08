@@ -4,7 +4,8 @@ import yaml
 import os
 from models import GameObjects
 from models.EnumStatus import MapTypes, Cardinals
-from models.GameObjects import DrawableObject, Vector2
+from models.GameObjects import DrawableObject
+from models.GenericObjects import Vector2
 import logging
 
 logger = logging.getLogger('Rogue-EVE')

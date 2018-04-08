@@ -3,7 +3,7 @@ from utils import Colors
 import logging
 import textwrap
 from models.EnumStatus import EGameState
-from models.GameObjects import Vector2
+from models.GenericObjects import Vector2
 from managers import Messenger
 
 logger = logging.getLogger('Rogue-EVE')
@@ -207,7 +207,7 @@ class ConsoleBuffer(object):
             y += 1
 
         if self.mouse_controller:
-            self.console.draw_str(1, 0, self.mouse_controller.get_names_under_mouse(self.camera_coord), bg=None, fg=Colors.light_gray)
+            self.console.draw_str(1, 0, self.mouse_controller.get_names_under_mouse(), bg=None, fg=Colors.light_gray)
 
         # blit the contents of "panel" to the root console
         self.root.blit(self.console, self.origin.X, self.origin.Y, self.width, self.height, self.target.X,

@@ -174,43 +174,480 @@ items:
     weight: 1.0
 monsters:
   - type: Character
+    weight: 1.0
     params:
-        char: o
-        color: dark_fuchsia
-        name: orc
+        char: U
+        color: dark_pink
+        name: Orc wizard
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 40
+            defense: 2
+            power: 5
+            xp: 50
+            death_function: monster_death
+        tags:
+            - monster
+            - weird
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: k
+        color: lightest_grey
+        name: Orc ranger
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 41
+            defense: 0
+            power: 3
+            xp: 41
+            death_function: monster_death
+        tags:
+            - monster
+            - weird
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: s
+        color: dark_flame
+        name: Purple lich ranger
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 37
+            defense: 0
+            power: 4
+            xp: 37
+            death_function: monster_death
+        tags:
+            - monster
+            - fantastical
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: q
+        color: dark_purple
+        name: Kobold wizard
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 11
+            defense: 1
+            power: 5
+            xp: 16
+            death_function: monster_death
+        tags:
+            - monster
+            - ghostly
+            - small
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: q
+        color: dark_flame
+        name: Evil lich soldier
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 34
+            defense: 1
+            power: 3
+            xp: 37
+            death_function: monster_death
+        tags:
+            - monster
+            - ghostly
+            - large
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: U
+        color: light_crimson
+        name: Blue zombie
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 41
+            defense: 3
+            power: 4
+            xp: 53
+            death_function: monster_death
+        tags:
+            - monster
+            - fantastical
+            - small
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: t
+        color: darker_amber
+        name: Purple gnome
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 26
+            defense: 3
+            power: 5
+            xp: 41
+            death_function: monster_death
+        tags:
+            - monster
+            - ghostly
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: u
+        color: dark_pink
+        name: Sage lich from hell
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 26
+            defense: 0
+            power: 5
+            xp: 26
+            death_function: monster_death
+        tags:
+            - monster
+            - brute
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: K
+        color: lightest_yellow
+        name: Orc assassin
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 33
+            defense: 0
+            power: 3
+            xp: 33
+            death_function: monster_death
+        tags:
+            - monster
+            - constructo
+            - small
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: h
+        color: dark_gray
+        name: Angry slime
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 30
+            defense: 3
+            power: 4
+            xp: 42
+            death_function: monster_death
+        tags:
+            - monster
+            - bloat
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: z
+        color: lightest_crimson
+        name: Ravaging zombie
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 25
+            defense: 1
+            power: 3
+            xp: 28
+            death_function: monster_death
+        tags:
+            - monster
+            - constructo
+            - large
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: h
+        color: orange
+        name: Skeleton mage
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 16
+            defense: 2
+            power: 4
+            xp: 24
+            death_function: monster_death
+        tags:
+            - monster
+            - bloat
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: D
+        color: darker_green
+        name: Orc ranger
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 12
+            defense: 0
+            power: 5
+            xp: 12
+            death_function: monster_death
+        tags:
+            - monster
+            - weird
+            - large
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: E
+        color: lighter_violet
+        name: Purple zombie
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 21
+            defense: 1
+            power: 3
+            xp: 24
+            death_function: monster_death
+        tags:
+            - monster
+            - undead
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: s
+        color: light_lime
+        name: Kobold wizard
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 18
+            defense: 2
+            power: 5
+            xp: 28
+            death_function: monster_death
+        tags:
+            - monster
+            - alien
+            - large
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: v
+        color: lightest_sepia
+        name: Skeleton ranger
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 21
+            defense: 1
+            power: 5
+            xp: 26
+            death_function: monster_death
+        tags:
+            - monster
+            - undead
+            - large
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: R
+        color: peach
+        name: Kobold berserker
         ai:
             interest_tag: player
         fighter:
             hp: 10
             defense: 0
-            power: 5
-            xp: 25
+            power: 4
+            xp: 10
             death_function: monster_death
         tags:
             - monster
-            - orc
+            - constructo
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: b
+        color: dark_blue
+        name: Kobold ranger
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 31
+            defense: 0
+            power: 4
+            xp: 31
+            death_function: monster_death
+        tags:
+            - monster
+            - undead
             - small
             - mortal
-    weight: 5.0
   - type: Character
+    weight: 1.0
     params:
-        char: T
-        color: dark_blue
-        name: Troll
+        char: C
+        color: desaturated_red
+        name: Red zombie
         ai:
-           interest_tag: player
+            interest_tag: player
         fighter:
-            hp: 25
-            defense: 1
-            power: 5
-            xp: 75
+            hp: 41
+            defense: 2
+            power: 3
+            xp: 47
             death_function: monster_death
         tags:
             - monster
-            - troll
-            - big
+            - undead
+            - small
             - mortal
+  - type: Character
     weight: 1.0
+    params:
+        char: e
+        color: desaturated_yellow
+        name: Sage zombie
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 36
+            defense: 0
+            power: 5
+            xp: 36
+            death_function: monster_death
+        tags:
+            - monster
+            - brute
+            - large
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: W
+        color: darkest_pink
+        name: Ravaging gnome
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 11
+            defense: 0
+            power: 3
+            xp: 11
+            death_function: monster_death
+        tags:
+            - monster
+            - undead
+            - large
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: a
+        color: dark_magenta
+        name: Angry gnome
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 33
+            defense: 2
+            power: 3
+            xp: 39
+            death_function: monster_death
+        tags:
+            - monster
+            - fantastical
+            - large
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: a
+        color: dark_grey
+        name: Kobold assassin
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 41
+            defense: 2
+            power: 4
+            xp: 49
+            death_function: monster_death
+        tags:
+            - monster
+            - robot
+            - large
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: A
+        color: peach
+        name: Angry slime
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 44
+            defense: 2
+            power: 3
+            xp: 50
+            death_function: monster_death
+        tags:
+            - monster
+            - ghostly
+            - medium
+            - mortal
+  - type: Character
+    weight: 1.0
+    params:
+        char: G
+        color: darkest_magenta
+        name: Orc soldier
+        ai:
+            interest_tag: player
+        fighter:
+            hp: 22
+            defense: 1
+            power: 5
+            xp: 27
+            death_function: monster_death
+        tags:
+            - monster
+            - weird
+            - medium
+            - mortal
 mandatory:
   - type: GameObject
     params:

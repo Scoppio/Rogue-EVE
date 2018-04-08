@@ -1,4 +1,5 @@
 import logging
+from models.GenericObjects import Vector2
 
 logger = logging.getLogger('Rogue-EVE')
 
@@ -11,6 +12,7 @@ class MouseController(object):
         self.mouse_coord = (0, 0)
         self.map = map
         self.object_pool = object_pool
+        self.camera = None
 
     def set_map(self, map):
         self.map = map
@@ -25,10 +27,9 @@ class MouseController(object):
         self.mouse_coord = new_coord
         logger.debug("mouse position {}".format(self.mouse_coord))
 
-    def get_names_under_mouse(self, camera_pos):
+    def get_names_under_mouse(self):
         # return a string with the names of all objects under the mouse
-        (x, y) = self.get_mouse_coord()
-        (x, y) = camera_pos.X + x, camera_pos.Y + y
+        (x, y) = self.camera.camera_coord + Vector2(*self.mouse_coord)
         # create a list with the names of all objects at the mouse's coordinates and in FOV
         objects = self.object_pool.get_objects_as_list()
         names = ""

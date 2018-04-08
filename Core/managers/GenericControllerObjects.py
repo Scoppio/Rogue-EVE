@@ -1,7 +1,8 @@
 import tdl
 import logging
 from models.EnumStatus import EGameState, EAction, EMessage
-from models.GameObjects import Vector2, Item, Equipment
+from models.GameObjects import Item, Equipment
+from models.GenericObjects import Vector2
 from managers import InputPeripherals, ObjectManager, Messenger
 from utils import Colors
 
@@ -9,8 +10,8 @@ logger = logging.getLogger('Rogue-EVE')
 
 
 class GameContext(object):
-    def __init__(self, next_level, object_pool = None, mouse_controller = None, map = None, game_state=None, real_time=False,
-                 menu=None, camera=None, lower_gui_renderer=None):
+    def __init__(self, next_level, object_pool = None, mouse_controller = None, map = None, game_state=None,
+                 real_time=False, menu=None, camera=None, lower_gui_renderer=None):
         self.object_pool = object_pool
         self.mouse_controller = mouse_controller
         self.map = map
@@ -102,6 +103,7 @@ class GameContext(object):
 
     def _set_mouse_controller(self):
         self.mouse_controller = InputPeripherals.MouseController(map=self.map, object_pool=self.object_pool)
+        self.mouse_controller.camera = self.camera
         logger.info("Mouse is set up")
 
     def _set_collision_handler(self):
@@ -345,3 +347,8 @@ class GameContext(object):
                     if Vector2.distance(obj.coord, coord) <= radius:
                         ret.append(obj)
         return ret
+
+    def set_camera(self, camera):
+        self.camera = camera
+        if self.mouse_controller:
+            self.mouse_controller.camera = self.camera

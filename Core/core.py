@@ -9,7 +9,8 @@ from pathlib import Path
 from utils import Colors
 from managers import ObjectManager, ObjectPool, Messenger
 from managers.GenericControllerObjects import GameContext
-from models.GameObjects import Character, Vector2
+from models.GameObjects import Character
+from models.GenericObjects import Vector2
 from models.EnumStatus import EGameState, EAction, MapTypes, EMessage
 from models.MapObjects import MapConstructor, MapObjectsConstructor
 
@@ -235,7 +236,7 @@ def next_level():
         1, 6, 'DUNGEON LEVEL', game_context.get_extra("dungeon_level"), Colors.yellow, None
     )
 
-    game_context.camera = viewport
+    game_context.set_camera(viewport)
     game_context.lower_gui_renderer = lower_gui_renderer
     Messenger.broadcast_message("game-controller", {EMessage.MONSTERS_LEVEL_UP: None})
 
@@ -323,7 +324,7 @@ def new_game():
     Messenger.send_message('Welcome stranger! Prepare to perish in the Tombs of the Ancient Kings.', Colors.red)
 
     game_context.game_state.set_state(EGameState.PLAYING)
-    game_context.camera = viewport
+    game_context.set_camera(viewport)
     game_context.lower_gui_renderer = lower_gui_renderer
     Messenger.broadcast_message("game-controller", {EMessage.MONSTERS_LEVEL_UP: None})
     return game_context
@@ -469,7 +470,8 @@ def load():
         1, 3, BAR_WIDTH, 'XP', 'xp', 'level_up_xp', game_context.player.fighter, Colors.light_blue, Colors.darker_blue
     )
     game_context.game_state.set_state(EGameState.PLAYING)
-    game_context.camera = viewport
+
+    game_context.set_camera(viewport)
     game_context.lower_gui_renderer = lower_gui_renderer
     Messenger.broadcast_message("game-controller", {EMessage.MONSTERS_LEVEL_UP: None})
 
